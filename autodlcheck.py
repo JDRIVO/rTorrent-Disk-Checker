@@ -249,7 +249,7 @@ if enable_disk_check:
                         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
 
                         for date, label, tracker, filesize, ratio, path, torrent in completed:
-                                torrents[datetime.utcfromtimestamp(date)] = urllib.unquote(label), tracker, filesize / 1073741824.0, ratio / 1000.0, path, tuple([torrent])
+                                torrents[datetime.utcfromtimestamp(date)] = label, tracker, filesize, ratio, path, torrent
 
                 if not fallback:
 
@@ -265,10 +265,6 @@ if enable_disk_check:
                         age = (datetime.now() - oldest_torrent).days
                         label = torrents[oldest_torrent][0]
                         tracker = torrents[oldest_torrent][1]
-                        filesize = torrents[oldest_torrent][2]
-                        ratio = torrents[oldest_torrent][3]
-                        path = torrents[oldest_torrent][4]
-                        torrent = torrents[oldest_torrent][5]
 
                         if exclude_unlabelled:
 
@@ -281,6 +277,7 @@ if enable_disk_check:
                                         continue
 
                         if labels:
+                                label = urllib.unquote(label)
 
                                 if label in labels:
 
@@ -338,6 +335,11 @@ if enable_disk_check:
 
                                         continue
 
+                        filesize = torrents[oldest_torrent][2] / 1073741824.0
+                        ratio = torrents[oldest_torrent][3] / 1000.0
+                        path = torrents[oldest_torrent][4]
+                        torrent = torrents[oldest_torrent][5]
+
                         if filesize < min_filesize or age < min_age or ratio < min_ratio:
 
                                 if fb_age is not no and filesize >= min_filesize and age >= fb_age:
@@ -367,7 +369,7 @@ if enable_disk_check:
                 else:
                         os.remove(path)
 
-                xmlrpc('d.erase', torrent)
+                xmlrpc('d.erase', tuple([torrent]))
 
                 if not fallback:
                         del torrents[oldest_torrent]
