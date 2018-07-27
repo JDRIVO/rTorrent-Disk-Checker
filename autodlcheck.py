@@ -249,11 +249,7 @@ if enable_disk_check:
                         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
 
                         for date, label, tracker, filesize, ratio, path, torrent in completed:
-                                date = datetime.utcfromtimestamp(date)
-                                label = urllib.unquote(label)
-                                filesize /= 1073741824.0
-                                ratio /= 1000.0
-                                torrents[date] = label, tracker, filesize, ratio, path, tuple([torrent])
+                                torrents[datetime.utcfromtimestamp(date)] = urllib.unquote(label), tracker, filesize / 1073741824.0, ratio / 1000.0, path, tuple([torrent])
 
                 if not fallback:
 
