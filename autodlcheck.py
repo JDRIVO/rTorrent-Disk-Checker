@@ -262,9 +262,6 @@ if enable_disk_check:
                                 fb_ratio = fallback_ratio
 
                         oldest_torrent = min(torrents)
-                        age = (datetime.now() - oldest_torrent).days
-                        label = torrents[oldest_torrent][0]
-                        tracker = torrents[oldest_torrent][1]
 
                         if exclude_unlabelled:
 
@@ -277,7 +274,7 @@ if enable_disk_check:
                                         continue
 
                         if labels:
-                                label = urllib.unquote(label)
+                                label = urllib.unquote(torrents[oldest_torrent][0])
 
                                 if label in labels:
 
@@ -306,6 +303,7 @@ if enable_disk_check:
                                         continue
 
                         if trackers and not override:
+                                tracker = torrents[oldest_torrent][1]
                                 rule = [rule for rule in trackers for url in tracker if rule in url[0]]
 
                                 if rule:
@@ -335,6 +333,7 @@ if enable_disk_check:
 
                                         continue
 
+                        age = (datetime.now() - oldest_torrent).days
                         filesize = torrents[oldest_torrent][2] / 1073741824.0
                         ratio = torrents[oldest_torrent][3] / 1000.0
                         path = torrents[oldest_torrent][4]
