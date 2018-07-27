@@ -254,10 +254,9 @@ if enable_disk_check:
                                 torrent = tuple([torrent])
                                 date = datetime.utcfromtimestamp(date)
                                 label = urllib.unquote(label)
-                                tracker = xmlrpc('t.multicall', (torrent[0], '', 't.url='))
                                 filesize /= 1073741824.0
                                 ratio /= 1000.0
-                                torrents[date] = label, tracker, filesize, ratio, path, torrent
+                                torrents[date] = label, filesize, ratio, path, torrent
 
                 if not fallback:
 
@@ -272,11 +271,10 @@ if enable_disk_check:
                         oldest_torrent = min(torrents)
                         age = (datetime.now() - oldest_torrent).days
                         label = torrents[oldest_torrent][0]
-                        tracker = torrents[oldest_torrent][1]
-                        filesize = torrents[oldest_torrent][2]
-                        ratio = torrents[oldest_torrent][3]
-                        path = torrents[oldest_torrent][4]
-                        torrent = torrents[oldest_torrent][5]
+                        filesize = torrents[oldest_torrent][1]
+                        ratio = torrents[oldest_torrent][2]
+                        path = torrents[oldest_torrent][3]
+                        torrent = torrents[oldest_torrent][4]
 
                         if exclude_unlabelled:
 
@@ -317,6 +315,7 @@ if enable_disk_check:
                                         continue
 
                         if trackers and not override:
+                                tracker = xmlrpc('t.multicall', (torrent[0], '', 't.url='))
                                 rule = [rule for rule in trackers for url in tracker if rule in url[0]]
 
                                 if rule:
