@@ -256,15 +256,13 @@ if enable_disk_check:
                                 fb_age = fallback_age
                                 fb_ratio = fallback_ratio
 
-                        if exclude_unlabelled:
+                        if exclude_unlabelled and not label:
+                                del torrents[oldest_torrent]
 
-                                if not label:
-                                        del torrents[oldest_torrent]
+                                if not torrents and not fallback_torrents:
+                                        break
 
-                                        if not torrents and not fallback_torrents:
-                                                break
-
-                                        continue
+                                continue
 
                         if labels:
                                 label = urllib.unquote(torrents[oldest_torrent][0])
