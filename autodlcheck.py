@@ -246,6 +246,7 @@ if enable_disk_check:
                                 torrents[datetime.utcfromtimestamp(date)] = label, tracker, filesize, ratio, path, torrent
 
                 if not fallback:
+                        oldest_torrent = min(torrents)
 
                         if override:
                                 override = False
@@ -254,8 +255,6 @@ if enable_disk_check:
                                 min_ratio = minimum_ratio
                                 fb_age = fallback_age
                                 fb_ratio = fallback_ratio
-
-                        oldest_torrent = min(torrents)
 
                         if exclude_unlabelled:
 
