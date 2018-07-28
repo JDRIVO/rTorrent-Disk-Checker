@@ -259,7 +259,6 @@ if enable_disk_check:
                                 fb_ratio = fallback_ratio
 
                         if exclude_unlabelled and not label:
-
                                 del torrents[oldest_torrent]
 
                                 if not torrents and not fallback_torrents:
