@@ -215,7 +215,7 @@ if torrent_label in imdb:
 
 if enable_disk_check:
         torrent_size /= 1073741824.0
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.hash='))
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         required_space = torrent_size + buffer
         min_filesize = minimum_filesize
@@ -230,12 +230,8 @@ if enable_disk_check:
 
         if downloading:
 
-                for torrent in downloading:
-                        progress = xmlrpc('d.down.total', tuple(torrent))
-
-                        if progress is 0:
-                                available_space -= float(open('autodlcheck.txt').readline())
-                                break
+                if [0] in downloading:
+                        available_space -= float(open('autodlcheck.txt').readline())
 
         with open('autodlcheck.txt', 'w+') as textfile:
                 textfile.write(str(torrent_size))
