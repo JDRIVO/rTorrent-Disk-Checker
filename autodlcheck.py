@@ -198,7 +198,6 @@ def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
                         print 'exit'
                         quit()
 
-
 def xmlrpc(methodname, params):
         xmlreq = xmlrpclib.dumps(params, methodname)
         xmlresp = SCGIRequest(host).send(xmlreq)
