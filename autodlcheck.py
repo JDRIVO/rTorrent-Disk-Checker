@@ -22,8 +22,11 @@ enable_disk_check = yes
 host = 'scgi://127.0.0.1:5000'
 disk = os.statvfs('/')
 
-# The minimum amount of free space (in Gigabytes) to maintain
-minimum_space = 5
+# The amount of space (in Gigabytes) to be freed on top of the size of the torrent
+buffer = 5
+
+# The available space (in Gigabytes) required to trigger the script to free space for the pending torrent + buffer
+trigger = 5
 
 # General Rules
 
@@ -218,6 +221,7 @@ if enable_disk_check:
         torrent_size /= 1073741824.0
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        required_space = torrent_size + buffer
         min_filesize = minimum_filesize
         min_age = minimum_age
         min_ratio = minimum_ratio
@@ -238,7 +242,10 @@ if enable_disk_check:
         with open('autodlcheck.txt', 'w+') as textfile:
                 textfile.write(str(torrent_size))
 
-        while available_space < (minimum_space and torrent_size):
+        if available_space >= required_space and available_space <= trigger:
+                available_space = 0
+
+        while available_space < required_space:
 
                 if not torrents and not fallback and fallback_torrents:
                         fallback = True
