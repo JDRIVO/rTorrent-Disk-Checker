@@ -238,7 +238,7 @@ if enable_disk_check:
         with open('autodlcheck.txt', 'w+') as textfile:
                 textfile.write(str(torrent_size))
 
-        while available_space < (torrent_size and minimum_space):
+        while available_space < (minimum_space and torrent_size):
 
                 if not torrents and not fallback and fallback_torrents:
                         fallback = True
