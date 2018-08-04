@@ -373,7 +373,7 @@ if enable_disk_check:
                 else:
                         del fallback_torrents[oldest_torrent]
 
-                available_space += filesize
+                zero += filesize
 
                 if not torrents and not fallback_torrents:
                         break
