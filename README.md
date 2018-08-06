@@ -7,7 +7,7 @@
 **2**. It can check the IMDB ratings/votes of a movie. The script will prevent autodl-irssi from sending a torrent to rTorrent if the IMDB rating/votes don't meet your minimum requirements.
 
 
-# Installation Instructions After Downloading [autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py)
+# Configuration Instructions After Downloading [autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py)
 
 ####  1. MatchedRealease.pm Modification
 
