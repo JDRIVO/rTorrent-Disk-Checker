@@ -377,7 +377,7 @@ if enable_disk_check:
                         break
 
 print ''
-print "Script Executed in " + str(datetime.now() - startTime) + " Seconds"
-print str(count) + " Torrents Deleted"
+print "Script Executed in", datetime.now() - startTime, "Seconds"
+print count, "Torrents Deleted"
 calc = available_space + zero - torrent_size
 print "%.2f GB Free Space After Torrent Download" % (calc)
