@@ -363,7 +363,7 @@ if enable_disk_check:
                         label = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
-                print "TL:", label, "TN:", name
+                print "DLed:", oldest_torrent, "TL:", label, "TN:", name
 
                 if not fallback:
                         del torrents[oldest_torrent]
