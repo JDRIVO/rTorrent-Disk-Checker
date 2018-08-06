@@ -342,10 +342,10 @@ if enable_disk_check:
                         if filesize < min_filesize or age < min_age or ratio < min_ratio:
 
                                 if fb_age is not no and filesize >= min_filesize and age >= fb_age:
-                                        fallback_torrents[oldest_torrent] = name, torrent, filesize
+                                        fallback_torrents[oldest_torrent] = name, label, filesize
 
                                 elif fb_ratio is not no and filesize >= min_filesize and ratio >= fb_ratio:
-                                        fallback_torrents[oldest_torrent] = name, torrent, filesize
+                                        fallback_torrents[oldest_torrent] = name, label, filesize
 
                                 del torrents[oldest_torrent]
 
@@ -360,7 +360,7 @@ if enable_disk_check:
                 else:
                         oldest_torrent = min(fallback_torrents)
                         name = fallback_torrents[oldest_torrent][0]
-                        torrent = fallback_torrents[oldest_torrent][1]
+                        label = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
                 print "TL:", label, "TN:", name
