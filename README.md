@@ -33,7 +33,7 @@
 
 #### 3. Python Module Installations Required for IMDB Function - Skip if Unused
 
-**3a**. Enter the following commands in your terminal to install [parse-torrent-name](https://github.com/divijbindlish/parse-torrent-name) and [ImdbPie](https://github.com/richardARPANET/imdb-pie)
+**3a**. Enter the following commands in your terminal to install [parse-torrent-name](https://github.com/divijbindlish/parse-torrent-name) and [ImdbPie](https://github.com/richardARPANET/imdb-pie):
 
 `pip install parse-torrent-name`
 
@@ -56,6 +56,3 @@ Enter the following command in your terminal to run it:
 `python testscript.py 69`
 
 **69** = torrent size in gigabytes
-
-
-
