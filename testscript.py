@@ -206,9 +206,9 @@ def xmlrpc(methodname, params):
         xmlresp = SCGIRequest(host).send(xmlreq)
         return xmlrpclib.loads(xmlresp)[0][0]
 
-torrent_name = str(sys.argv[1])
-torrent_label = str(sys.argv[2])
-torrent_size = int(sys.argv[3])
+torrent_name = None
+torrent_label = None
+torrent_size = int(sys.argv[1])
 
 if torrent_label in imdb:
         minimum_rating = imdb[torrent_label][0]
@@ -217,7 +217,6 @@ if torrent_label in imdb:
         imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if enable_disk_check:
-        torrent_size /= 1073741824.0
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         min_filesize = minimum_filesize
@@ -376,3 +375,5 @@ if enable_disk_check:
                         break
 
 print datetime.now() - startTime
+calc = available_space + zero - torrent_size
+print "%.2f GB Free Space After Torrent Download" % (calc)
