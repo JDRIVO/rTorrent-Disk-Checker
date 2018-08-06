@@ -70,7 +70,7 @@ trackers_only = yes
 # exclude: exclude label
 
 # Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-labels = {}
+labels = {'':['']}
 
 # Example
 #labels = {
