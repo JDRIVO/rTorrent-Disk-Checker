@@ -1,4 +1,4 @@
-# Script Explaination
+# Script Explanation
 
 #### This script is capable of the following functions prior to autodl-irssi sending a torrent to rTorrent.
 
