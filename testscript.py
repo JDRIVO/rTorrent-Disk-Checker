@@ -240,6 +240,7 @@ if enable_disk_check:
                 textfile.write(str(torrent_size))
 
         zero = 0
+        count = 0
         required_space = torrent_size - (available_space - minimum_space)
 
         while zero < required_space:
@@ -248,10 +249,10 @@ if enable_disk_check:
                         fallback = True
 
                 if not torrents and not fallback:
-                        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
+                        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.name=', 'd.hash='))
 
-                        for date, label, tracker, filesize, ratio, path, torrent in completed:
-                                torrents[datetime.utcfromtimestamp(date)] = label, tracker, filesize, ratio, path, torrent
+                        for date, label, tracker, filesize, ratio, name, torrent in completed:
+                                torrents[datetime.utcfromtimestamp(date)] = label, tracker, filesize, ratio, name, torrent
 
                 if not fallback:
                         oldest_torrent = min(torrents)
@@ -335,16 +336,16 @@ if enable_disk_check:
                         age = (datetime.now() - oldest_torrent).days
                         filesize = torrents[oldest_torrent][2] / 1073741824.0
                         ratio = torrents[oldest_torrent][3] / 1000.0
-                        path = torrents[oldest_torrent][4]
+                        name = torrents[oldest_torrent][4]
                         torrent = torrents[oldest_torrent][5]
 
                         if filesize < min_filesize or age < min_age or ratio < min_ratio:
 
                                 if fb_age is not no and filesize >= min_filesize and age >= fb_age:
-                                        fallback_torrents[oldest_torrent] = path, torrent, filesize
+                                        fallback_torrents[oldest_torrent] = name, torrent, filesize
 
                                 elif fb_ratio is not no and filesize >= min_filesize and ratio >= fb_ratio:
-                                        fallback_torrents[oldest_torrent] = path, torrent, filesize
+                                        fallback_torrents[oldest_torrent] = name, torrent, filesize
 
                                 del torrents[oldest_torrent]
 
@@ -358,11 +359,11 @@ if enable_disk_check:
                                 continue
                 else:
                         oldest_torrent = min(fallback_torrents)
-                        path = fallback_torrents[oldest_torrent][0]
+                        name = fallback_torrents[oldest_torrent][0]
                         torrent = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
-                print path
+                print "TL: " + label + " TN: " + name
 
                 if not fallback:
                         del torrents[oldest_torrent]
@@ -370,10 +371,12 @@ if enable_disk_check:
                         del fallback_torrents[oldest_torrent]
 
                 zero += filesize
+                count += 1
 
                 if not torrents and not fallback_torrents:
                         break
 
 print datetime.now() - startTime
+print str(count) + " torrents deleted"
 calc = available_space + zero - torrent_size
 print "%.2f GB Free Space After Torrent Download" % (calc)
