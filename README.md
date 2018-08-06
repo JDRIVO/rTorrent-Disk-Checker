@@ -16,7 +16,13 @@
 
 `find /home/$USER -name MatchedRelease.pm`
 
-**1b**. Add the code from [this link](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/MatchedRelease.pm) to line 629 of [MatchedRelease.pm](https://github.com/autodl-community/autodl-irssi/blob/35957c4258a28d467974c93155a0a1e9a2b599a4/AutodlIrssi/MatchedRelease.pm#L629) ensuring you update the path to autodlcheck.py 
+**1b**. Add the code from [this link](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/MatchedRelease.pm) to line 629 of [MatchedRelease.pm](https://github.com/autodl-community/autodl-irssi/blob/35957c4258a28d467974c93155a0a1e9a2b599a4/AutodlIrssi/MatchedRelease.pm#L629) ensuring you update the path to autodlcheck.py
+
+**1c**. Restart autodl-irssi for the changes to take effect. Enter the following commands to achieve this:
+
+`pkill irssi`
+
+`screen -d -m irssi`
 
 #### 2. Disk Check Function Configuration: Setting SCGI Address/Port
 
@@ -25,12 +31,6 @@
 `find /home/$USER -name '.rtorrent.rc' -print | xargs grep 'network.scgi.open_port = ' /dev/null`
 
 **2b**. Update the host variable in line 22 of [autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py#L22) with your own SCGI address/port
-
-**2c**. Restart autodl-irssi for the changes to take effect. Enter the following commands to achieve this:
-
-`pkill irssi`
-
-`screen -d -m irssi`
 
 #### 3. Python Module Installations Required for IMDB Function - Skip if Unused
 
