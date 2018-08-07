@@ -49,12 +49,12 @@ To enable the script set the .torrent action in autodl-irssi to **rtorrent**.
 
 # [Test Script](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/testscript.py)
 
-#### This script will show you what torrents the script will delete without actually deleting torrents. 
+#### This script will show you what torrents the script will delete without actually deleting torrents.
+
+Results will outputted to your terminal and a text file named **testresult.txt**
 
 Enter the following command in your terminal to run it:
 
 `python testscript.py 69`
 
 **69** = torrent size in gigabytes
-
-Results will outputted to your terminal and a text file named **testresult.txt**
