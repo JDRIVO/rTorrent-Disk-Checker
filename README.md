@@ -56,3 +56,5 @@ Enter the following command in your terminal to run it:
 `python testscript.py 69`
 
 **69** = torrent size in gigabytes
+
+Results will outputted to your terminal and a text file named **testresult.txt**
