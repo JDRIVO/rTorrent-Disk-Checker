@@ -167,30 +167,6 @@ class SCGIRequest(object):
                 xmlresp = fresp.read()
                 return (xmlresp, headers)
 
-
-def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
-        imdb = Imdb()
-        torrent_info = PTN.parse(torrent_name)
-
-        try:
-                search = imdb.get_title_ratings(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])
-                rating = search['rating']
-                votes = search['ratingCount']
-        except:
-                return
-        else:
-                if rating < minimum_rating or votes < minimum_votes:
-                        print 'exit'
-                        quit()
-
-        if skip_foreign:
-                country = imdb.get_title_versions(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
-
-                if 'US' not in country:
-                        print 'exit'
-                        quit()
-
-
 def xmlrpc(methodname, params):
         xmlreq = xmlrpclib.dumps(params, methodname)
         xmlresp = SCGIRequest(host).send(xmlreq)
@@ -199,12 +175,6 @@ def xmlrpc(methodname, params):
 torrent_name = None
 torrent_label = None
 torrent_size = int(sys.argv[1])
-
-if torrent_label in imdb:
-        minimum_rating = imdb[torrent_label][0]
-        minimum_votes = imdb[torrent_label][1]
-        skip_foreign = imdb[torrent_label][2]
-        imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
