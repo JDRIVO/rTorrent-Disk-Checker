@@ -1,4 +1,4 @@
-print "DD = Download Date  TL = Torrent Label  TN = Torrent Name"
+print "DD = Download Date  TL = Torrent Label  TN = Torrent Name\n"
 
 import sys, os, shutil, cStringIO as StringIO
 import xmlrpclib, urllib, urlparse, socket, re
