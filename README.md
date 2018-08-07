@@ -29,7 +29,7 @@
 
 `find /home/$USER -name '.rtorrent.rc' -print | xargs grep 'network.scgi.open_port = ' /dev/null`
 
-**2b**. Update the host variable in line 22 of [autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py#L22) with your own SCGI address/port.
+**2b**. Update the host variable in [line 22 of autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py#L22) with your own SCGI address/port.
 
 #### 3. Python Module Installations Required for IMDB Function - Skip if Unused
 
