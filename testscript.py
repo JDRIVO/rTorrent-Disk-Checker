@@ -72,7 +72,7 @@ trackers_only = no
 # exclude: exclude label
 
 # Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-labels = {'':['']}
+labels = {True}
 
 # Example
 #labels = {
@@ -86,18 +86,6 @@ labels_only = no
 
 # Exclude torrents without labels (yes/no)
 exclude_unlabelled = no
-
-
-# IMDB Criteria - Fill to enable
-# Value Order - 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
-imdb = {}
-
-# Example
-#imdb = {
-#                     "Hollywood Blockbusters" : [7, 80000, yes],
-#                     "Bollywood Classics" : [8, 60000, no],
-#       }
-
 
 class SCGIRequest(object):
 
