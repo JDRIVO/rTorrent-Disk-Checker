@@ -376,8 +376,7 @@ if enable_disk_check:
                 if not torrents and not fallback_torrents:
                         break
 
-print ''
-print "Script Executed in", datetime.now() - startTime, "Seconds"
+print "\nScript Executed in", datetime.now() - startTime, "Seconds"
 print count, "Torrent(s) Deleted"
 calc = available_space + zero - torrent_size
 print "%.2f GB Free Space After Torrent Download" % calc
