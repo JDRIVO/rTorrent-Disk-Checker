@@ -1,4 +1,4 @@
-print "DD = Download Date  TL = Torrent Label  TN = Torrent Name\n"
+print "DD = Download Date  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n"
 
 import sys, os, shutil, cStringIO as StringIO
 import xmlrpclib, urllib, urlparse, socket, re
@@ -295,10 +295,10 @@ if enable_disk_check:
                         if filesize < min_filesize or age < min_age or ratio < min_ratio:
 
                                 if fb_age is not no and filesize >= min_filesize and age >= fb_age:
-                                        fallback_torrents[oldest_torrent] = name, label, filesize
+                                        fallback_torrents[oldest_torrent] = filesize, name, label, tracker
 
                                 elif fb_ratio is not no and filesize >= min_filesize and ratio >= fb_ratio:
-                                        fallback_torrents[oldest_torrent] = name, label, filesize
+                                        fallback_torrents[oldest_torrent] = filesize, name, label, tracker
 
                                 del torrents[oldest_torrent]
 
@@ -312,11 +312,10 @@ if enable_disk_check:
                                 continue
                 else:
                         oldest_torrent = min(fallback_torrents)
-                        name = fallback_torrents[oldest_torrent][0]
-                        label = fallback_torrents[oldest_torrent][1]
-                        filesize = fallback_torrents[oldest_torrent][2]
-
-                deleted.append("DD: %s TL: %s TN: %s" % (oldest_torrent, label, name))
+                        filesize = fallback_torrents[oldest_torrent][0]
+                        name = fallback_torrents[oldest_torrent][1]
+                        label = fallback_torrents[oldest_torrent][2]
+                        tracker = fallback_torrents[oldest_torrent][3]
 
                 if not fallback:
                         del torrents[oldest_torrent]
@@ -325,6 +324,8 @@ if enable_disk_check:
 
                 zero += filesize
                 count += 1
+
+                deleted.append("%s. DD: %s\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n" % (count, oldest_torrent, count, name, count, label, count, tracker))
 
                 if not torrents and not fallback_torrents:
                         break
@@ -335,7 +336,7 @@ calc = available_space + zero - torrent_size
 with open('testresult.txt', 'w+') as textfile:
         textfile.write("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n" % (time, count, zero))
         textfile.write("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n" % (available_space, calc, torrent_size))
-        textfile.write("DD = Download Date  TL = Torrent Label  TN = Torrent Name\n\n")
+        textfile.write("DD = Download Date  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n")
 
         for result in deleted:
                 textfile.write(result.encode('utf-8') + "\n")
@@ -343,5 +344,5 @@ with open('testresult.txt', 'w+') as textfile:
 for result in deleted:
         print result
 
-print "\nScript Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero)
+print "Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero)
 print "%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download" % (available_space, calc, torrent_size)
