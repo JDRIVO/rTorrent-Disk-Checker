@@ -350,4 +350,4 @@ for result in deleted:
         print result
 
 print "\nScript Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero)
-print "%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After Torrent Download" % (available_space, calc)
+print "%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download" % (available_space, calc, torrent_size)
