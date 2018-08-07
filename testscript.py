@@ -184,6 +184,7 @@ if enable_disk_check:
         fb_ratio = fallback_ratio
         torrents = {}
         fallback_torrents = {}
+        deleted = []
         fallback = False
         override = False
 
@@ -321,7 +322,7 @@ if enable_disk_check:
                         label = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
-                print "DD:", oldest_torrent, "TL:", label, "TN:", name
+                deleted.append("DD: %s TL: %s TN: %s" % (oldest_torrent, label, name))
 
                 if not fallback:
                         del torrents[oldest_torrent]
@@ -334,8 +335,19 @@ if enable_disk_check:
                 if not torrents and not fallback_torrents:
                         break
 
-print "\nScript Executed in", datetime.now() - startTime, "Seconds"
-print count, "Torrent(s) Deleted Totaling %.2f GB" % zero
-print "%.2f GB Free Space Before Torrent Download" % available_space
+time = datetime.now() - startTime
 calc = available_space + zero - torrent_size
-print "%.2f GB Free Space After Torrent Download" % calc
+
+with open('testresult.txt', 'w+') as textfile:
+        textfile.write("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n" % (time, count, zero))
+        textfile.write("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n" % (available_space, calc, torrent_size))
+        textfile.write("DD = Download Date  TL = Torrent Label  TN = Torrent Name\n\n")
+
+        for result in deleted:
+                textfile.write(result.encode('utf-8') + "\n")
+
+for result in deleted:
+        print result
+
+print "\nScript Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero)
+print "%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After Torrent Download" % (available_space, calc)
