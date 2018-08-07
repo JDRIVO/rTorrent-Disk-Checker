@@ -336,5 +336,6 @@ if enable_disk_check:
 
 print "\nScript Executed in", datetime.now() - startTime, "Seconds"
 print count, "Torrent(s) Deleted Totaling %.2f GB" % zero
+print "%.2f GB Free Space Before Torrent Download" % available_space
 calc = available_space + zero - torrent_size
 print "%.2f GB Free Space After Torrent Download" % calc
