@@ -51,7 +51,7 @@ To enable the script set the .torrent action in autodl-irssi to **rtorrent**.
 
 #### This script will show you what torrents the script will delete without actually deleting torrents.
 
-Results will outputted to your terminal and a text file named **testresult.txt**
+Results will output to your terminal and a text file named **testresult.txt**
 
 Enter the following command in your terminal to run it:
 
