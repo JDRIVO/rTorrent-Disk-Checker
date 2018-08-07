@@ -172,8 +172,6 @@ def xmlrpc(methodname, params):
         xmlresp = SCGIRequest(host).send(xmlreq)
         return xmlrpclib.loads(xmlresp)[0][0]
 
-torrent_name = None
-torrent_label = None
 torrent_size = int(sys.argv[1])
 
 if enable_disk_check:
