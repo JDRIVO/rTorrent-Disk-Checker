@@ -66,7 +66,7 @@ trackers_only = no
 # exclude: exclude label
 
 # Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-labels = {True}
+labels = {}
 
 # Example
 #labels = {
@@ -209,6 +209,8 @@ if enable_disk_check:
 
                 if not fallback:
                         oldest_torrent = min(torrents)
+                        label = urllib.unquote(torrents[oldest_torrent][0])
+                        tracker = torrents[oldest_torrent][1]
 
                         if override:
                                 override = False
@@ -227,7 +229,6 @@ if enable_disk_check:
                                 continue
 
                         if labels:
-                                label = urllib.unquote(torrents[oldest_torrent][0])
 
                                 if label in labels:
 
@@ -256,7 +257,6 @@ if enable_disk_check:
                                         continue
 
                         if trackers and not override:
-                                tracker = torrents[oldest_torrent][1]
                                 rule = [rule for rule in trackers for url in tracker if rule in url[0]]
 
                                 if rule:
