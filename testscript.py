@@ -1,3 +1,5 @@
+print "DD = Download Date  TL = Torrent Label  TN = Torrent Name"
+
 import sys, os, shutil, cStringIO as StringIO
 import xmlrpclib, urllib, urlparse, socket, re
 from urlparse import uses_netloc
@@ -363,7 +365,7 @@ if enable_disk_check:
                         label = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
-                print "DLed:", oldest_torrent, "TL:", label, "TN:", name
+                print "DD:", oldest_torrent, "TL:", label, "TN:", name
 
                 if not fallback:
                         del torrents[oldest_torrent]
