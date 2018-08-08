@@ -59,7 +59,7 @@ Enter the following command in your terminal to run it:
 
 **69** = torrent size in gigabytes
 
-# Configured Script Example
+# Illustration of User Defined Variables 
 
 <p align="center">
   <img src="https://cdn.pbrd.co/images/HyaYHmt.png">
