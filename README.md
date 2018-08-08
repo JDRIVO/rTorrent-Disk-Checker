@@ -61,6 +61,45 @@ Enter the following command in your terminal to run it:
 
 # Illustration of User Defined Variables 
 
-<p align="center">
-  <img src="https://cdn.pbrd.co/images/HyaYHmt.png">
-</p>
+```python
+enable_disk_check = yes
+
+host = 'scgi://127.0.0.1:5000'
+disk = os.statvfs('/')
+
+minimum_space = 5
+
+minimum_filesize = 5
+minimum_age = 15
+minimum_ratio = 1.2
+
+fallback_age = 7
+fallback_ratio = no
+
+trackers = {
+                     "demonoid.pw" : [include],
+                     "hdme.eu" : [exclude],
+                     "redacted.ch" : [1, 7, 1.2, no, no],
+                     "hd-torrents.org" : [3, 5, 1.3, 9, 1.3],
+                     "privatehd.to" : [5, 6, 1.2, 12, no],
+                     "apollo.rip" : [2, 5, 1.4, no, 1.8],
+           }
+
+trackers_only = yes
+
+labels = {
+                     "Trash" : [include],
+                     "TV" : [exclude],
+                     "HD" : [1, 5, 1.2, 15, 1.2],
+         }
+
+
+labels_only = no
+
+exclude_unlabelled = yes
+
+imdb = {
+                     "Hollywood Blockbusters" : [7, 80000, yes],
+                     "Bollywood Classics" : [8, 60000, no],               
+       }
+```
