@@ -58,3 +58,9 @@ Enter the following command in your terminal to run it:
 `python testscript.py 69`
 
 **69** = torrent size in gigabytes
+
+# Configured Script Example
+
+<p align="center">
+  <img src="https://cdn.pbrd.co/images/HyaYHmt.png">
+</p>
