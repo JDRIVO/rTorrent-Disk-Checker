@@ -15,7 +15,7 @@
 
 `find /home/$USER -name MatchedRelease.pm`
 
-**1b**. Add [this code](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/MatchedRelease.pm) to [line 629 of MatchedRelease.pm](https://github.com/autodl-community/autodl-irssi/blob/35957c4258a28d467974c93155a0a1e9a2b599a4/AutodlIrssi/MatchedRelease.pm#L629) ensuring you update the path to autodlcheck.py.
+**1b**. Add [this code](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/MatchedRelease.pm) to [line 629 of MatchedRelease.pm](https://github.com/autodl-community/autodl-irssi/blob/35957c4258a28d467974c93155a0a1e9a2b599a4/AutodlIrssi/MatchedRelease.pm#L629) **ensuring you update the path to autodlcheck.py.**
 
 **1c**. Restart autodl-irssi for the changes to take effect. Enter the following commands to achieve this:
 
