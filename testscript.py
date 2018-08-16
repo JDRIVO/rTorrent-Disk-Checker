@@ -166,7 +166,7 @@ def xmlrpc(methodname, params):
         xmlresp = SCGIRequest(host).send(xmlreq)
         return xmlrpclib.loads(xmlresp)[0][0]
 
-torrent_size = int(sys.argv[1])
+torrent_size = float(sys.argv[1])
 
 if enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
