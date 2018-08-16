@@ -47,7 +47,7 @@ To enable the script set the .torrent action in autodl-irssi to **rtorrent**.
   <img src="https://cdn.pbrd.co/images/HoXZLSN.png">
 </p>
 
-# [Test Script](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/testscript.py)
+## [Test Script](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/testscript.py)
 
 #### This script will show you what torrents the script will delete without actually deleting torrents.
 
