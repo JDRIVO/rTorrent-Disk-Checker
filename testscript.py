@@ -169,8 +169,8 @@ def xmlrpc(methodname, params):
 torrent_size = float(sys.argv[1])
 
 if enable_disk_check:
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        required_space = torrent_size - (available_space - minimum_space)
         min_filesize = minimum_filesize
         min_age = minimum_age
         min_ratio = minimum_ratio
@@ -181,13 +181,8 @@ if enable_disk_check:
         deleted = []
         fallback = False
         override = False
-
-        with open('autodlcheck.txt', 'w+') as textfile:
-                textfile.write(str(torrent_size))
-
-        zero = 0
         count = 0
-        required_space = torrent_size - (available_space - minimum_space)
+        zero = 0
 
         while zero < required_space:
 
