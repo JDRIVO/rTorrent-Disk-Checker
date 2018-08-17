@@ -182,13 +182,6 @@ if enable_disk_check:
         fallback = False
         override = False
 
-        if downloading and [0] in downloading:
-
-                try:
-                        available_space -= float(open('autodlcheck.txt').readline())
-                except:
-                        pass
-
         with open('autodlcheck.txt', 'w+') as textfile:
                 textfile.write(str(torrent_size))
 
