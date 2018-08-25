@@ -49,17 +49,15 @@ fallback_ratio = 1.4
 # exclude: exclude tracker
 
 # Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-trackers = {}
 
-# Example
-#trackers = {
+trackers = {
 #                     "demonoid.pw" : [include],
 #                     "hdme.eu" : [exclude],
 #                     "redacted.ch" : [1, 7, 1.2, no, no],
 #                     "hd-torrents.org" : [3, 5, 1.3, 9, 1.3],
 #                     "privatehd.to" : [5, 6, 1.2, 12, no],
 #                     "apollo.rip" : [2, 5, 1.4, no, 1.8],
-#           }
+           }
 
 # Only delete torrents from trackers in your tracker dictionary (yes/no)
 trackers_only = yes
@@ -70,14 +68,12 @@ trackers_only = yes
 # exclude: exclude label
 
 # Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-labels = {}
 
-# Example
-#labels = {
+labels = {
 #                     "Trash" : [include],
 #                     "TV" : [exclude],
 #                     "HD" : [1, 5, 1.2, 15, 1.2],
-#         }
+         }
 
 # Only delete torrents with labels in your label dictionary (yes/no)
 labels_only = yes
@@ -88,13 +84,11 @@ exclude_unlabelled = no
 
 # IMDB Criteria - Fill to enable
 # Value Order - 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
-imdb = {}
 
-# Example
-#imdb = {
+imdb = {
 #                     "Hollywood Blockbusters" : [7, 80000, yes],
 #                     "Bollywood Classics" : [8, 60000, no],
-#       }
+       }
 
 ############ USER DEFINED VARIABLES END ############
 
