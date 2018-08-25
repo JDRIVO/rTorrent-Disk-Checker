@@ -12,7 +12,7 @@ host = 'scgi://127.0.0.1:5000'
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
 
-# General Rules
+# GENERAL RULES START
 
 # All minimum requirements must be met by a torrent to be deleted
 
@@ -28,7 +28,7 @@ fallback_age = no
 # Fallback Ratio - Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
 fallback_ratio = 1.4
 
-# End of General Rules
+# GENERAL RULES END
 
 
 # Tracker Rules will override general rules - Fill to enable
