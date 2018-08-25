@@ -1,22 +1,7 @@
-import sys, os, shutil, cStringIO as StringIO
-import xmlrpclib, urllib, urlparse, socket, re
-from urlparse import uses_netloc
-from datetime import datetime
-
-try:
-        import PTN
-        from imdbpie import Imdb
-except:
-        pass
-
-yes = True
-no = False
-
 include = True
 exclude = False
-
-uses_netloc.append('scgi')
-disk = os.statvfs('/')
+yes = True
+no = False
 
 ############ USER DEFINED VARIABLES START ############
 
@@ -91,6 +76,20 @@ imdb = {
        }
 
 ############ USER DEFINED VARIABLES END ############
+
+import sys, os, shutil, cStringIO as StringIO
+import xmlrpclib, urllib, urlparse, socket, re
+from urlparse import uses_netloc
+from datetime import datetime
+
+try:
+        import PTN
+        from imdbpie import Imdb
+except:
+        pass
+
+uses_netloc.append('scgi')
+disk = os.statvfs('/')
 
 class SCGIRequest(object):
 
