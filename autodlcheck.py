@@ -16,11 +16,13 @@ include = True
 exclude = False
 
 uses_netloc.append('scgi')
+disk = os.statvfs('/')
+
+############ USER DEFINED VARIABLES START ############
 
 enable_disk_check = yes
 
 host = 'scgi://127.0.0.1:5000'
-disk = os.statvfs('/')
 
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
@@ -94,6 +96,7 @@ imdb = {}
 #                     "Bollywood Classics" : [8, 60000, no],
 #       }
 
+############ USER DEFINED VARIABLES END ############
 
 class SCGIRequest(object):
 
