@@ -65,7 +65,6 @@ Enter the following command in your terminal to run it:
 enable_disk_check = yes
 
 host = 'scgi://127.0.0.1:5000'
-disk = os.statvfs('/')
 
 minimum_space = 5
 
