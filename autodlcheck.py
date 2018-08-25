@@ -50,7 +50,7 @@ trackers = {
 trackers_only = yes
 
 
-# Add/Exclude labels or set Label Rules - Label Rules will override general/tracker rules - Fill to enable
+# Label Rules will override general/tracker rules - Fill to enable
 
 # include: use general/tracker rules | exclude: exclude label
 
