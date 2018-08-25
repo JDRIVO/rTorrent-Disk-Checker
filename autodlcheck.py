@@ -365,6 +365,7 @@ if enable_disk_check:
                 else:
                         os.remove(path)
 
+                xmlrpc('d.tracker_announce', tuple([torrent]))
                 xmlrpc('d.erase', tuple([torrent]))
 
                 if not fallback:
