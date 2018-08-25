@@ -360,13 +360,13 @@ if enable_disk_check:
                         torrent = fallback_torrents[oldest_torrent][1]
                         filesize = fallback_torrents[oldest_torrent][2]
 
+                xmlrpc('d.tracker_announce', tuple([torrent]))
+                xmlrpc('d.erase', tuple([torrent]))
+
                 if os.path.isdir(path):
                         shutil.rmtree(path)
                 else:
                         os.remove(path)
-
-                xmlrpc('d.tracker_announce', tuple([torrent]))
-                xmlrpc('d.erase', tuple([torrent]))
 
                 if not fallback:
                         del torrents[oldest_torrent]
