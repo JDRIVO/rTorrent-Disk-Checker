@@ -22,10 +22,10 @@ minimum_filesize = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
-# Fallback Age - Only the age of a torrent must be higher or equal to this number to be deleted - no to disable
+# Fallback Age: Only the age of a torrent must be higher or equal to this number to be deleted - no to disable
 fallback_age = no
 
-# Fallback Ratio - Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
+# Fallback Ratio: Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
 fallback_ratio = 1.4
 
 # GENERAL RULES END
@@ -35,7 +35,7 @@ fallback_ratio = 1.4
 
 # include: use general rules | exclude: exclude tracker
 
-# Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 trackers = {
 #                     "demonoid.pw" : [include],
@@ -54,7 +54,7 @@ trackers_only = yes
 
 # include: use general/tracker rules | exclude: exclude label
 
-# Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 labels = {
 #                     "Trash" : [include],
@@ -71,7 +71,7 @@ exclude_unlabelled = no
 
 # IMDB Criteria - Fill to enable
 
-# Value Order - 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
+# Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
 
 imdb = {
 #                     "Hollywood Blockbusters" : [7, 80000, yes],
