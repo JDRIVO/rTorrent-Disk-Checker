@@ -1,7 +1,5 @@
 print "DD = Download Date  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n"
 
-startTime = datetime.now()
-
 include = True
 exclude = False
 yes = True
@@ -97,6 +95,7 @@ except:
 
 uses_netloc.append('scgi')
 disk = os.statvfs('/')
+startTime = datetime.now()
 
 class SCGIRequest(object):
 
