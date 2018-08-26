@@ -1,85 +1,102 @@
 print "DD = Download Date  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n"
 
-import sys, os, shutil, cStringIO as StringIO
-import xmlrpclib, urllib, urlparse, socket, re
-from urlparse import uses_netloc
-from datetime import datetime
-
 startTime = datetime.now()
-
-yes = True
-no = False
 
 include = True
 exclude = False
+yes = True
+no = False
 
-uses_netloc.append('scgi')
+############ USER DEFINED VARIABLES START ############
 
 enable_disk_check = yes
 
 host = 'scgi://127.0.0.1:5000'
-disk = os.statvfs('/')
 
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
 
-# General Rules
+# GENERAL RULES START
+
+# All minimum requirements must be met by a torrent to be deleted
 
 # Filesize in Gigabytes / Age in Days
+
 minimum_filesize = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
-# Fallback Age - Only the age of a torrent must be higher or equal to this number to be deleted - no to disable
+# Fallback Age: Only the age of a torrent must be higher or equal to this number to be deleted - no to disable
 fallback_age = no
 
-# Fallback Ratio - Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
+# Fallback Ratio: Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
 fallback_ratio = 1.4
 
-# End of General Rules
+# GENERAL RULES END
 
 
 # Tracker Rules will override general rules - Fill to enable
 
-# include: use general rules
-# exclude: exclude tracker
+# include: use general rules | exclude: exclude tracker
 
-# Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-trackers = {}
+# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
-# Example
-#trackers = {
+trackers = {
 #                     "demonoid.pw" : [include],
 #                     "hdme.eu" : [exclude],
 #                     "redacted.ch" : [1, 7, 1.2, no, no],
 #                     "hd-torrents.org" : [3, 5, 1.3, 9, 1.3],
 #                     "privatehd.to" : [5, 6, 1.2, 12, no],
 #                     "apollo.rip" : [2, 5, 1.4, no, 1.8],
-#           }
+           }
 
 # Only delete torrents from trackers in your tracker dictionary (yes/no)
-trackers_only = no
+trackers_only = yes
 
-# Add/Exclude labels or set Label Rules - Label Rules will override general/tracker rules - Fill to enable
 
-# include: use general/tracker rules
-# exclude: exclude label
+# Label Rules will override general/tracker rules - Fill to enable
 
-# Value Order - 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
-labels = {}
+# include: use general/tracker rules | exclude: exclude label
 
-# Example
-#labels = {
+# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+
+labels = {
 #                     "Trash" : [include],
 #                     "TV" : [exclude],
 #                     "HD" : [1, 5, 1.2, 15, 1.2],
-#         }
+         }
 
 # Only delete torrents with labels in your label dictionary (yes/no)
-labels_only = no
+labels_only = yes
 
 # Exclude torrents without labels (yes/no)
 exclude_unlabelled = no
+
+
+# IMDB Criteria - Fill to enable
+
+# Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
+
+imdb = {
+#                     "Hollywood Blockbusters" : [7, 80000, yes],
+#                     "Bollywood Classics" : [8, 60000, no],
+       }
+
+############ USER DEFINED VARIABLES END ############
+
+import sys, os, shutil, cStringIO as StringIO
+import xmlrpclib, urllib, urlparse, socket, re
+from urlparse import uses_netloc
+from datetime import datetime
+
+try:
+        import PTN
+        from imdbpie import Imdb
+except:
+        pass
+
+uses_netloc.append('scgi')
+disk = os.statvfs('/')
 
 class SCGIRequest(object):
 
