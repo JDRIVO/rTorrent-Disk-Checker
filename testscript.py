@@ -70,16 +70,6 @@ labels_only = yes
 # Exclude torrents without labels (yes/no)
 exclude_unlabelled = no
 
-
-# IMDB Criteria - Fill to enable
-
-# Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
-
-imdb = {
-#                     "Hollywood Blockbusters" : [7, 80000, yes],
-#                     "Bollywood Classics" : [8, 60000, no],
-       }
-
 ############ USER DEFINED VARIABLES END ############
 
 import sys, os, shutil, cStringIO as StringIO
