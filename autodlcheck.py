@@ -168,16 +168,14 @@ class SCGIRequest(object):
                 return (xmlresp, headers)
 
 def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
+
         try:
                 import PTN
                 from imdbpie import Imdb
-        except:
-                return
 
-        imdb = Imdb()
-        torrent_info = PTN.parse(torrent_name)
+                imdb = Imdb()
+                torrent_info = PTN.parse(torrent_name)
 
-        try:
                 search = imdb.get_title_ratings(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])
                 rating = search['rating']
                 votes = search['ratingCount']
