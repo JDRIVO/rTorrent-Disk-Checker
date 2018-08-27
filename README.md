@@ -23,7 +23,7 @@
 
 `screen -d -m irssi`
 
-#### 2. Disk Check Function Configuration: Setting SCGI Address/Port
+#### 2. Disk Check Function Configuration: Setting SCGI Address/Port - Skip if Disabled
 
 **2a**. Enter the following command in your terminal to obtain your SCGI address/port:
 
