@@ -164,7 +164,6 @@ class SCGIRequest(object):
                 xmlresp = fresp.read()
                 return (xmlresp, headers)
 
-
 def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
         try:
                 import PTN
