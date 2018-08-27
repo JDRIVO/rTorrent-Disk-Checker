@@ -77,12 +77,6 @@ import xmlrpclib, urllib, urlparse, socket, re
 from urlparse import uses_netloc
 from datetime import datetime
 
-try:
-        import PTN
-        from imdbpie import Imdb
-except:
-        pass
-
 uses_netloc.append('scgi')
 disk = os.statvfs('/')
 startTime = datetime.now()
