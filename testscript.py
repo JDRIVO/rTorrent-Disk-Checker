@@ -76,8 +76,6 @@ import sys, os, shutil, xmlrpclib, urllib, urlparse, socket, re, cStringIO as St
 from urlparse import uses_netloc
 from datetime import datetime
 
-uses_netloc.append('scgi')
-disk = os.statvfs('/')
 startTime = datetime.now()
 
 class SCGIRequest(object):
@@ -168,6 +166,8 @@ def xmlrpc(methodname, params):
 torrent_size = float(sys.argv[1])
 
 if enable_disk_check:
+        uses_netloc.append('scgi')
+        disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         required_space = torrent_size - (available_space - minimum_space)
         min_filesize = minimum_filesize
