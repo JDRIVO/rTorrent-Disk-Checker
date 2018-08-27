@@ -174,7 +174,7 @@ def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
                 import PTN
                 from imdbpie import Imdb
         except:
-                pass
+                return
 
         imdb = Imdb()
         torrent_info = PTN.parse(torrent_name)
