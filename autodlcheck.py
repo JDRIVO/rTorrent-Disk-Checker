@@ -85,12 +85,6 @@ import xmlrpclib, urllib, urlparse, socket, re
 from urlparse import uses_netloc
 from datetime import datetime
 
-try:
-        import PTN
-        from imdbpie import Imdb
-except:
-        pass
-
 uses_netloc.append('scgi')
 disk = os.statvfs('/')
 
@@ -176,6 +170,12 @@ class SCGIRequest(object):
 
 
 def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
+        try:
+                import PTN
+                from imdbpie import Imdb
+        except:
+                pass
+
         imdb = Imdb()
         torrent_info = PTN.parse(torrent_name)
 
