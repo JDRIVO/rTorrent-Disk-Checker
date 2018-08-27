@@ -72,8 +72,7 @@ exclude_unlabelled = no
 
 ############ USER DEFINED VARIABLES END ############
 
-import sys, os, shutil, cStringIO as StringIO
-import xmlrpclib, urllib, urlparse, socket, re
+import sys, os, shutil, xmlrpclib, urllib, urlparse, socket, re, cStringIO as StringIO
 from urlparse import uses_netloc
 from datetime import datetime
 
