@@ -80,13 +80,9 @@ imdb = {
 
 ############ USER DEFINED VARIABLES END ############
 
-import sys, os, shutil, cStringIO as StringIO
-import xmlrpclib, urllib, urlparse, socket, re
+import sys, os, shutil, xmlrpclib, urllib, urlparse, socket, re, cStringIO as StringIO
 from urlparse import uses_netloc
 from datetime import datetime
-
-uses_netloc.append('scgi')
-disk = os.statvfs('/')
 
 class SCGIRequest(object):
 
@@ -213,6 +209,8 @@ if torrent_label in imdb:
         imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if enable_disk_check:
+        uses_netloc.append('scgi')
+        disk = os.statvfs('/')
         torrent_size /= 1073741824.0
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
