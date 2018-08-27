@@ -22,10 +22,10 @@ minimum_filesize = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
-# Fallback Age: Only the age of a torrent must be higher or equal to this number to be deleted - no to disable
+# Only the age of a torrent must be higher or equal to this number to be deleted (filesize requirement remains) - no to disable
 fallback_age = no
 
-# Fallback Ratio: Only the ratio of a torrent must be higher or equal to this number to be deleted - no to disable
+# Only the ratio of a torrent must be higher or equal to this number to be deleted (filesize requirement remains) - no to disable
 fallback_ratio = 1.4
 
 # GENERAL RULES END
