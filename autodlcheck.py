@@ -5,7 +5,10 @@ no = False
 
 ############ USER DEFINED VARIABLES START ############
 
+# no to disable
 enable_disk_check = yes
+
+###### DISK CHECK SECTION - IGNORE IF DISABLED ######
 
 host = 'scgi://127.0.0.1:5000'
 
@@ -69,7 +72,7 @@ labels_only = yes
 exclude_unlabelled = no
 
 
-# IMDB Criteria - Fill to enable
+###### IMDB SECTION - IGNORE IF UNWANTED  ######
 
 # Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
 
