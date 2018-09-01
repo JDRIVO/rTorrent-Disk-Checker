@@ -72,7 +72,9 @@ labels_only = yes
 exclude_unlabelled = no
 
 
-###### IMDB SECTION - IGNORE IF UNWANTED  ######
+###### IMDB SECTION - IGNORE IF UNWANTED ######
+
+# The IMDB function will only execute if the torrent is attached to a label with an IMDB rule
 
 # Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
 
