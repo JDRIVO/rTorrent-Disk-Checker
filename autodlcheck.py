@@ -210,6 +210,6 @@ if g.enable_disk_check:
                         break
 
 if available_space < required_space:
-    subprocess.Popen(['python', g.folder_path + '/' + 'stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        subprocess.Popen(['python', g.folder_path + '/' + 'stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 print 'finish'
