@@ -2,16 +2,16 @@ import sys
 from xmlrpc import xmlrpc
 
 decimals = sys.argv[1].split(' ')
-hex = []
+hexadecimal = []
 
 for decimal in decimals:
-   hex.append(format(int(decimal), '02x'))
+        hexadecimal.append(format(int(decimal), '02x'))
 
-torrent_hash = ''.join(hex).upper()
+torrent_hash = ''.join(hexadecimal).upper()
 
 while True:
-    try:
-        xmlrpc('d.stop', tuple([torrent_hash]))
-        break
-    except:
-        pass
+        try:
+                xmlrpc('d.stop', tuple([torrent_hash]))
+                break
+        except:
+                pass
