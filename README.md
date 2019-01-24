@@ -2,7 +2,7 @@
 
 #### This script is capable of the following functions prior to autodl-irssi sending a torrent to rTorrent.
 
-**1**. It can check your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the script will delete torrents based on criteria defined in the script. The script will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first.
+**1**. It can check your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the script will delete torrents based on criteria defined in the script. The script will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	
 
 **2**. It can check the IMDB ratings/votes of a movie. The script will prevent autodl-irssi from sending a torrent to rTorrent if the IMDB rating/votes don't meet your minimum requirements.
 
@@ -21,7 +21,7 @@
 
 `pkill irssi && screen -d -m irssi`
 
-#### 2. Disk Check Function Configuration: Setting SCGI Address/Port - Skip if Disabled
+#### 2. Disk Check Function Configuration (Skip if Disabled): Setting SCGI Address/Port
 
 **2a**. Enter the following command in your terminal to obtain your SCGI address/port:
 
@@ -29,7 +29,7 @@
 
 **2b**. Update the host variable in [line 13 of autodlcheck.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/autodlcheck.py#L13) with your own SCGI address/port.
 
-#### 3. Python Module Installations Required for IMDB Function - Skip if Unused
+#### 3. Python Module Installations Required for IMDB Function (Skip if Unused)
 
 **3a**. Enter the following commands in your terminal to install [parse-torrent-name](https://github.com/divijbindlish/parse-torrent-name) and [ImdbPie](https://github.com/richardARPANET/imdb-pie):
 
