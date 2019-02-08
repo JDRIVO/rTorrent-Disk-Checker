@@ -6,7 +6,7 @@
 
 **2**. It can check the IMDB ratings/votes of a movie. The script will prevent autodl-irssi from sending a torrent to rTorrent if the IMDB rating/votes don't meet your minimum requirements.
 
-## Usage
+## Installation
 
 Run the installation script by entering the following command in your terminal:
 
