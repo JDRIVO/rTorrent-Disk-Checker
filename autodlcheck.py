@@ -1,5 +1,4 @@
-import sys, os, urllib, shutil, subprocess
-import config as cfg
+import sys, os, urllib, shutil, subprocess, config as cfg
 from datetime import datetime
 from xmlrpc import xmlrpc
 
