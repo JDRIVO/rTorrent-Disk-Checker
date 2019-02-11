@@ -41,7 +41,8 @@ if torrent_label in g.imdb:
         imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if g.enable_disk_check:
-        queued = g.folder_path + '/' + 'autodlcheck.txt'
+        current_directory = os.getcwd()
+        queued = current_directory + '/downloading.txt'
         disk = os.statvfs('/')
         torrent_size /= 1073741824.0
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
@@ -60,11 +61,7 @@ if g.enable_disk_check:
         no = False
 
         if downloading and [0] in downloading:
-
-                try:
-                        available_space -= float(open(queued).readline())
-                except:
-                        pass
+                available_space -= float(open(queued).readline())
 
         with open(queued, 'w+') as textfile:
                 textfile.write(str(torrent_size))
@@ -210,6 +207,6 @@ if g.enable_disk_check:
                         break
 
 if available_space < required_space:
-        subprocess.Popen(['python', g.folder_path + '/' + 'stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        subprocess.Popen(['python', current_directory + '/stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 print 'finish'
