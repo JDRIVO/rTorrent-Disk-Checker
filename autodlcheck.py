@@ -162,15 +162,15 @@ if g.enable_disk_check:
                         filesize = oldest_torrent[3] / 1073741824.0
                         ratio = oldest_torrent[4] / 1000.0
                         path = oldest_torrent[5]
-                        torrent = oldest_torrent[6]
+                        torrent_hash = oldest_torrent[6]
 
                         if filesize < min_filesize or age < min_age or ratio < min_ratio:
 
                                 if fb_age is not no and filesize >= min_filesize and age >= fb_age:
-                                        fallback_torrents.append([path, torrent, filesize])
+                                        fallback_torrents.append([path, torrent_hash, filesize])
 
                                 elif fb_ratio is not no and filesize >= min_filesize and ratio >= fb_ratio:
-                                        fallback_torrents.append([path, torrent, filesize])
+                                        fallback_torrents.append([path, torrent_hash, filesize])
 
                                 del completed[0]
 
@@ -185,11 +185,11 @@ if g.enable_disk_check:
                 else:
                         oldest_torrent = fallback_torrents[0]
                         path = oldest_torrent[0]
-                        torrent = oldest_torrent[1]
+                        torrent_hash = oldest_torrent[1]
                         filesize = oldest_torrent[2]
 
-                xmlrpc('d.tracker_announce', tuple([torrent]))
-                xmlrpc('d.erase', tuple([torrent]))
+                xmlrpc('d.tracker_announce', tuple([torrent_hash]))
+                xmlrpc('d.erase', tuple([torrent_hash]))
 
                 if os.path.isdir(path):
                         shutil.rmtree(path)
