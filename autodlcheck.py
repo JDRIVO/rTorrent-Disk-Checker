@@ -206,7 +206,7 @@ if g.enable_disk_check:
                 if not completed and not fallback_torrents:
                         break
 
-if available_space < required_space:
-        subprocess.Popen(['python', scripts_directory + '/stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        if available_space < required_space:
+                subprocess.Popen(['python', scripts_directory + '/stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
 print 'finish'
