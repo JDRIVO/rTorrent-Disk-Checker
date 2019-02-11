@@ -10,7 +10,6 @@ startTime = datetime.now()
 torrent_size = float(sys.argv[1])
 
 if g.enable_disk_check:
-        queued = g.folder_path + '/' + 'autodlcheck.txt'
         disk = os.statvfs('/')
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
