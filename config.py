@@ -5,9 +5,6 @@ no = False
 
 ############ USER DEFINED VARIABLES START ############
 
-# The directory containing the autodlcheck scripts
-folder_path = "/home/user/scripts"
-
 # no to disable
 enable_disk_check = yes
 
