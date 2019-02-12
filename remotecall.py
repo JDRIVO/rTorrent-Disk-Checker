@@ -39,6 +39,7 @@ class SCGIRequest(object):
                                 recvdata = sock.recv(1024).decode(errors='ignore')
                         else:
                                 recvdata = sock.recv(1024)
+
                         resp += recvdata
 
                 sock.close()
