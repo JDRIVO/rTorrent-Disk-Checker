@@ -1,8 +1,5 @@
 import xmlrpclib, urllib, urlparse, socket, cStringIO as StringIO
-from urlparse import uses_netloc
 from config import host
-
-uses_netloc.append('scgi')
 
 def xmlrpc(methodname, params):
         xmlreq = xmlrpclib.dumps(params, methodname)
