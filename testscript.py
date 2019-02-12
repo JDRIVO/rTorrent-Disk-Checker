@@ -1,9 +1,14 @@
-print "TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n"
+print("\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n")
 
 import sys, os, urllib, shutil, subprocess
 import config as g
 from datetime import datetime
-from xmlrpc import xmlrpc
+from remotecall import xmlrpc
+
+try:
+    from urllib import parse as urllib
+except:
+    import urllib
 
 startTime = datetime.now()
 
@@ -173,10 +178,10 @@ with open('testresult.txt', 'w+') as textfile:
         textfile.write("TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n")
 
         for result in deleted:
-                textfile.write(result.encode('utf-8') + "\n")
+                textfile.write(str(result.encode('utf-8')) + "\n")
 
 for result in deleted:
-        print result
+        print(result)
 
-print "Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero)
-print "%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download" % (available_space, calc, torrent_size)
+print("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero))
+print("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download" % (available_space, calc, torrent_size))
