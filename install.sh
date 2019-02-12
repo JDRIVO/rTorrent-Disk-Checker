@@ -43,7 +43,7 @@ Manual Installation Instructions:
 chmod +x autodlcheck.py
 chmod +x config.py
 chmod +x stop.py
-chmod +x xmlrpc.py
+chmod +x remotecall.py
 
 scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^network.scgi.open_port = \K.*")
 
