@@ -1,6 +1,11 @@
-import sys, os, urllib, shutil, subprocess, config as cfg
+import sys, os, shutil, subprocess, config as cfg
 from datetime import datetime
-from xmlrpc import xmlrpc
+from remotecall import xmlrpc
+
+try:
+    from urllib import parse as urllib
+except:
+    import urllib
 
 torrent_name = str(sys.argv[1])
 torrent_label = str(sys.argv[2])
@@ -22,14 +27,14 @@ def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
                 return
         else:
                 if rating < minimum_rating or votes < minimum_votes:
-                        print 'exit'
+                        print('exit')
                         quit()
 
         if skip_foreign:
                 country = imdb.get_title_versions(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
 
                 if 'US' not in country:
-                        print 'exit'
+                        print('exit')
                         quit()
 
 
@@ -208,4 +213,4 @@ if cfg.enable_disk_check:
         if available_space < required_space:
                 subprocess.Popen(['python', scripts_directory + '/stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
-print 'finish'
+print('finish')
