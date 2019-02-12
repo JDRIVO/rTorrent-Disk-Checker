@@ -1,4 +1,10 @@
-import xmlrpclib, urllib, urlparse, socket, cStringIO as StringIO
+try:
+        import urllib.parse as urlparse, xmlrpc.client as xmlrpclib, io as StringIO, socket
+        python3 = True
+except:
+        import urlparse, xmlrpclib, cStringIO as StringIO, socket
+        python3 = False
+
 from config import host
 
 def xmlrpc(methodname, params):
@@ -13,30 +19,26 @@ class SCGIRequest(object):
                 self.resp_headers = []
 
         def __send(self, scgireq):
-                scheme, netloc, path, query, frag = urlparse.urlsplit(self.url)
-                host, port = urllib.splitport(netloc)
+                parsed = urlparse.urlsplit(self.url)
+                scheme, netloc, path, query, frag = parsed
+                host = parsed.hostname
+                port = parsed.port
+                addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                sock = socket.socket(*addrinfo[0][:3])
+                sock.connect(addrinfo[0][4])
+                sock.send(scgireq.encode())
 
-                if netloc:
-                        inet6_host = ''
-
-                        if len(inet6_host) > 0:
-                                addrinfo = socket.getaddrinfo(inet6_host, port, socket.AF_INET6, socket.SOCK_STREAM)
-                        else:
-                                addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-
-                        assert len(addrinfo) == 1, "There's more than one? %r" % addrinfo
-
-                        sock = socket.socket(*addrinfo[0][:3])
-                        sock.connect(addrinfo[0][4])
+                if python3:
+                        recvdata = resp = sock.recv(1024).decode(errors='ignore')
                 else:
-                        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                        sock.connect(path)
-
-                sock.send(scgireq)
-                recvdata = resp = sock.recv(1024)
+                        recvdata = resp = sock.recv(1024)
 
                 while recvdata != '':
-                        recvdata = sock.recv(1024)
+
+                        if python3:
+                                recvdata = sock.recv(1024).decode(errors='ignore')
+                        else:
+                                recvdata = sock.recv(1024)
                         resp += recvdata
 
                 sock.close()
@@ -51,19 +53,19 @@ class SCGIRequest(object):
         @staticmethod
         def encode_netstring(string):
                 "Encode string as netstring"
-                return '%d:%s,'%(len(string), string)
+                return '%d:%s,' % (len(string), string)
 
         @staticmethod
         def make_headers(headers):
                 "Make scgi header list"
-                return '\x00'.join(['%s\x00%s'%t for t in headers])+'\x00'
+                return '\x00'.join(['%s\x00%s' % t for t in headers]) + '\x00'
 
         @staticmethod
         def add_required_scgi_headers(data, headers = []):
                 "Wrap data in an scgi request,\nsee spec at: http://python.ca/scgi/protocol.txt"
-                headers = SCGIRequest.make_headers([('CONTENT_LENGTH', str(len(data))),('SCGI', '1'),] + headers)
+                headers = SCGIRequest.make_headers([('CONTENT_LENGTH', str(len(data))), ('SCGI', '1'),] + headers)
                 enc_headers = SCGIRequest.encode_netstring(headers)
-                return enc_headers+data
+                return enc_headers + data
 
         @staticmethod
         def gen_headers(file):
