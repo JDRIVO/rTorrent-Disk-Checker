@@ -47,7 +47,7 @@ chmod +x xmlrpc.py
 
 scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^network.scgi.open_port = \K.*")
 
-sed -i "13s~.*~host = \"scgi://$scgi\"~" config.py
+sed -i "13s~.*~host = \"$scgi\"~" config.py
 
 sed -i "629i\\
         my \$torrentHash = dataToHex(\$self->{info_hash});\n\
