@@ -1,8 +1,8 @@
 try:
-        import urllib.parse as urlparse, xmlrpc.client as xmlrpclib, io as StringIO, socket
+        import xmlrpc.client as xmlrpclib, io as StringIO, socket
         python3 = True
 except:
-        import urlparse, xmlrpclib, cStringIO as StringIO, socket
+        import xmlrpclib, cStringIO as StringIO, socket
         python3 = False
 
 from config import host
@@ -19,10 +19,9 @@ class SCGIRequest(object):
                 self.resp_headers = []
 
         def __send(self, scgireq):
-                parsed = urlparse.urlsplit(self.url)
-                scheme, netloc, path, query, frag = parsed
-                host = parsed.hostname
-                port = parsed.port
+                ip = self.url.split(':')
+                host = ip[0]
+                port = ip[1]
                 addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addrinfo[0][:3])
                 sock.connect(addrinfo[0][4])
