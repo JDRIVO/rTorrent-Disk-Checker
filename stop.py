@@ -1,5 +1,5 @@
 import sys
-from xmlrpc import xmlrpc
+from remotecall import xmlrpc
 
 while True:
         try:
