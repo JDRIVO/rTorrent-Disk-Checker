@@ -50,8 +50,8 @@ if cfg.enable_disk_check:
         completed.sort()
         scripts_directory = os.path.dirname(sys.argv[0])
         queued = scripts_directory + '/downloading.txt'
-        disk = os.statvfs('/')
         torrent_size /= 1073741824.0
+        disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         min_filesize = cfg.minimum_filesize
         min_age = cfg.minimum_age
