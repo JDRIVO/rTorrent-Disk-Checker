@@ -59,7 +59,7 @@ sed -i "629i\\
 chmod 444 "/home/$USER/.irssi/scripts/AutodlIrssi/MatchedRelease.pm"
 pkill irssi && screen -d -m irssi
 
-echo "Will you be using the IMDB function of the script?"
+echo "Will you be using the IMDB function of the script (Y/N)?"
 
 while true; do
     read answer
