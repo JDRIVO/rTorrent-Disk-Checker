@@ -63,5 +63,5 @@ class SCGIRequest(object):
 
 def xmlrpc(methodname, params):
         xmlreq = xmlrpclib.dumps(params, methodname)
-        xmlresp = SCGIRequest(host).send(xmlreq)
+        xmlresp = SCGIRequest(scgi).send(xmlreq)
         return xmlrpclib.loads(xmlresp)[0][0]
