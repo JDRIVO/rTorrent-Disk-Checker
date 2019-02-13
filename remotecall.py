@@ -13,8 +13,7 @@ class SCGIRequest(object):
                 self.url = url
 
         def __send(self, scgireq):
-                ip = self.url.split(':')
-                host, port = ip
+                host, port = self.url.split(':')
                 addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addrinfo[0][:3])
                 sock.connect(addrinfo[0][4])
