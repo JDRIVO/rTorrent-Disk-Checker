@@ -1,16 +1,11 @@
+from config import scgi
+
 try:
-        import xmlrpc.client as xmlrpclib, io as StringIO, socket
+        import xmlrpc.client as xmlrpclib, socket
         python3 = True
 except:
-        import xmlrpclib, cStringIO as StringIO, socket
+        import xmlrpclib, socket
         python3 = False
-
-from config import host
-
-def xmlrpc(methodname, params):
-        xmlreq = xmlrpclib.dumps(params, methodname)
-        xmlresp = SCGIRequest(host).send(xmlreq)
-        return xmlrpclib.loads(xmlresp)[0][0]
 
 class SCGIRequest(object):
 
@@ -47,7 +42,7 @@ class SCGIRequest(object):
         def send(self, data):
                 "Send data over scgi to url and get response"
                 scgiresp = self.__send(self.add_required_scgi_headers(data))
-                resp = self.get_scgi_resp(scgiresp)
+                resp = ''.join(scgiresp.split('\n')[4:])
                 return resp
 
         @staticmethod
@@ -67,14 +62,7 @@ class SCGIRequest(object):
                 enc_headers = SCGIRequest.encode_netstring(headers)
                 return enc_headers + data
 
-        @staticmethod
-        def get_scgi_resp(resp):
-                "Get xmlrpc response from scgi response"
-                fresp = StringIO.StringIO(resp)
-                line = fresp.readline().rstrip()
-
-                while line.strip():
-                        line = fresp.readline().rstrip()
-
-                xmlresp = fresp.read()
-                return xmlresp
+def xmlrpc(methodname, params):
+        xmlreq = xmlrpclib.dumps(params, methodname)
+        xmlresp = SCGIRequest(host).send(xmlreq)
+        return xmlrpclib.loads(xmlresp)[0][0]
