@@ -47,7 +47,7 @@ class SCGIRequest(object):
         def send(self, data):
                 "Send data over scgi to url and get response"
                 scgiresp = self.__send(self.add_required_scgi_headers(data))
-                resp, self.resp_headers = self.get_scgi_resp(scgiresp)
+                resp = self.get_scgi_resp(scgiresp)
                 return resp
 
         @staticmethod
@@ -68,22 +68,13 @@ class SCGIRequest(object):
                 return enc_headers + data
 
         @staticmethod
-        def gen_headers(file):
-                "Get header lines from scgi response"
-                line = file.readline().rstrip()
-
-                while line.strip():
-                        yield line
-                        line = file.readline().rstrip()
-
-        @staticmethod
         def get_scgi_resp(resp):
                 "Get xmlrpc response from scgi response"
                 fresp = StringIO.StringIO(resp)
-                headers = []
+                line = fresp.readline().rstrip()
 
-                for line in SCGIRequest.gen_headers(fresp):
-                        headers.append(line.split(': ', 1))
+                while line.strip():
+                        line = fresp.readline().rstrip()
 
                 xmlresp = fresp.read()
-                return (xmlresp, headers)
+                return xmlresp
