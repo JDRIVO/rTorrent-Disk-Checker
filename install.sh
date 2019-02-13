@@ -28,7 +28,7 @@ Manual Installation Instructions:
 
  find /home/$USER -name '.rtorrent.rc' -print | xargs grep '^network.scgi.open_port = '
 
-2b. Update the scgi variable in line 16 of config.py with your own SCGI address/port.
+2b. Update the scgi variable in line 14 of config.py with your own SCGI address/port.
 
 
 3. Python Module Installations Required for IMDB Function (Skip if Unused)
