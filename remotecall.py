@@ -40,8 +40,7 @@ class SCGIRequest(object):
         def send(self, data):
                 "Send data over scgi to url and get response"
                 scgiresp = self.__send(self.add_required_scgi_headers(data))
-                resp = ''.join(scgiresp.split('\n')[4:])
-                return resp
+                return ''.join(scgiresp.split('\n')[4:])
 
         @staticmethod
         def encode_netstring(string):
