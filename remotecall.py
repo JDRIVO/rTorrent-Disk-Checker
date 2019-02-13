@@ -14,8 +14,7 @@ class SCGIRequest(object):
 
         def __send(self, scgireq):
                 ip = self.url.split(':')
-                host = ip[0]
-                port = ip[1]
+                host, port = ip[0], ip[1]
                 addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                 sock = socket.socket(*addrinfo[0][:3])
                 sock.connect(addrinfo[0][4])
