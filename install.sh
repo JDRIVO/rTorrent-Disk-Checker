@@ -28,7 +28,7 @@ Manual Installation Instructions:
 
  find /home/$USER -name '.rtorrent.rc' -print | xargs grep '^network.scgi.open_port = '
 
-2b. Update the host variable in line 16 of config.py with your own SCGI address/port.
+2b. Update the scgi variable in line 16 of config.py with your own SCGI address/port.
 
 
 3. Python Module Installations Required for IMDB Function (Skip if Unused)
@@ -47,7 +47,7 @@ chmod +x remotecall.py
 
 scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^network.scgi.open_port = \K.*")
 
-sed -i "13s~.*~host = \"$scgi\"~" config.py
+sed -i "14s~.*~scgi = \"$scgi\"~" config.py
 
 sed -i "629i\\
         my \$torrentHash = dataToHex(\$self->{info_hash});\n\
