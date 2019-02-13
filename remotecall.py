@@ -11,7 +11,6 @@ class SCGIRequest(object):
 
         def __init__(self, url):
                 self.url = url
-                self.resp_headers = []
 
         def __send(self, scgireq):
                 ip = self.url.split(':')
