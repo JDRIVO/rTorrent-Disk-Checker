@@ -45,11 +45,13 @@ if torrent_label in cfg.imdb:
         imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if cfg.enable_disk_check:
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
+        completed.sort()
         scripts_directory = os.path.dirname(sys.argv[0])
         queued = scripts_directory + '/downloading.txt'
         disk = os.statvfs('/')
         torrent_size /= 1073741824.0
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         min_filesize = cfg.minimum_filesize
         min_age = cfg.minimum_age
@@ -59,7 +61,6 @@ if cfg.enable_disk_check:
         fallback_torrents = []
         include = True
         exclude = False
-        request = False
         fallback = False
         override = False
         no = False
@@ -74,11 +75,6 @@ if cfg.enable_disk_check:
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
         while zero < required_space:
-
-                if not request:
-                        request = True
-                        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
-                        completed.sort()
 
                 if not completed and not fallback and fallback_torrents:
                         fallback = True
