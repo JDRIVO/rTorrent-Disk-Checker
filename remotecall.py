@@ -2,10 +2,8 @@ from config import scgi
 
 try:
         import xmlrpc.client as xmlrpclib, socket
-        python3 = True
 except:
         import xmlrpclib, socket
-        python3 = False
 
 class SCGIRequest(object):
 
@@ -18,23 +16,19 @@ class SCGIRequest(object):
                 sock = socket.socket(*addrinfo[0][:3])
                 sock.connect(addrinfo[0][4])
                 sock.send(scgireq.encode())
+                sfile = sock.makefile()
+                response = ''
 
-                if python3:
-                        recvdata = resp = sock.recv(1024).decode(errors='ignore')
-                else:
-                        recvdata = resp = sock.recv(1024)
+                while True:
+                        data = sfile.read(1024)
 
-                while recvdata != '':
+                        if not data:
+                                break
 
-                        if python3:
-                                recvdata = sock.recv(1024).decode(errors='ignore')
-                        else:
-                                recvdata = sock.recv(1024)
-
-                        resp += recvdata
+                        response += data
 
                 sock.close()
-                return resp
+                return response
 
         def send(self, data):
                 "Send data over scgi to url and get response"
