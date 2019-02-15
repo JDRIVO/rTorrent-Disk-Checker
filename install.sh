@@ -1,4 +1,4 @@
-: '
+<< 'COMMENT'
 
 Manual Installation Instructions:
 
@@ -39,7 +39,7 @@ Manual Installation Instructions:
  pip install parse-torrent-name
  pip install imdbpie
 
-'
+COMMENT
 
 chmod +x autodlcheck.py config.py stop.py remotecall.py
 
