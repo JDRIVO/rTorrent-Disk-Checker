@@ -10,8 +10,9 @@ Manual Installation Instructions:
 
 1b. Add the following code to line 629 of MatchedRelease.pm ensuring you update the path to autodlcheck.py:
 
+        my $torrentNameNew = quotemeta($self->{ti}{torrentName});
         my $torrentHash = dataToHex($self->{info_hash});
-        my @script = split $/, `python /path/to/autodlcheck.py "$self->{ti}{torrentName}" "$self->{uploadMethod}{rtLabel}" "$self->{ti}{torrentSizeInBytes}" "$torrentHash"`;
+        my @script = split $/, `python /path/to/autodlcheck.py $torrentNameNew '$self->{uploadMethod}{rtLabel}' '$self->{ti}{torrentSizeInBytes}' '$torrentHash'`;
 
         if ($script[0] eq "exit") {
                 return;
@@ -47,8 +48,9 @@ scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^network.s
 sed -i "14s~.*~scgi = \"$scgi\"~" config.py
 
 sed -i "629i\\
+        my \$torrentNameNew = quotemeta(\$self->{ti}{torrentName});\n\
         my \$torrentHash = dataToHex(\$self->{info_hash});\n\
-        my @script = split $/, \`python \"$PWD/autodlcheck.py\" \"\$self->{ti}{torrentName}\" \"\$self->{uploadMethod}{rtLabel}\" \"\$self->{ti}{torrentSizeInBytes}\" \"\$torrentHash\"\`;\n\n\
+        my @script = split $/, \`python \"$PWD/autodlcheck.py\" \$torrentNameNew \'\$self->{uploadMethod}{rtLabel}\' \'\$self->{ti}{torrentSizeInBytes}\' \'\$torrentHash\'\`;\n\n\
         if (\$script[0] eq \"exit\") {\n\
                 return;\n\
         }" "/home/$USER/.irssi/scripts/AutodlIrssi/MatchedRelease.pm"
