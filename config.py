@@ -20,9 +20,9 @@ minimum_space = 5
 
 # All minimum requirements must be met by a torrent to be deleted
 
-# Filesize in Gigabytes / Age in Days
+# Torrent Size in Gigabytes / Age in Days
 
-minimum_filesize = 5
+minimum_size = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
