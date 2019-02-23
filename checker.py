@@ -7,9 +7,10 @@ try:
 except:
     import urllib
 
-torrent_name = str(sys.argv[1])
-torrent_label = str(sys.argv[2])
+torrent_name = sys.argv[1]
+torrent_label = sys.argv[2]
 torrent_size = int(sys.argv[3])
+torrent_hash = sys.argv[4]
 
 def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
 
@@ -45,15 +46,14 @@ if torrent_label in cfg.imdb:
         imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
 
 if cfg.enable_disk_check:
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total=', 'd.hash='))
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
         completed.sort()
-        scripts_directory = os.path.dirname(sys.argv[0])
-        queued = scripts_directory + '/downloading.txt'
+        queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         torrent_size /= 1073741824.0
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
-        min_filesize = cfg.minimum_filesize
+        min_size = cfg.minimum_size
         min_age = cfg.minimum_age
         min_ratio = cfg.minimum_ratio
         fb_age = cfg.fallback_age
@@ -65,7 +65,7 @@ if cfg.enable_disk_check:
         override = False
         no = False
 
-        if downloading and [0] in downloading:
+        if [0 in list for list in downloading if list[1] != torrent_hash]:
                 available_space -= float(open(queued).readline())
 
         with open(queued, 'w+') as textfile:
@@ -84,7 +84,7 @@ if cfg.enable_disk_check:
 
                         if override:
                                 override = False
-                                min_filesize = cfg.minimum_filesize
+                                min_size = cfg.minimum_size
                                 min_age = cfg.minimum_age
                                 min_ratio = cfg.minimum_ratio
                                 fb_age = cfg.fallback_age
@@ -113,7 +113,7 @@ if cfg.enable_disk_check:
 
                                         elif cfg.labels[label][0] is not include:
                                                 override = True
-                                                min_filesize = cfg.labels[label][0]
+                                                min_size = cfg.labels[label][0]
                                                 min_age = cfg.labels[label][1]
                                                 min_ratio = cfg.labels[label][2]
                                                 fb_age = cfg.labels[label][3]
@@ -144,7 +144,7 @@ if cfg.enable_disk_check:
 
                                         elif cfg.trackers[rule][0] is not include:
                                                 override = True
-                                                min_filesize = cfg.trackers[rule][0]
+                                                min_size = cfg.trackers[rule][0]
                                                 min_age = cfg.trackers[rule][1]
                                                 min_ratio = cfg.trackers[rule][2]
                                                 fb_age = cfg.trackers[rule][3]
@@ -158,19 +158,19 @@ if cfg.enable_disk_check:
 
                                         continue
 
-                        age = (datetime.now() - datetime.utcfromtimestamp(oldest_torrent[0])).days
-                        filesize = oldest_torrent[3] / 1073741824.0
-                        ratio = oldest_torrent[4] / 1000.0
-                        path = oldest_torrent[5]
-                        torrent_hash = oldest_torrent[6]
+                        t_age = (datetime.now() - datetime.utcfromtimestamp(oldest_torrent[0])).days
+                        t_size = oldest_torrent[3] / 1073741824.0
+                        t_ratio = oldest_torrent[4] / 1000.0
+                        t_path = oldest_torrent[5]
+                        t_hash = oldest_torrent[6]
 
-                        if filesize < min_filesize or age < min_age or ratio < min_ratio:
+                        if t_size < min_size or t_age < min_age or t_ratio < min_ratio:
 
-                                if fb_age is not no and filesize >= min_filesize and age >= fb_age:
-                                        fallback_torrents.append([path, torrent_hash, filesize])
+                                if fb_age is not no and t_size >= min_size and t_age >= fb_age:
+                                        fallback_torrents.append([t_path, t_hash, t_size])
 
-                                elif fb_ratio is not no and filesize >= min_filesize and ratio >= fb_ratio:
-                                        fallback_torrents.append([path, torrent_hash, filesize])
+                                elif fb_ratio is not no and t_size >= min_size and t_ratio >= fb_ratio:
+                                        fallback_torrents.append([t_path, t_hash, t_size])
 
                                 del completed[0]
 
@@ -184,29 +184,29 @@ if cfg.enable_disk_check:
                                 continue
                 else:
                         oldest_torrent = fallback_torrents[0]
-                        path = oldest_torrent[0]
-                        torrent_hash = oldest_torrent[1]
-                        filesize = oldest_torrent[2]
+                        t_path = oldest_torrent[0]
+                        t_hash = oldest_torrent[1]
+                        t_size = oldest_torrent[2]
 
-                xmlrpc('d.tracker_announce', tuple([torrent_hash]))
-                xmlrpc('d.erase', tuple([torrent_hash]))
+                xmlrpc('d.tracker_announce', tuple([t_hash]))
+                xmlrpc('d.erase', tuple([t_hash]))
 
-                if os.path.isdir(path):
-                        shutil.rmtree(path)
+                if os.path.isdir(t_path):
+                        shutil.rmtree(t_path)
                 else:
-                        os.remove(path)
+                        os.remove(t_path)
 
                 if not fallback:
                         del completed[0]
                 else:
                         del fallback_torrents[0]
 
-                zero += filesize
+                zero += t_size
 
                 if not completed and not fallback_torrents:
                         break
 
         if available_space < required_space:
-                subprocess.Popen(['python', scripts_directory + '/stop.py', sys.argv[4]], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                xmlrpc('d.stop', tuple([torrent_hash]))
 
 print('finish')
