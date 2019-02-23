@@ -1,6 +1,8 @@
 ## Script Explanation
 
-#### This script is capable of the following functions prior to autodl-irssi sending a torrent to rTorrent.
+#### This script is capable of the following functions prior:
+                                                               to autodl-irssi sending a torrent to rTorrent.
+                                                               to directly or remotely adding a torrent.
 
 **1**. It can check your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the script will delete torrents based on criteria defined in [config.py](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/config.py). The script will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	
 
@@ -10,13 +12,7 @@
 
 Run the installation script by entering the following command in your terminal:
 
-`bash install.sh`
-
-To enable the script set the .torrent action in autodl-irssi to **rtorrent**.
-
-<p align="center">
-  <img src="https://cdn.pbrd.co/images/HoXZLSN.png">
-</p>
+`bash setup.sh`
 
 ## [Test Script](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/testscript.py)
 
