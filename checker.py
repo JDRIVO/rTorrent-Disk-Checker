@@ -208,5 +208,3 @@ if cfg.enable_disk_check:
 
         if available_space < required_space:
                 xmlrpc('d.stop', tuple([torrent_hash]))
-
-print('finish')
