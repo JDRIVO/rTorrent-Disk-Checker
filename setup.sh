@@ -8,7 +8,7 @@ chmod +x checker.py config.py remotecall.py
 
 2. rtorrent.rc File Modification
 
-2a. Locate your rtorrent.c file via this command:
+2a. Locate your rtorrent.rc file via this command:
 
 find /home/$USER -name '.rtorrent.rc'
 
