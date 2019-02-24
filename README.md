@@ -1,6 +1,6 @@
 ## Script Explanation
 
-#### This script is capable of the following functions prior to:
+#### This script is capable of the following functions upon:
                                                         a torrent added by any program (autodl-irssi, RSS Downloader etc)
                                                         directly or remotely adding a torrent.
 
