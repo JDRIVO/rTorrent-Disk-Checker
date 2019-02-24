@@ -65,7 +65,7 @@ if cfg.enable_disk_check:
         override = False
         no = False
 
-        if [list for list in downloading if torrent_hash not in list and 0 in list]:
+        if [list for list in downloading if list[1] is not torrent_hash and 0 is list[0]]:
                 available_space -= float(open(queued).readline())
 
         with open(queued, 'w+') as textfile:
