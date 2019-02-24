@@ -80,8 +80,8 @@ while true; do
     case $answer in
 
         [yY] )
-                 pip install imdbpie || sudo pip install imdbpie
-                 pip install parse-torrent-name || sudo pip install parse-torrent-name
+                 pip install imdbpie -q || sudo pip install imdbpie -q
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q
                  break
                  ;;
 
