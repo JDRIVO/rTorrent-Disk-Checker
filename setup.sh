@@ -8,7 +8,7 @@ chmod +x checker.py config.py remotecall.py
 
 2. Rtorrent.rc Modifcation
 
-2a. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added.
+2a. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
 
 method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
