@@ -16,7 +16,7 @@ find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K
 2b. Update the scgi variable in line 14 of config.py with your own SCGI address/port.
 
 2c. Add this code to your rtorrent.rc file if you want the script to execute when you remotely or directly add torrents to rtorrent:
-    !! Update the path to checker !!
+    !! Update the path to checker.py !!
 
 method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
@@ -25,7 +25,7 @@ method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/pa
 1. Access the autodl-irssi filters from within rutorrent
 2. Click on a filter and access the action tab
 3. Set the .torrent action to 'rtorrent'
-4. Paste the following code into the commands box !! Update the path to checker !!:
+4. Paste the following code into the commands box !! Update the path to checker.py !!:
 
 execute=/usr/bin/python,/path/to/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=
 
