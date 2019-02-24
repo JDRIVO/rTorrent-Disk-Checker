@@ -69,4 +69,4 @@ rtorrent=$(find /home/$USER -name '.rtorrent.rc')
 sed -i "1i\
 method.set_key = event.download.inserted_new,script,\"execute=/usr/bin/python,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
 printf "\nRestart rtorrent for the changes to take effect.\n\n"
-printf  "Configuration Completed\n"
+printf  "Configuration completed.\n"
