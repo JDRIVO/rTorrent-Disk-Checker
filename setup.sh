@@ -44,7 +44,7 @@ chmod +x checker.py config.py remotecall.py
 scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K.*")
 
 if [ -z "$scgi" ]; then
-    echo 'SCGI address not found. Manually change it in the config.py file.'
+    echo 'SCGI address not found. Manually update it in the config.py file.'
 else
     sed -i "14s~.*~scgi = \"$scgi\"~" config.py
 fi
