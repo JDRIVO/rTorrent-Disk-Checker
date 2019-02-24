@@ -6,7 +6,7 @@ Manual Setup Instructions:
 
 chmod +x checker.py config.py remotecall.py
 
-2. rtorrent.rc File Modifcation
+2. rtorrent.rc File Modification
 
 2a. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
 
