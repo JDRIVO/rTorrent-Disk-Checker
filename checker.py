@@ -188,8 +188,9 @@ if cfg.enable_disk_check:
                         t_hash = oldest_torrent[1]
                         t_size = oldest_torrent[2]
 
-                xmlrpc('d.tracker_announce', tuple([t_hash]))
-                xmlrpc('d.erase', tuple([t_hash]))
+                t_hash = tuple([t_hash])
+                xmlrpc('d.tracker_announce', t_hash)
+                xmlrpc('d.erase', t_hash)
 
                 if os.path.isdir(t_path):
                         shutil.rmtree(t_path)
