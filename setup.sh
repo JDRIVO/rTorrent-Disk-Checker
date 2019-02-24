@@ -16,7 +16,7 @@ find /home/$USER -name '.rtorrent.rc'
 
 method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
-3. Disk Check Function Configuration (Skip if Disabled)
+3. SCGI Address Addition
 
 3a. Enter the following command in your terminal to obtain your SCGI address/port:
 
