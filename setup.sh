@@ -102,7 +102,7 @@ while true; do
     case $answer in
 
         [yY] )
-                 echo "To enable this action perform the following:"
+                 printf "\nTo enable this action perform the following:\n"
                  echo "1. Access the autodl-irssi filters from within rutorrent"
                  echo "2. Click on a filter and access the action tab"
                  echo "3. Set the .torrent action to 'rtorrent'"
