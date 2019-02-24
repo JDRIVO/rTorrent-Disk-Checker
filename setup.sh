@@ -49,17 +49,15 @@ else
     sed -i "14s~.*~scgi = \"$scgi\"~" config.py
 fi
 
-echo "Do you want the script to execute before adding torrents to rtorrent remotely or directly (Y/N)?"
+echo "Will you be using the IMDB function of the script (Y/N)?"
 
 while true; do
     read answer
     case $answer in
 
         [yY] )
-                 rtorrent=$(find /home/$USER -name '.rtorrent.rc')
-                 sed -i "1i\
-                 method.set_key = event.download.inserted_new,script,\"execute=/usr/bin/python,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
-                 printf "Restart rtorrent for the changes take effect.\n\n"
+                 pip install imdbpie -q || sudo pip install imdbpie -q
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q
                  break
                  ;;
 
@@ -73,15 +71,17 @@ while true; do
     esac
 done
 
-echo "Will you be using the IMDB function of the script (Y/N)?"
+echo "Do you want the script to execute before adding torrents to rtorrent remotely or directly (Y/N)?"
 
 while true; do
     read answer
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q
+                 rtorrent=$(find /home/$USER -name '.rtorrent.rc')
+                 sed -i "1i\
+                 method.set_key = event.download.inserted_new,script,\"execute=/usr/bin/python,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
+                 printf "Restart rtorrent for the changes take effect.\n\n"
                  break
                  ;;
 
