@@ -60,7 +60,7 @@ done
 scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K.*")
 
 if [ -z "$scgi" ]; then
-    echo 'SCGI address not found. Manually update it in the config.py file.'
+    echo 'SCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.'
 else
     sed -i "14s~.*~scgi = \"$scgi\"~" config.py
 fi
