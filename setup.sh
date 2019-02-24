@@ -6,23 +6,23 @@ Manual Setup Instructions:
 
 chmod +x checker.py config.py remotecall.py
 
-2. Rtorrent.rc Modifcation
+2. rtorrent.rc File Modifcation
 
 2a. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
 
 method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
-2. Disk Check Function Configuration (Skip if Disabled)
+3. Disk Check Function Configuration (Skip if Disabled)
 
-2a. Enter the following command in your terminal to obtain your SCGI address/port:
+3a. Enter the following command in your terminal to obtain your SCGI address/port:
 
 find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K.*"
 
-2b. Update the scgi variable in line 14 of config.py with your own SCGI address/port.
+3b. Update the scgi variable in line 14 of config.py with your own SCGI address/port.
 
-3. Python Module Installations Required for IMDB Function (Skip if Unused)
+4. Python Module Installations Required for IMDB Function (Skip if Unused)
 
-3a. Enter the following commands in your terminal to install parse-torrent-name and ImdbPie:
+4a. Enter the following commands in your terminal to install parse-torrent-name and ImdbPie:
 
 pip install parse-torrent-name
 pip install imdbpie
