@@ -52,11 +52,8 @@ if cfg.enable_disk_check:
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         torrent_size /= 1073741824.0
         fallback_torrents = []
-        min_size = cfg.minimum_size
-        min_age = cfg.minimum_age
-        min_ratio = cfg.minimum_ratio
-        fb_age = cfg.fallback_age
-        fb_ratio = cfg.fallback_ratio
+        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
         include = True
         exclude = False
         fallback = False
@@ -82,11 +79,7 @@ if cfg.enable_disk_check:
 
                         if override:
                                 override = False
-                                min_size = cfg.minimum_size
-                                min_age = cfg.minimum_age
-                                min_ratio = cfg.minimum_ratio
-                                fb_age = cfg.fallback_age
-                                fb_ratio = cfg.fallback_ratio
+                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
