@@ -14,7 +14,7 @@ find /home/$USER -name '.rtorrent.rc'
 
 2b. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
 
-method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
+method.set_key = event.download.inserted_new,checker,"execute=python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
 3. SCGI Address Addition
 
@@ -67,6 +67,6 @@ fi
 
 rtorrent=$(find /home/$USER -name '.rtorrent.rc')
 sed -i "1i\
-method.set_key = event.download.inserted_new,script,\"execute=/usr/bin/python,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
+method.set_key = event.download.inserted_new,checker,\"execute=python,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
 printf "\nRestart rtorrent for the changes to take effect.\n\n"
 printf  "Configuration completed.\n"
