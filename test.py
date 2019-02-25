@@ -69,8 +69,10 @@ if cfg.enable_disk_check:
                         if cfg.labels:
 
                                 if t_label in cfg.labels:
+                                        label_rule = cfg.labels[t_label]
+                                        rule = label_rule[0]
 
-                                        if not cfg.labels[t_label][0]:
+                                        if not rule:
                                                 del completed[0]
 
                                                 if not completed and not fallback_torrents:
@@ -78,9 +80,9 @@ if cfg.enable_disk_check:
 
                                                 continue
 
-                                        elif cfg.labels[t_label][0] is not include:
+                                        elif rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = cfg.labels[t_label]
+                                                min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
 
                                 elif cfg.labels_only:
                                         del completed[0]
@@ -94,9 +96,10 @@ if cfg.enable_disk_check:
                                 rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
 
                                 if rule:
-                                        rule = rule[0]
+                                        tracker_rule = cfg.trackers[rule[0]]
+                                        rule = tracker_rule[0]
 
-                                        if not cfg.trackers[rule][0]:
+                                        if not rule:
                                                 del completed[0]
 
                                                 if not completed and not fallback_torrents:
@@ -104,9 +107,9 @@ if cfg.enable_disk_check:
 
                                                 continue
 
-                                        elif cfg.trackers[rule][0] is not include:
+                                        elif rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = cfg.trackers[rule]
+                                                min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
 
                                 elif cfg.trackers_only:
                                         del completed[0]
