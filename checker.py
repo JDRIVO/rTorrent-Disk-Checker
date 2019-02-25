@@ -12,7 +12,7 @@ torrent_label = sys.argv[2]
 torrent_size = int(sys.argv[3])
 torrent_hash = sys.argv[4]
 
-def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
+def imdb_search():
 
         try:
                 import PTN
@@ -21,7 +21,7 @@ def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
                 imdb = Imdb()
                 torrent_info = PTN.parse(torrent_name)
 
-                search = imdb.get_title_ratings(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])
+                search = imdb.get_title_ratings(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])
                 rating = search['rating']
                 votes = search['ratingCount']
         except:
@@ -32,7 +32,7 @@ def imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign):
                         quit()
 
         if skip_foreign:
-                country = imdb.get_title_versions(imdb.search_for_title(str(torrent_info['title']) + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
+                country = imdb.get_title_versions(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
 
                 if 'US' not in country:
                         xmlrpc('d.erase', tuple([torrent_hash]))
@@ -43,22 +43,22 @@ if torrent_label in cfg.imdb:
         minimum_rating = cfg.imdb[torrent_label][0]
         minimum_votes = cfg.imdb[torrent_label][1]
         skip_foreign = cfg.imdb[torrent_label][2]
-        imdb_search(torrent_name, minimum_rating, minimum_votes, skip_foreign)
+        imdb_search()
 
 if cfg.enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total=', 'd.hash='))
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.size_bytes=', 'd.ratio=', 'd.base_path=', 'd.hash='))
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
         completed.sort()
-        queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
-        torrent_size /= 1073741824.0
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
+        torrent_size /= 1073741824.0
+        fallback_torrents = []
         min_size = cfg.minimum_size
         min_age = cfg.minimum_age
         min_ratio = cfg.minimum_ratio
         fb_age = cfg.fallback_age
         fb_ratio = cfg.fallback_ratio
-        fallback_torrents = []
         include = True
         exclude = False
         fallback = False
@@ -80,7 +80,7 @@ if cfg.enable_disk_check:
                         fallback = True
 
                 if not fallback:
-                        oldest_torrent = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_hash, t_path = completed[0]
 
                         if override:
                                 override = False
@@ -90,7 +90,7 @@ if cfg.enable_disk_check:
                                 fb_age = cfg.fallback_age
                                 fb_ratio = cfg.fallback_ratio
 
-                        if cfg.exclude_unlabelled and not oldest_torrent[1]:
+                        if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
 
                                 if not completed and not fallback_torrents:
@@ -99,11 +99,11 @@ if cfg.enable_disk_check:
                                 continue
 
                         if cfg.labels:
-                                label = urllib.unquote(oldest_torrent[1])
+                                t_label = urllib.unquote(t_label)
 
-                                if label in cfg.labels:
+                                if t_label in cfg.labels:
 
-                                        if not cfg.labels[label][0]:
+                                        if not cfg.labels[t_label][0]:
                                                 del completed[0]
 
                                                 if not completed and not fallback_torrents:
@@ -111,13 +111,9 @@ if cfg.enable_disk_check:
 
                                                 continue
 
-                                        elif cfg.labels[label][0] is not include:
+                                        elif cfg.labels[t_label][0] is not include:
                                                 override = True
-                                                min_size = cfg.labels[label][0]
-                                                min_age = cfg.labels[label][1]
-                                                min_ratio = cfg.labels[label][2]
-                                                fb_age = cfg.labels[label][3]
-                                                fb_ratio = cfg.labels[label][4]
+                                                min_size, min_age, min_ratio, fb_age, fb_ratio = cfg.labels[t_label]
 
                                 elif cfg.labels_only:
                                         del completed[0]
@@ -128,8 +124,7 @@ if cfg.enable_disk_check:
                                         continue
 
                         if cfg.trackers and not override:
-                                tracker = oldest_torrent[2]
-                                rule = [rule for rule in cfg.trackers for url in tracker if rule in url[0]]
+                                rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
 
                                 if rule:
                                         rule = rule[0]
@@ -144,11 +139,7 @@ if cfg.enable_disk_check:
 
                                         elif cfg.trackers[rule][0] is not include:
                                                 override = True
-                                                min_size = cfg.trackers[rule][0]
-                                                min_age = cfg.trackers[rule][1]
-                                                min_ratio = cfg.trackers[rule][2]
-                                                fb_age = cfg.trackers[rule][3]
-                                                fb_ratio = cfg.trackers[rule][4]
+                                                min_size, min_age, min_ratio, fb_age, fb_ratio = cfg.trackers[rule]
 
                                 elif cfg.trackers_only:
                                         del completed[0]
@@ -158,19 +149,17 @@ if cfg.enable_disk_check:
 
                                         continue
 
-                        t_age = (datetime.now() - datetime.utcfromtimestamp(oldest_torrent[0])).days
-                        t_size = oldest_torrent[3] / 1073741824.0
-                        t_ratio = oldest_torrent[4] / 1000.0
-                        t_path = oldest_torrent[5]
-                        t_hash = oldest_torrent[6]
+                        t_age = (datetime.now() - datetime.utcfromtimestamp(t_age)).days
+                        t_ratio /= 1000.0
+                        t_size /= 1073741824.0
 
-                        if t_size < min_size or t_age < min_age or t_ratio < min_ratio:
+                        if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
-                                if fb_age is not no and t_size >= min_size and t_age >= fb_age:
-                                        fallback_torrents.append([t_path, t_hash, t_size])
+                                if fb_age is not no and t_age >= fb_age and t_size >= min_size:
+                                        fallback_torrents.append([t_hash, t_path, t_size])
 
-                                elif fb_ratio is not no and t_size >= min_size and t_ratio >= fb_ratio:
-                                        fallback_torrents.append([t_path, t_hash, t_size])
+                                elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
+                                        fallback_torrents.append([t_hash, t_path, t_size])
 
                                 del completed[0]
 
@@ -183,10 +172,7 @@ if cfg.enable_disk_check:
 
                                 continue
                 else:
-                        oldest_torrent = fallback_torrents[0]
-                        t_path = oldest_torrent[0]
-                        t_hash = oldest_torrent[1]
-                        t_size = oldest_torrent[2]
+                        t_hash, t_path, t_size = fallback_torrents[0]
 
                 t_hash = tuple([t_hash])
                 xmlrpc('d.tracker_announce', t_hash)
