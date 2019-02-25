@@ -167,5 +167,6 @@ with open('testresult.txt', 'w+') as textfile:
 for result in deleted:
         print(result)
 
+print("TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n")
 print("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero))
-print("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download" % (available_space, calc, torrent_size))
+print("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n" % (available_space, calc, torrent_size))
