@@ -1,4 +1,4 @@
-import sys, os, shutil, subprocess, config as cfg
+import sys, os, shutil, config as cfg
 from datetime import datetime
 from remotecall import xmlrpc
 
