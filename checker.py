@@ -40,9 +40,7 @@ def imdb_search():
 
 
 if torrent_label in cfg.imdb:
-        minimum_rating = cfg.imdb[torrent_label][0]
-        minimum_votes = cfg.imdb[torrent_label][1]
-        skip_foreign = cfg.imdb[torrent_label][2]
+        minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
 if cfg.enable_disk_check:
