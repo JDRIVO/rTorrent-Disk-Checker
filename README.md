@@ -14,7 +14,7 @@ Run the setup script by entering the following command in your terminal (Refer t
 
 `bash setup.sh`
 
-## [Test Script](https://github.com/GangaBanga/AUTODL-IRSSI-IMDB-DISK-CHECK/blob/master/testscript.py)
+## [Test Script](https://github.com/GangaBanga/RTORRENT-IMDB-DISK-CHECK/blob/master/test.py)
 
 #### This script will show you what torrents the script will delete without actually deleting torrents.
 
@@ -22,6 +22,6 @@ Results will output to your terminal and a text file named **testresult.txt**
 
 Enter the following command in your terminal to run it:
 
-`python testscript.py 69`
+`python test.py 69`
 
 **69** = torrent size in gigabytes
