@@ -3,9 +3,9 @@ from datetime import datetime
 from remotecall import xmlrpc
 
 try:
-    from urllib import parse as urllib
+        from urllib import parse as urllib
 except:
-    import urllib
+        import urllib
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
