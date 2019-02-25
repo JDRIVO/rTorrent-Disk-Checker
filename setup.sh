@@ -22,7 +22,7 @@ method.set_key = event.download.inserted_new,script,"execute=/usr/bin/python,/pa
 
 find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K.*"
 
-3b. Update the scgi variable in line 14 of config.py with your own SCGI address/port.
+3b. Update the scgi variable in line 9 of config.py with your own SCGI address/port.
 
 4. Python Module Installations Required for IMDB Function (Skip if Unused)
 
@@ -62,7 +62,7 @@ scgi=$(find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi
 if [ -z "$scgi" ]; then
     echo 'SCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.'
 else
-    sed -i "14s~.*~scgi = \"$scgi\"~" config.py
+    sed -i "9s~.*~scgi = \"$scgi\"~" config.py
 fi
 
 rtorrent=$(find /home/$USER -name '.rtorrent.rc')
