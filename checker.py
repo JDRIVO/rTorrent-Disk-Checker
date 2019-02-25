@@ -126,10 +126,10 @@ if cfg.enable_disk_check:
                                         continue
 
                         if cfg.trackers and not override:
-                                rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
+                                tracker_rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
 
-                                if rule:
-                                        tracker_rule = cfg.trackers[rule[0]]
+                                if tracker_rule:
+                                        tracker_rule = cfg.trackers[tracker_rule[0]]
                                         rule = tracker_rule[0]
 
                                         if not rule:
