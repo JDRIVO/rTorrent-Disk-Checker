@@ -162,7 +162,7 @@ with open('testresult.txt', 'w+') as textfile:
         textfile.write("TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n")
 
         for result in deleted:
-                textfile.write(str(result.encode('utf-8')) + "\n")
+                textfile.write(result + "\n")
 
 for result in deleted:
         print(result)
