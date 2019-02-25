@@ -5,13 +5,13 @@ no = False
 
 ############ USER DEFINED VARIABLES START ############
 
+# SCGI address found in your rtorrent.rc file
+scgi = "127.0.0.1:5000"
+
 # no to disable
 enable_disk_check = yes
 
 ###### DISK CHECK SECTION - IGNORE IF DISABLED ######
-
-# SCGI address found in your rtorrent.rc file
-scgi = "127.0.0.1:5000"
 
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
