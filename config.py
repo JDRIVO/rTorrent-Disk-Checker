@@ -26,10 +26,10 @@ minimum_size = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
-# Only the age of a torrent must be higher or equal to this number to be deleted (filesize requirement remains) - no to disable
+# Only the age of a torrent must be higher or equal to this number to be deleted (torrent size requirement remains) - no to disable
 fallback_age = no
 
-# Only the ratio of a torrent must be higher or equal to this number to be deleted (filesize requirement remains) - no to disable
+# Only the ratio of a torrent must be higher or equal to this number to be deleted (torrent size requirement remains) - no to disable
 fallback_ratio = 1.1
 
 # GENERAL RULES END
@@ -39,7 +39,7 @@ fallback_ratio = 1.1
 
 # include: use general rules | exclude: exclude tracker
 
-# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 trackers = {
 #                     "demonoid.pw" : [include],
@@ -58,7 +58,7 @@ trackers_only = yes
 
 # include: use general/tracker rules | exclude: exclude label
 
-# Value Order: 1. Minimum Filesize (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 labels = {
 #                     "Trash" : [include],
