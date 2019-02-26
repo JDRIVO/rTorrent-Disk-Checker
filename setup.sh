@@ -46,9 +46,9 @@ if [ -z "$rtorrent" ]; then
     exit
 fi
 
-echo 'Do you want the script to be run in Python 2 or 3? Python 3 is faster.
+printf '\nDo you want the script to be run in Python 2 or 3? Python 3 is faster.
 
-Enter 2 for Python 2 or 3 for Python 3.'
+Enter 2 for Python 2 or 3 for Python 3.\n'
 
 while true; do
     read answer
@@ -73,15 +73,7 @@ done
 sed -i "1i\
 method.set_key = event.download.inserted_new,checker,\"execute=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" "$rtorrent"
 
-scgi=$(find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*")
-
-if [ -z "$scgi" ]; then
-    echo 'SCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.'
-else
-    sed -i "9s~.*~scgi = \"$scgi\"~" config.py
-fi
-
-echo 'Will you be using the IMDB function of the script (Y/N)?'
+printf '\nWill you be using the IMDB function of the script (Y/N)?\n'
 
 while true; do
     read answer
@@ -102,6 +94,14 @@ while true; do
               ;;
     esac
 done
+
+scgi=$(find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*")
+
+if [ -z "$scgi" ]; then
+    printf '\nSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\n'
+else
+    sed -i "9s~.*~scgi = \"$scgi\"~" config.py
+fi
 
 printf '\nRestart rtorrent for the changes to take effect.\n\n'
 printf  'Configuration completed.\n\n'
