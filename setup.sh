@@ -88,8 +88,8 @@ while true; do
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q || echo 'Failed to install Python module: imdbpie'
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || echo 'Failed to install Python module: parse-torrent-name'
+                 pip install imdbpie -q || sudo pip install imdbpie -q || printf '\nFailed to install Python module: imdbpie\n\n'
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || printf '\nFailed to install Python module: parse-torrent-name\n'
                  break
                  ;;
 
@@ -103,5 +103,5 @@ while true; do
     esac
 done
 
-printf "\nRestart rtorrent for the changes to take effect.\n\n"
-printf  "Configuration completed.\n\n"
+printf '\nRestart rtorrent for the changes to take effect.\n\n'
+printf  'Configuration completed.\n\n'
