@@ -42,7 +42,7 @@ chmod +x checker.py config.py remotecall.py
 rtorrent=$(find /home/$USER -name '.rtorrent.rc')
 
 if [ -z "$rtorrent" ]; then
-    echo 'Unable to locate your rtorrent.rc file. Terminating script.'
+    echo 'rtorrent.rc file not found. Terminating script.'
     exit
 fi
 
