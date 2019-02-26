@@ -81,15 +81,15 @@ else
     sed -i "9s~.*~scgi = \"$scgi\"~" config.py
 fi
 
-echo "Will you be using the IMDB function of the script (Y/N)?"
+echo 'Will you be using the IMDB function of the script (Y/N)?'
 
 while true; do
     read answer
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q
+                 pip install imdbpie -q || sudo pip install imdbpie -q || echo 'Failed to install Python module: imdbpie'
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || echo 'Failed to install Python module: parse-torrent-name'
                  break
                  ;;
 
