@@ -38,7 +38,6 @@ def imdb_search():
                         xmlrpc('d.erase', tuple([torrent_hash]))
                         quit()
 
-
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
