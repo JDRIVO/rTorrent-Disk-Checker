@@ -15,7 +15,7 @@ find /home/$USER -name '.rtorrent.rc'
 2b. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
 
 Python 2:
-method.set_key = event.download.inserted_new,checker,"execute=python,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
+method.set_key = event.download.inserted_new,checker,"execute=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
 Python 3:
 method.set_key = event.download.inserted_new,checker,"execute=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
