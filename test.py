@@ -6,7 +6,7 @@ except:
         print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
         quit()
 
-print("\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n")
+print('\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 
 import sys, os, config as cfg
 from datetime import datetime
@@ -26,11 +26,8 @@ if cfg.enable_disk_check:
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         fallback_torrents = []
-        min_size = cfg.minimum_size
-        min_age = cfg.minimum_age
-        min_ratio = cfg.minimum_ratio
-        fb_age = cfg.fallback_age
-        fb_ratio = cfg.fallback_ratio
+        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
         include = True
         exclude = False
         fallback = False
@@ -52,11 +49,7 @@ if cfg.enable_disk_check:
 
                         if override:
                                 override = False
-                                min_size = cfg.minimum_size
-                                min_age = cfg.minimum_age
-                                min_ratio = cfg.minimum_ratio
-                                fb_age = cfg.fallback_age
-                                fb_ratio = cfg.fallback_ratio
+                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
@@ -93,10 +86,10 @@ if cfg.enable_disk_check:
                                         continue
 
                         if cfg.trackers and not override:
-                                rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
+                                tracker_rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
 
                                 if rule:
-                                        tracker_rule = cfg.trackers[rule[0]]
+                                        tracker_rule = cfg.trackers[tracker_rule[0]]
                                         rule = tracker_rule[0]
 
                                         if not rule:
@@ -151,7 +144,7 @@ if cfg.enable_disk_check:
 
                 count += 1
                 zero += t_size
-                deleted.append("%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n" % (count, t_age, count, t_name, count, t_label, count, t_tracker))
+                deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
                 if not completed and not fallback_torrents:
                         break
@@ -160,16 +153,16 @@ time = datetime.now() - startTime
 calc = available_space + zero - torrent_size
 
 with open('testresult.txt', 'w+') as textfile:
-        textfile.write("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n" % (time, count, zero))
-        textfile.write("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n" % (available_space, calc, torrent_size))
-        textfile.write("TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n")
+        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, zero))
+        textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (available_space, calc, torrent_size))
+        textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
         for result in deleted:
-                textfile.write(result + "\n")
+                textfile.write(result + '\n')
 
 for result in deleted:
         print(result)
 
-print("TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n")
-print("Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB" % (time, count, zero))
-print("%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n" % (available_space, calc, torrent_size))
+print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
+print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, zero))
+print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
