@@ -24,7 +24,7 @@ method.set_key = event.download.inserted_new,checker,"execute=python3,/path/to/c
 
 3a. Enter the following command in your terminal to obtain your SCGI address/port:
 
-find /home/$USER -name '.rtorrent.rc' -print | xargs grep -oP "^[^#]*scgi.* = \K.*"
+find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*"
 
 3b. Update the scgi variable in line 9 of config.py with your own SCGI address/port.
 
