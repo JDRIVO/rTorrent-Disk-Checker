@@ -80,8 +80,8 @@ while true; do
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q || '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || '\n\033[0;36mFailed to install Python module: parse-torrent-name\033[0m\n'
+                 pip install imdbpie -q || sudo pip install imdbpie -q || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || printf '\n\033[0;36mFailed to install Python module: parse-torrent-name\033[0m\n'
                  break
                  ;;
 
