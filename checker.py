@@ -43,7 +43,7 @@ if torrent_label in cfg.imdb:
         imdb_search()
 
 if cfg.enable_disk_check:
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.hash=', 'd.down.total='))
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
         completed.sort()
         disk = os.statvfs('/')
@@ -59,7 +59,7 @@ if cfg.enable_disk_check:
         override = False
         no = False
 
-        if downloading and [0] in downloading:
+        if [list for list in downloading if list[0] != torrent_hash and list[1] is 0]:
                 available_space -= float(open(queued).readline())
 
         with open(queued, 'w+') as textfile:
