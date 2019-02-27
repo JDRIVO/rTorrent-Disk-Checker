@@ -9,7 +9,7 @@ except:
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
-torrent_size = int(sys.argv[3])
+torrent_size = int(sys.argv[3]) / 1073741824.0
 torrent_hash = sys.argv[4]
 
 def imdb_search():
@@ -49,12 +49,11 @@ if cfg.enable_disk_check:
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
         completed.sort()
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
-        torrent_size /= 1073741824.0
-        fallback_torrents = []
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
         include = True
         exclude = fallback = override = no = False
+        fallback_torrents = []
 
         if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
                 available_space -= float(open(queued).readline())
