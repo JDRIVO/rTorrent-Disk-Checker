@@ -44,10 +44,10 @@ if torrent_label in cfg.imdb:
 
 if cfg.enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.hash=', 'd.down.total='))
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
-        completed.sort()
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
+        completed.sort()
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         torrent_size /= 1073741824.0
         fallback_torrents = []
