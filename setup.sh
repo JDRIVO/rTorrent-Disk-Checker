@@ -8,11 +8,7 @@ chmod +x checker.py config.py remotecall.py
 
 2. rtorrent.rc File Modification
 
-2a. Locate your rtorrent.rc file via this command:
-
-find /home/$USER -name '.rtorrent.rc'
-
-2b. Add the following code to your rtorrent.rc file !! Update the path to checker.py !! Restart rtorrent once added:
+2a. Add the following code to ~/.rtorrent.rc !! Update the path to checker.py !! Restart rtorrent once added:
 
 Python 2:
 method.set_key = event.download.inserted_new,checker,"execute=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
@@ -24,7 +20,7 @@ method.set_key = event.download.inserted_new,checker,"execute=python3,/path/to/c
 
 3a. Enter the following command in your terminal to obtain your SCGI address/port:
 
-find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*"
+grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 3b. Update the scgi variable in line 9 of config.py with your own SCGI address/port.
 
@@ -39,7 +35,7 @@ COMMENT
 
 chmod +x checker.py config.py remotecall.py
 
-rtorrent=$(find /home/$USER -name '.rtorrent.rc')
+rtorrent="/home/$USER/.rtorrent.rc"
 
 if [ -z "$rtorrent" ]; then
     echo 'rtorrent.rc file not found. Terminating script.'
@@ -95,7 +91,7 @@ while true; do
     esac
 done
 
-scgi=$(find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*")
+scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
 
 if [ -z "$scgi" ]; then
     printf '\n\033[0;36mSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\033[0m\n'
