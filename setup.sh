@@ -80,8 +80,8 @@ while true; do
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q || printf '\nFailed to install Python module: imdbpie\n\n'
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || printf '\nFailed to install Python module: parse-torrent-name\n'
+                 pip install imdbpie -q || sudo pip install imdbpie -q || '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
+                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || '\n\033[0;36mFailed to install Python module: parse-torrent-name\033[0m\n'
                  break
                  ;;
 
@@ -98,7 +98,7 @@ done
 scgi=$(find /home/$USER -name '.rtorrent.rc' | xargs grep -oP "^[^#]*scgi.* = \K.*")
 
 if [ -z "$scgi" ]; then
-    printf '\nSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\n'
+    printf '\n\033[0;36mSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\033[0m\n'
 else
     sed -i "9s~.*~scgi = \"$scgi\"~" config.py
 fi
