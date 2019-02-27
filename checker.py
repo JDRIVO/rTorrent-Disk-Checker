@@ -54,10 +54,7 @@ if cfg.enable_disk_check:
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
         include = True
-        exclude = False
-        fallback = False
-        override = False
-        no = False
+        exclude = fallback = override = no = False
 
         if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
                 available_space -= float(open(queued).readline())
