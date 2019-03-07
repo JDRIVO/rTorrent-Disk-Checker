@@ -50,9 +50,9 @@ if cfg.enable_disk_check:
         completed.sort()
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-        min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
-        include = True
-        exclude = fallback = override = no = False
+        include = override = True
+        exclude = no = False
+        freed = 0
         fallback_torrents = []
 
         if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
@@ -61,15 +61,14 @@ if cfg.enable_disk_check:
         with open(queued, 'w+') as textfile:
                 textfile.write(str(torrent_size))
 
-        zero = 0
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
-        while zero < required_space:
+        while freed < required_space:
 
-                if not completed and not fallback and fallback_torrents:
-                        fallback = True
+                if not completed and not fallback_torrents:
+                        break
 
-                if not fallback:
+                if completed:
                         t_age, t_label, t_tracker, t_ratio, t_size, t_hash, t_path = completed[0]
 
                         if override:
@@ -78,10 +77,6 @@ if cfg.enable_disk_check:
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
-
-                                if not completed and not fallback_torrents:
-                                        break
-
                                 continue
 
                         if cfg.labels:
@@ -93,22 +88,14 @@ if cfg.enable_disk_check:
 
                                         if not rule:
                                                 del completed[0]
-
-                                                if not completed and not fallback_torrents:
-                                                        break
-
                                                 continue
 
-                                        elif rule is not include:
+                                        if rule is not include:
                                                 override = True
                                                 min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
 
                                 elif cfg.labels_only:
                                         del completed[0]
-
-                                        if not completed and not fallback_torrents:
-                                                break
-
                                         continue
 
                         if cfg.trackers and not override:
@@ -120,22 +107,14 @@ if cfg.enable_disk_check:
 
                                         if not rule:
                                                 del completed[0]
-
-                                                if not completed and not fallback_torrents:
-                                                        break
-
                                                 continue
 
-                                        elif rule is not include:
+                                        if rule is not include:
                                                 override = True
                                                 min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
 
                                 elif cfg.trackers_only:
                                         del completed[0]
-
-                                        if not completed and not fallback_torrents:
-                                                break
-
                                         continue
 
                         t_age = (datetime.now() - datetime.utcfromtimestamp(t_age)).days
@@ -151,17 +130,12 @@ if cfg.enable_disk_check:
                                         fallback_torrents.append([t_hash, t_path, t_size])
 
                                 del completed[0]
-
-                                if not completed:
-
-                                        if fallback_torrents:
-                                                continue
-
-                                        break
-
                                 continue
+
+                        del completed[0]
                 else:
                         t_hash, t_path, t_size = fallback_torrents[0]
+                        del fallback_torrents[0]
 
                 t_hash = tuple([t_hash])
                 xmlrpc('d.tracker_announce', t_hash)
@@ -172,15 +146,7 @@ if cfg.enable_disk_check:
                 else:
                         os.remove(t_path)
 
-                if not fallback:
-                        del completed[0]
-                else:
-                        del fallback_torrents[0]
-
-                zero += t_size
-
-                if not completed and not fallback_torrents:
-                        break
+                freed += t_size
 
         if available_space < required_space:
                 xmlrpc('d.stop', tuple([torrent_hash]))
