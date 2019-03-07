@@ -52,7 +52,7 @@ if cfg.enable_disk_check:
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
         exclude = no = False
-        freed = 0
+        freed_space = 0
         fallback_torrents = []
 
         if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
@@ -63,7 +63,7 @@ if cfg.enable_disk_check:
 
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
-        while freed < required_space:
+        while freed_space < required_space:
 
                 if not completed and not fallback_torrents:
                         break
@@ -146,7 +146,7 @@ if cfg.enable_disk_check:
                 else:
                         os.remove(t_path)
 
-                freed += t_size
+                freed_space += t_size
 
         if available_space < required_space:
                 xmlrpc('d.stop', tuple([torrent_hash]))
