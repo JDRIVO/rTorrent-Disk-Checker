@@ -25,25 +25,21 @@ if cfg.enable_disk_check:
         completed.sort()
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
-        fallback_torrents = []
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-        min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
-        include = True
-        exclude = False
-        fallback = False
-        override = False
-        no = False
+        include = override = True
+        exclude = no = False
+        fallback_torrents = []
         deleted = []
         count = 0
-        zero = 0
+        freed = 0
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
-        while zero < required_space:
+        while freed < required_space:
 
-                if not completed and not fallback and fallback_torrents:
-                        fallback = True
+                if not completed and not fallback_torrents:
+                        break
 
-                if not fallback:
+                if completed:
                         t_age, t_label, t_tracker, t_ratio, t_size, t_path, t_name = completed[0]
                         t_label = urllib.unquote(t_label)
 
@@ -53,13 +49,10 @@ if cfg.enable_disk_check:
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
-
-                                if not completed and not fallback_torrents:
-                                        break
-
                                 continue
 
                         if cfg.labels:
+                                t_label = urllib.unquote(t_label)
 
                                 if t_label in cfg.labels:
                                         label_rule = cfg.labels[t_label]
@@ -67,22 +60,14 @@ if cfg.enable_disk_check:
 
                                         if not rule:
                                                 del completed[0]
-
-                                                if not completed and not fallback_torrents:
-                                                        break
-
                                                 continue
 
-                                        elif rule is not include:
+                                        if rule is not include:
                                                 override = True
                                                 min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
 
                                 elif cfg.labels_only:
                                         del completed[0]
-
-                                        if not completed and not fallback_torrents:
-                                                break
-
                                         continue
 
                         if cfg.trackers and not override:
@@ -94,22 +79,14 @@ if cfg.enable_disk_check:
 
                                         if not rule:
                                                 del completed[0]
-
-                                                if not completed and not fallback_torrents:
-                                                        break
-
                                                 continue
 
-                                        elif rule is not include:
+                                        if rule is not include:
                                                 override = True
                                                 min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
 
                                 elif cfg.trackers_only:
                                         del completed[0]
-
-                                        if not completed and not fallback_torrents:
-                                                break
-
                                         continue
 
                         t_age = (datetime.now() - datetime.utcfromtimestamp(t_age)).days
@@ -125,35 +102,22 @@ if cfg.enable_disk_check:
                                         fallback_torrents.append([t_age, t_label, t_tracker, t_size, t_name])
 
                                 del completed[0]
-
-                                if not completed:
-
-                                        if fallback_torrents:
-                                                continue
-
-                                        break
-
                                 continue
-                else:
-                        t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
 
-                if not fallback:
                         del completed[0]
                 else:
+                        t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
                         del fallback_torrents[0]
 
                 count += 1
-                zero += t_size
+                freed += t_size
                 deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
-                if not completed and not fallback_torrents:
-                        break
-
 time = datetime.now() - startTime
-calc = available_space + zero - torrent_size
+calc = available_space + freed - torrent_size
 
 with open('testresult.txt', 'w+') as textfile:
-        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, zero))
+        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, freed))
         textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (available_space, calc, torrent_size))
         textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
@@ -164,5 +128,5 @@ for result in deleted:
         print(result)
 
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, zero))
+print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed))
 print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
