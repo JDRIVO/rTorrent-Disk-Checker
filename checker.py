@@ -50,6 +50,7 @@ if cfg.enable_disk_check:
         completed.sort()
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        current_date = datetime.now()
         include = override = True
         exclude = no = False
         freed_space = 0
@@ -117,7 +118,7 @@ if cfg.enable_disk_check:
                                         del completed[0]
                                         continue
 
-                        t_age = (datetime.now() - datetime.utcfromtimestamp(t_age)).days
+                        t_age = (current_date - datetime.utcfromtimestamp(t_age)).days
                         t_ratio /= 1000.0
                         t_size /= 1073741824.0
 
