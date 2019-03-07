@@ -30,7 +30,7 @@ if cfg.enable_disk_check:
         exclude = no = False
         fallback_torrents = []
         deleted = []
-        count = 0
+        count = 1
         freed = 0
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
