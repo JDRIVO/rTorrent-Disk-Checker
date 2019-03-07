@@ -26,15 +26,16 @@ if cfg.enable_disk_check:
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        current_date = datetime.now()
         include = override = True
         exclude = no = False
         fallback_torrents = []
         deleted = []
         count = 0
-        freed = 0
+        freed_space = 0
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
-        while freed < required_space:
+        while freed_space < required_space:
 
                 if not completed and not fallback_torrents:
                         break
@@ -89,7 +90,7 @@ if cfg.enable_disk_check:
                                         del completed[0]
                                         continue
 
-                        t_age = (datetime.now() - datetime.utcfromtimestamp(t_age)).days
+                        t_age = (current_date - datetime.utcfromtimestamp(t_age)).days
                         t_ratio /= 1000.0
                         t_size /= 1073741824.0
 
@@ -110,14 +111,14 @@ if cfg.enable_disk_check:
                         del fallback_torrents[0]
 
                 count += 1
-                freed += t_size
+                freed_space += t_size
                 deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
 time = datetime.now() - startTime
-calc = available_space + freed - torrent_size
+calc = available_space + freed_space - torrent_size
 
 with open('testresult.txt', 'w+') as textfile:
-        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, freed))
+        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, freed_space))
         textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (available_space, calc, torrent_size))
         textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
@@ -128,5 +129,5 @@ for result in deleted:
         print(result)
 
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed))
+print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed_space))
 print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
