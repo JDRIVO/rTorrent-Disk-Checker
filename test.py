@@ -30,7 +30,7 @@ if cfg.enable_disk_check:
         exclude = no = False
         fallback_torrents = []
         deleted = []
-        count = 1
+        count = 0
         freed = 0
         required_space = torrent_size - (available_space - cfg.minimum_space)
 
@@ -109,9 +109,9 @@ if cfg.enable_disk_check:
                         t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
                 count += 1
                 freed += t_size
+                deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
 time = datetime.now() - startTime
 calc = available_space + freed - torrent_size
