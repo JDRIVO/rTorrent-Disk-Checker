@@ -53,7 +53,6 @@ if cfg.enable_disk_check:
                                 continue
 
                         if cfg.labels:
-                                t_label = urllib.unquote(t_label)
 
                                 if t_label in cfg.labels:
                                         label_rule = cfg.labels[t_label]
