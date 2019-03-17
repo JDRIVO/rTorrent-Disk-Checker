@@ -87,7 +87,7 @@ if cfg.enable_disk_check:
                                         label_rule = cfg.labels[t_label]
                                         rule = label_rule[0]
 
-                                        if not rule:
+                                        if rule is exclude:
                                                 del completed[0]
                                                 continue
 
@@ -106,7 +106,7 @@ if cfg.enable_disk_check:
                                         tracker_rule = cfg.trackers[tracker_rule[0]]
                                         rule = tracker_rule[0]
 
-                                        if not rule:
+                                        if rule is exclude:
                                                 del completed[0]
                                                 continue
 
