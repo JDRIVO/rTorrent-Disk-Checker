@@ -91,14 +91,6 @@ while true; do
     esac
 done
 
-scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
-
-if [ -z "$scgi" ]; then
-    printf '\n\033[0;36mSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\033[0m\n'
-else
-    sed -i "9s~.*~scgi = \"$scgi\"~" config.py
-fi
-
 printf '\nAttempting to restart rtorrent.\n'
 instance=$(pgrep rtorrent)
 
@@ -113,7 +105,7 @@ if [ $instance ]; then
             if : pgrep rtorrent; then
                 printf '\nRtorrent has been restarted successfully.\n'
             else
-                printf '\nFailed to restart rtorrent. Please restart rtorrent manually.\n'
+                printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
             fi
 
             break
@@ -122,7 +114,15 @@ if [ $instance ]; then
     done
 
 else
-    printf '\nFailed to restart rtorrent. Please restart rtorrent manually.\n'
+    printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
+fi
+
+scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
+
+if [ -z "$scgi" ]; then
+    printf '\n\033[0;36mSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\033[0m\n'
+else
+    sed -i "9s~.*~scgi = \"$scgi\"~" config.py
 fi
 
 printf '\nConfiguration completed.\n\n'
