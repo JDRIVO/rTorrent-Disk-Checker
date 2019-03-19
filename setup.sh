@@ -99,5 +99,30 @@ else
     sed -i "9s~.*~scgi = \"$scgi\"~" config.py
 fi
 
-printf '\nRestart rtorrent for the changes to take effect.\n\n'
-printf  'Configuration completed.\n\n'
+printf '\nAttempting to restart rtorrent.\n'
+instance=$(pgrep rtorrent)
+
+if [ $instance ]; then
+
+    while true; do
+        kill -KILL $instance
+
+        if : ! pgrep rtorrent; then
+            screen -d -m rtorrent
+
+            if : pgrep rtorrent; then
+                printf '\nRtorrent has been restarted successfully.\n'
+            else
+                printf '\nFailed to restart rtorrent. Please restart rtorrent manually.\n'
+            fi
+
+            break
+        fi
+
+    done
+
+else
+    printf '\nFailed to restart rtorrent. Please restart rtorrent manually.\n'
+fi
+
+printf '\nConfiguration completed.\n\n'
