@@ -42,6 +42,7 @@ if [ -z "$rtorrent" ]; then
     exit
 fi
 
+sed -i '/event.download.inserted_new,checker,"execute=python/d' ~/.rtorrent.rc
 printf '\nDo you want the script to be run in Python 2 or 3? Python 3 is faster.
 
 Enter 2 for Python 2 or 3 for Python 3.\n'
