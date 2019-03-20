@@ -12,9 +12,9 @@ import sys, os, config as cfg
 from datetime import datetime
 
 try:
-    from urllib import parse as urllib
+        from urllib import parse as urllib
 except:
-    import urllib
+        import urllib
 
 startTime = datetime.now()
 
