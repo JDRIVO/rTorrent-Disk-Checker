@@ -10,7 +10,7 @@
 
 ## Setup
 
-Run the setup script by entering the following command in your terminal (Refer to this script for manual config instructions):
+Run the setup script by entering the following command in your terminal (Refer to this script for manual setup instructions):
 
 `bash setup.sh`
 
