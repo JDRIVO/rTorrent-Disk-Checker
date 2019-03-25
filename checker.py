@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import sys, os, shutil, config as cfg
 from datetime import datetime
 from remotecall import xmlrpc
@@ -46,7 +48,7 @@ if cfg.enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.hash=', 'd.down.total='))
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.base_path='))
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
         queued = os.path.dirname(sys.argv[0]) + '/downloading.txt'
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
@@ -141,11 +143,27 @@ if cfg.enable_disk_check:
                 t_hash = tuple([t_hash])
                 xmlrpc('d.tracker_announce', t_hash)
                 xmlrpc('d.erase', t_hash)
+                files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
+                [os.remove(''.join(file)) for file in files]
 
-                if os.path.isdir(t_path):
-                        shutil.rmtree(t_path)
-                else:
-                        os.remove(t_path)
+                if os.path.exists(t_path):
+                        try:
+                                os.rmdir(t_path)
+                        except:
+
+                                for root, directories, files in os.walk(t_path, topdown=False):
+
+                                        for directory in directories:
+
+                                                try:
+                                                        os.rmdir(root + '/' + directory)
+                                                except:
+                                                        pass
+
+                                try:
+                                        os.rmdir(t_path)
+                                except:
+                                        pass
 
                 freed_space += t_size
 
