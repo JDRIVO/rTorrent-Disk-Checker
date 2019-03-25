@@ -142,6 +142,8 @@ if cfg.enable_disk_check:
 
                 t_hash = tuple([t_hash])
                 files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
+                xmlrpc('d.tracker_announce', t_hash)
+                xmlrpc('d.erase', t_hash)
                 [os.remove(''.join(file)) for file in files]
 
                 if os.path.exists(t_path):
@@ -164,8 +166,6 @@ if cfg.enable_disk_check:
                                 except:
                                         pass
 
-                xmlrpc('d.tracker_announce', t_hash)
-                xmlrpc('d.erase', t_hash)
                 freed_space += t_size
 
         if available_space < required_space:
