@@ -141,8 +141,6 @@ if cfg.enable_disk_check:
                         del fallback_torrents[0]
 
                 t_hash = tuple([t_hash])
-                xmlrpc('d.tracker_announce', t_hash)
-                xmlrpc('d.erase', t_hash)
                 files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
                 [os.remove(''.join(file)) for file in files]
 
@@ -166,6 +164,8 @@ if cfg.enable_disk_check:
                                 except:
                                         pass
 
+                xmlrpc('d.tracker_announce', t_hash)
+                xmlrpc('d.erase', t_hash)
                 freed_space += t_size
 
         if available_space < required_space:
