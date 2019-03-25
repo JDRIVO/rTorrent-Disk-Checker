@@ -40,7 +40,7 @@ def imdb_search():
                         xmlrpc('d.erase', tuple([torrent_hash]))
                         quit()
 
-def remove(t_hash, t_path):
+def remover(t_hash, t_path):
         files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
         t_hash = tuple([t_hash])
         xmlrpc('d.tracker_announce', t_hash)
@@ -160,7 +160,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                threading.Thread(target=remove, args=(t_hash, t_path,)).start()
+                threading.Thread(target=remover, args=(t_hash, t_path,)).start()
                 freed_space += t_size
 
         if available_space < required_space:
