@@ -147,6 +147,7 @@ if cfg.enable_disk_check:
                 [os.remove(''.join(file)) for file in files]
 
                 if os.path.exists(t_path):
+
                         try:
                                 os.rmdir(t_path)
                         except:
