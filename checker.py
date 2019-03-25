@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, config as cfg
+import sys, os, threading, config as cfg
 from datetime import datetime
 from remotecall import xmlrpc
 
@@ -39,6 +39,33 @@ def imdb_search():
                 if 'US' not in country:
                         xmlrpc('d.erase', tuple([torrent_hash]))
                         quit()
+
+def remove(t_hash, t_path):
+                files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
+                t_hash = tuple([t_hash])
+                xmlrpc('d.tracker_announce', t_hash)
+                xmlrpc('d.erase', t_hash)
+                [os.remove(''.join(file)) for file in files]
+
+                if os.path.exists(t_path):
+
+                        try:
+                                os.rmdir(t_path)
+                        except:
+
+                                for root, directories, files in os.walk(t_path, topdown=False):
+
+                                        for directory in directories:
+
+                                                try:
+                                                        os.rmdir(root + '/' + directory)
+                                                except:
+                                                        pass
+
+                                try:
+                                        os.rmdir(t_path)
+                                except:
+                                        pass
 
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
@@ -140,32 +167,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
-                t_hash = tuple([t_hash])
-                xmlrpc('d.tracker_announce', t_hash)
-                xmlrpc('d.erase', t_hash)
-                [os.remove(''.join(file)) for file in files]
-
-                if os.path.exists(t_path):
-
-                        try:
-                                os.rmdir(t_path)
-                        except:
-
-                                for root, directories, files in os.walk(t_path, topdown=False):
-
-                                        for directory in directories:
-
-                                                try:
-                                                        os.rmdir(root + '/' + directory)
-                                                except:
-                                                        pass
-
-                                try:
-                                        os.rmdir(t_path)
-                                except:
-                                        pass
-
+                threading.Thread(target=remove, args=(t_hash, t_path,)).start()
                 freed_space += t_size
 
         if available_space < required_space:
