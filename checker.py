@@ -55,12 +55,10 @@ def remove(t_hash, t_path):
 
                         for root, directories, files in os.walk(t_path, topdown=False):
 
-                                for directory in directories:
-
-                                        try:
-                                                os.rmdir(root + '/' + directory)
-                                        except:
-                                                pass
+                                try:
+                                        os.rmdir(root)
+                                except:
+                                        pass
 
                         try:
                                 os.rmdir(t_path)
