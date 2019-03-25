@@ -60,11 +60,6 @@ def remove(t_hash, t_path):
                                 except:
                                         pass
 
-                        try:
-                                os.rmdir(t_path)
-                        except:
-                                pass
-
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
