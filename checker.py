@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, shutil, config as cfg
+import sys, os, config as cfg
 from datetime import datetime
 from remotecall import xmlrpc
 
