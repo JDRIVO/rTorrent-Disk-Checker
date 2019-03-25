@@ -140,8 +140,8 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                t_hash = tuple([t_hash])
                 files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
+                t_hash = tuple([t_hash])
                 xmlrpc('d.tracker_announce', t_hash)
                 xmlrpc('d.erase', t_hash)
                 [os.remove(''.join(file)) for file in files]
