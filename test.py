@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from remotecall import xmlrpc
 
 try:
