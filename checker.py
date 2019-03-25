@@ -45,7 +45,7 @@ def remove(t_hash, t_path):
         t_hash = tuple([t_hash])
         xmlrpc('d.tracker_announce', t_hash)
         xmlrpc('d.erase', t_hash)
-        [os.remove(''.join(file)) for file in files]
+        [os.remove(file[0]) for file in files]
 
         if os.path.exists(t_path):
 
