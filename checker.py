@@ -45,9 +45,11 @@ def remover(t_hash, t_path):
         t_hash = tuple([t_hash])
         xmlrpc('d.tracker_announce', t_hash)
         xmlrpc('d.erase', t_hash)
-        [os.remove(file[0]) for file in files]
 
-        if os.path.exists(t_path):
+        if len(files) <= 1:
+                os.remove(files[0][0])
+        else:
+                [os.remove(file[0]) for file in files]
 
                 try:
                         os.rmdir(t_path)
