@@ -135,7 +135,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                Popen(['python', remover, t_hash, t_path])
+                Popen([sys.executable, remover, t_hash, t_path])
                 freed_space += t_size
 
         if available_space < required_space:
