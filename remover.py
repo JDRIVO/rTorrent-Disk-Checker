@@ -10,8 +10,8 @@ torrent_path = sys.argv[2]
 t_hash = tuple([torrent_hash])
 xmlrpc('d.tracker_announce', t_hash)
 xmlrpc('d.open', t_hash)
-xmlrpc('d.erase', t_hash)
 files = xmlrpc('f.multicall', (torrent_hash, '', 'f.frozen_path='))
+xmlrpc('d.erase', t_hash)
 
 if len(files) <= 1:
         os.remove(files[0][0])
