@@ -35,10 +35,8 @@ if cfg.enable_disk_check:
         current_date = datetime.now()
         include = override = True
         exclude = no = False
-        freed_space = 0
-        count = 0
-        deleted = []
-        fallback_torrents = []
+        freed_space = count = 0
+        fallback_torrents, deleted = [], []
 
         while freed_space < required_space:
 
