@@ -20,9 +20,9 @@ else:
                 os.rmdir(t_path)
         except:
 
-               for root, directories, files in os.walk(t_path, topdown=False):
+                for root, directories, files in os.walk(t_path, topdown=False):
 
-                       try:
-                               os.rmdir(root)
-                       except:
-                               pass
+                        try:
+                                os.rmdir(root)
+                        except:
+                                pass
