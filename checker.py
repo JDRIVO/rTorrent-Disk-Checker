@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, threading, config as cfg
+import sys, os, subprocess, config as cfg
 from datetime import datetime
 from remotecall import xmlrpc
 
@@ -40,33 +40,12 @@ def imdb_search():
                         xmlrpc('d.erase', tuple([torrent_hash]))
                         quit()
 
-def remover(t_hash, t_path):
-        files = xmlrpc('f.multicall', (t_hash, '', 'f.frozen_path='))
-        t_hash = tuple([t_hash])
-        xmlrpc('d.tracker_announce', t_hash)
-        xmlrpc('d.erase', t_hash)
-
-        if len(files) <= 1:
-                os.remove(files[0][0])
-        else:
-                [os.remove(file[0]) for file in files]
-
-                try:
-                        os.rmdir(t_path)
-                except:
-
-                        for root, directories, files in os.walk(t_path, topdown=False):
-
-                                try:
-                                        os.rmdir(root)
-                                except:
-                                        pass
-
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
 if cfg.enable_disk_check:
+        remover = os.path.dirname(sys.argv[0]) + '/remover.py'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
@@ -155,7 +134,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                threading.Thread(target=remover, args=(t_hash, t_path,)).start()
+                subprocess.Popen(['python', remover, t_hash, t_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
                 freed_space += t_size
 
         if available_space < required_space:
