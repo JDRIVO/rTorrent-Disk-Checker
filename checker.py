@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, subprocess, config as cfg
+import sys, os, config as cfg
+from subprocess import Popen
 from datetime import datetime
 from remotecall import xmlrpc
 
@@ -134,7 +135,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                subprocess.Popen(['python', remover, t_hash, t_path], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                Popen(['python', remover, t_hash, t_path])
                 freed_space += t_size
 
         if available_space < required_space:
