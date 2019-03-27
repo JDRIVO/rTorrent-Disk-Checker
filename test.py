@@ -23,19 +23,22 @@ startTime = datetime.now()
 torrent_size = float(sys.argv[1])
 
 if cfg.enable_disk_check:
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.base_path=', 'd.name='))
+        remover = os.path.dirname(sys.argv[0]) + '/remover.py'
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.directory=', 'd.name='))
         completed.sort()
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
+        downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
         disk = os.statvfs('/')
-        available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
+        required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         current_date = datetime.now()
         include = override = True
         exclude = no = False
-        fallback_torrents = []
-        deleted = []
-        count = 0
         freed_space = 0
-        required_space = torrent_size - (available_space - cfg.minimum_space)
+        count = 0
+        deleted = []
+        fallback_torrents = []
 
         while freed_space < required_space:
 
