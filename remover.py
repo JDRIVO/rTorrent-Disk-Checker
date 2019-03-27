@@ -14,11 +14,11 @@ xmlrpc('d.erase', t_hash)
 if len(files) <= 1:
         os.remove(files[0][0])
 else:
-       [os.remove(file[0]) for file in files]
+        [os.remove(file[0]) for file in files]
 
-       try:
-               os.rmdir(t_path)
-       except:
+        try:
+                os.rmdir(t_path)
+        except:
 
                for root, directories, files in os.walk(t_path, topdown=False):
 
