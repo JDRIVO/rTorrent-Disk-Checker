@@ -12,7 +12,7 @@ except:
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
-torrent_size = int(sys.argv[3]) / 1073741824.0
+torrent_size = sys.argv[3]
 torrent_hash = sys.argv[4]
 
 def imdb_search():
@@ -46,20 +46,29 @@ if torrent_label in cfg.imdb:
         imdb_search()
 
 if cfg.enable_disk_check:
-        remover = os.path.dirname(sys.argv[0]) + '/remover.py'
+        script_path = os.path.dirname(sys.argv[0])
+        remover = script_path + '/remover.py'
+        last_dl = script_path + '/tsize.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
-        downloading = sum(torrent[0] for torrent in downloading)
+        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
         disk = os.statvfs('/')
-        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
-        required_space = available_space - cfg.minimum_space
+        available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         current_date = datetime.now()
         include = override = True
         exclude = no = False
         freed_space = 0
         fallback_torrents = []
+
+        if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
+                available_space -= float(open(last_dl).readline())
+
+        with open(last_dl, 'w+') as textfile:
+                textfile.write(torrent_size)
+
+        torrent_size = int(torrent_size) / 1073741824.0
+        required_space = torrent_size - (available_space - cfg.minimum_space)
 
         while freed_space < required_space:
 
