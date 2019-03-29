@@ -36,9 +36,6 @@ with open(queue, 'a+') as txt:
 
 time.sleep(0.01)
 
-with open(queue, 'r') as txt:
-        queued = txt.read()
-
 while True:
 
         try:
