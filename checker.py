@@ -48,8 +48,8 @@ if torrent_label in cfg.imdb:
 if cfg.enable_disk_check:
         current_date = datetime.now()
         script_path = os.path.dirname(sys.argv[0])
-        remover = script_path + '/remover.py'
         queue = script_path + '/' + str(random.randrange(0, 99999))
+        remover = script_path + '/remover.py'
         last_dl = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
