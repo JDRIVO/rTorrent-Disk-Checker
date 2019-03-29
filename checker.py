@@ -59,7 +59,7 @@ if cfg.enable_disk_check:
                 downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
         except:
                 downloading = 0
-                
+
         with open(last_dl, 'w+') as textfile:
                 textfile.write(torrent_hash)
 
