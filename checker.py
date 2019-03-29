@@ -48,13 +48,18 @@ if torrent_label in cfg.imdb:
 if cfg.enable_disk_check:
         script_path = os.path.dirname(sys.argv[0])
         remover = script_path + '/remover.py'
-        last_dl = script_path + '/tsize.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
-        downloading.remove([0])
+
+        try:
+                last_dl = open(script_path + '/hash.txt').readline()
+                downloading = xmlrpc('d.left.bytes', tuple([last_dl]))
+        except:
+                downloading = 0
+
         disk = os.statvfs('/')
-        available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
+        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
+        required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         current_date = datetime.now()
         include = override = True
@@ -62,14 +67,8 @@ if cfg.enable_disk_check:
         freed_space = 0
         fallback_torrents = []
 
-        if [0] in downloading:
-                available_space -= float(open(last_dl).readline())
-
         with open(last_dl, 'w+') as textfile:
-                textfile.write(torrent_size)
-
-        torrent_size = int(torrent_size) / 1073741824.0
-        required_space = torrent_size - (available_space - cfg.minimum_space)
+                textfile.write(torrent_hash)
 
         while freed_space < required_space:
 
