@@ -55,7 +55,6 @@ if cfg.enable_disk_check:
         try:
                 last_hash = open(last_dl).readline()
                 downloading = xmlrpc('d.left.bytes', tuple([last_hash]))
-                
         except:
                 downloading = 0
                 
