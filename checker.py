@@ -56,10 +56,11 @@ if cfg.enable_disk_check:
                 last_hash = open(last_dl).readline()
                 downloading = xmlrpc('d.left.bytes', tuple([last_hash]))
                 
-                with open(last_dl, 'w+') as textfile:
-                        textfile.write(torrent_hash)
         except:
                 downloading = 0
+                
+        with open(last_dl, 'w+') as textfile:
+                textfile.write(torrent_hash)
 
         disk = os.statvfs('/')
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
