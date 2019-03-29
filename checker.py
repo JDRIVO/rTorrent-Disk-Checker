@@ -48,12 +48,16 @@ if torrent_label in cfg.imdb:
 if cfg.enable_disk_check:
         script_path = os.path.dirname(sys.argv[0])
         remover = script_path + '/remover.py'
+        last_dl = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
 
         try:
-                last_dl = open(script_path + '/hash.txt').readline()
-                downloading = xmlrpc('d.left.bytes', tuple([last_dl]))
+                last_hash = open(last_dl).readline()
+                downloading = xmlrpc('d.left.bytes', tuple([last_hash]))
+                
+                with open(last_dl, 'w+') as textfile:
+                        textfile.write(torrent_hash)
         except:
                 downloading = 0
 
@@ -66,9 +70,6 @@ if cfg.enable_disk_check:
         exclude = no = False
         freed_space = 0
         fallback_torrents = []
-
-        with open(last_dl, 'w+') as textfile:
-                textfile.write(torrent_hash)
 
         while freed_space < required_space:
 
