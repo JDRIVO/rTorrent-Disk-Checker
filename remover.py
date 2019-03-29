@@ -31,7 +31,6 @@ def remover():
                                 except:
                                         pass
 
-
 in_front = str(int(queue_position) - 1)
 copy = queue + 'c'
 
