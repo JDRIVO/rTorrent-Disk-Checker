@@ -12,7 +12,7 @@ except:
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
-torrent_size = sys.argv[3]
+torrent_size = int(sys.argv[3]) / 1073741824.0
 torrent_hash = sys.argv[4]
 
 def imdb_search():
