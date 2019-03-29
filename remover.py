@@ -31,9 +31,6 @@ def remover():
                                 except:
                                         pass
 
-in_front = str(int(queue_position) - 1)
-queue_copy = queue + 'c'
-
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
 
@@ -42,24 +39,19 @@ time.sleep(0.01)
 with open(queue, 'r') as txt:
         queued = txt.read()
 
-if in_front not in queued:
-        remover()
-else:
+while queued[0] != queue_position:
 
-        while True:
+        with open(queue, 'r') as txt:
+                queued = txt.read()
 
-                with open(queue, 'r') as txt:
-                        queued = txt.read()
+        time.sleep(0.01)
 
-                if in_front not in queued:
-                        remover()
-                        break
-
-                time.sleep(0.01)
+remover()
+queue_copy = queue + 'c'
 
 with open(queue_copy, 'w+') as txt:
 
-        for number in queued.strip():
+        for number in queued.strip().split('\n'):
 
                 if number != queue_position:
                         txt.write(number + '\n')
