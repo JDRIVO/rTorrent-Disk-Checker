@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, config as cfg
+import sys, os, random, config as cfg
 from subprocess import Popen
 from datetime import datetime
 from remotecall import xmlrpc
@@ -48,6 +48,7 @@ if torrent_label in cfg.imdb:
 if cfg.enable_disk_check:
         script_path = os.path.dirname(sys.argv[0])
         remover = script_path + '/remover.py'
+        queue = script_path + '/' + str(random.randrange(0, 99999))
         last_dl = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
@@ -68,7 +69,7 @@ if cfg.enable_disk_check:
         current_date = datetime.now()
         include = override = True
         exclude = no = False
-        freed_space = 0
+        freed_space = count = 0
         fallback_torrents = []
 
         while freed_space < required_space:
@@ -145,8 +146,9 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                Popen([sys.executable, remover, t_hash, t_path])
+                Popen([sys.executable, remover, queue, str(count), t_hash, t_path])
                 freed_space += t_size
+                count += 1
 
         if available_space < required_space:
                 xmlrpc('d.stop', tuple([torrent_hash]))
