@@ -46,6 +46,7 @@ if torrent_label in cfg.imdb:
         imdb_search()
 
 if cfg.enable_disk_check:
+        current_date = datetime.now()
         script_path = os.path.dirname(sys.argv[0])
         remover = script_path + '/remover.py'
         queue = script_path + '/' + str(random.randrange(0, 99999))
@@ -66,7 +67,6 @@ if cfg.enable_disk_check:
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-        current_date = datetime.now()
         include = override = True
         exclude = no = False
         freed_space = count = 0
