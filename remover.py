@@ -36,18 +36,28 @@ with open(queue, 'a+') as txt:
 
 time.sleep(0.01)
 
-while True:
+with open(queue, 'r') as txt:
+        queued = txt.read()
 
-        try:
-                with open(queue, 'r') as txt:
-                        queued = txt.read()
+if queue_position not in queued:
 
-                if queued[0] == queue_position:
-                        break
-        except:
-                pass
+        with open(queue, 'a+') as txt:
+                txt.write(queue_position + '\n')
+                
+if queued[0] != queue_position:
 
-        time.sleep(0.01)
+        while True:
+
+                try:
+                        with open(queue, 'r') as txt:
+                                queued = txt.read()
+
+                        if queued[0] == queue_position:
+                                break
+                except:
+                        pass
+
+                time.sleep(0.01)
 
 remover()
 time.sleep(0.10)
