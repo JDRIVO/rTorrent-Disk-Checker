@@ -50,18 +50,18 @@ while True:
         time.sleep(0.01)
 
 remover()
-queue_copy = queue + 'c'
 time.sleep(0.10)
 
-with open(queue_copy, 'w+') as q_copy, open(queue, 'r') as q:
-        queued = q.read()
+with open(queue, 'r') as txt:
+        queued = txt.read()
+
+with open(queue, 'w') as txt:
 
         for number in queued.strip().split('\n'):
 
                 if number != queue_position:
-                        q_copy.write(number + '\n')
+                        txt.write(number + '\n')
 
-shutil.move(queue_copy, queue)
 time.sleep(180)
 
 try:
