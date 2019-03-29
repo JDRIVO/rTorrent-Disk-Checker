@@ -39,10 +39,16 @@ time.sleep(0.01)
 with open(queue, 'r') as txt:
         queued = txt.read()
 
-while queued[0] != queue_position:
+while True:
 
-        with open(queue, 'r') as txt:
-                queued = txt.read()
+        try:
+                with open(queue, 'r') as txt:
+                        queued = txt.read()
+
+                if queued[0] == queue_position:
+                        break
+        except:
+                pass
 
         time.sleep(0.01)
 
