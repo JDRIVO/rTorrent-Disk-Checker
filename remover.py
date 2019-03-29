@@ -56,7 +56,6 @@ while True:
         time.sleep(0.01)
 
 remover()
-time.sleep(0.10)
 
 with open(queue, 'r') as txt:
         queued = txt.read()
