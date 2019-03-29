@@ -29,10 +29,10 @@ def imdb_search():
                 votes = search['ratingCount']
         except:
                 return
-        else:
-                if rating < minimum_rating or votes < minimum_votes:
-                        xmlrpc('d.erase', tuple([torrent_hash]))
-                        quit()
+
+        if rating < minimum_rating or votes < minimum_votes:
+                xmlrpc('d.erase', tuple([torrent_hash]))
+                quit()
 
         if skip_foreign:
                 country = imdb.get_title_versions(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
