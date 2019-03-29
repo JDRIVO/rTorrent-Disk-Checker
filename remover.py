@@ -34,7 +34,7 @@ def remover():
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
 
-time.sleep(0.05)
+time.sleep(0.10)
 
 while True:
 
