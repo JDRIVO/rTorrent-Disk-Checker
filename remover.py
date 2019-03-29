@@ -34,7 +34,7 @@ def remover():
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
 
-time.sleep(0.10)
+time.sleep(0.01)
 
 while True:
 
@@ -51,13 +51,15 @@ while True:
 
 remover()
 queue_copy = queue + 'c'
+time.sleep(0.10)
 
-with open(queue_copy, 'w+') as txt:
+with open(queue_copy, 'w+') as q_copy, open(queue, 'r') as q:
+        queued = q.read()
 
         for number in queued.strip().split('\n'):
 
                 if number != queue_position:
-                        txt.write(number + '\n')
+                        q_copy.write(number + '\n')
 
 shutil.move(queue_copy, queue)
 time.sleep(180)
