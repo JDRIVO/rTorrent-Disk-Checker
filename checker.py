@@ -52,6 +52,7 @@ if cfg.enable_disk_check:
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
+        downloading.remove([0])
         disk = os.statvfs('/')
         available_space = disk.f_bsize * disk.f_bavail / 1073741824.0
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
@@ -61,7 +62,7 @@ if cfg.enable_disk_check:
         freed_space = 0
         fallback_torrents = []
 
-        if [list for list in downloading if list[0] != torrent_hash and list[1] == 0]:
+        if [0] in downloading:
                 available_space -= float(open(last_dl).readline())
 
         with open(last_dl, 'w+') as textfile:
