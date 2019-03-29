@@ -32,7 +32,7 @@ def remover():
                                         pass
 
 in_front = str(int(queue_position) - 1)
-copy = queue + 'c'
+queue_copy = queue + 'c'
 
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
@@ -57,14 +57,14 @@ else:
 
                 time.sleep(0.01)
 
-with open(copy, 'w+') as txt:
+with open(queue_copy, 'w+') as txt:
 
         for number in queued.strip():
 
                 if number != queue_position:
                         txt.write(number + '\n')
 
-shutil.move(copy, queue)
+shutil.move(queue_copy, queue)
 time.sleep(180)
 
 try:
