@@ -152,7 +152,7 @@ if cfg.enable_disk_check:
                 count += 1
 
         if available_space < required_space:
-                
+
                 if cfg.enable_email:
                         Popen([sys.executable, emailer])
 
