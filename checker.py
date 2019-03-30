@@ -3,7 +3,7 @@
 import sys, os, random, config as cfg
 from subprocess import Popen
 from datetime import datetime
-from remotecall import xmlrpc
+from remotecaller import xmlrpc
 
 try:
         from urllib import parse as urllib
