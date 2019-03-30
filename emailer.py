@@ -10,10 +10,13 @@ else:
                 txt.write('1')
 
 try:
-        server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
-        server.login(cfg.account, cfg.password)
+        try:
+                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+                server.login(cfg.account, cfg.password)
+        except:
+                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+                server.login(cfg.account, cfg.password)
 except:
-        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
         server.starttls()
         server.login(cfg.account, cfg.password)
 
