@@ -15,7 +15,8 @@ try:
         try:
                 server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
                 server.login(cfg.account, cfg.password)
-        except:
+        except Exception as e:
+                print(e)
 
                 if server:
                         server.quit()
@@ -23,7 +24,8 @@ try:
                 server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
                 server.starttls()
                 server.login(cfg.account, cfg.password)
-except:
+except Exception as e:
+        print(e)
 
         if server:
                 server.quit()
