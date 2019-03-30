@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import sys, os, time
-from remotecall import xmlrpc
+from remotecaller import xmlrpc
 
 queue = sys.argv[1]
 queue_position = sys.argv[2]
