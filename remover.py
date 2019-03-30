@@ -45,10 +45,10 @@ while True:
 
                 if queued[0] == queue_position:
                         break
-                        
+
                 if queue_position not in queued:
 
-                        with open(queue, 'a+') as txt:
+                        with open(queue, 'a') as txt:
                                 txt.write(queue_position + '\n')
         except:
                 pass
