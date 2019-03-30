@@ -1,7 +1,6 @@
 import os, sys, time, smtplib, config as cfg
 
 lock = os.path.dirname(sys.argv[0]) + '/email.txt'
-cfg.interval *= 60
 
 if os.path.isfile(lock):
         quit()
@@ -22,5 +21,5 @@ message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
 server.sendmail(cfg.account, cfg.receiver, message)
 server.quit()
 
-time.sleep(cfg.interval)
+time.sleep(cfg.interval * 60)
 os.remove(lock)
