@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from remotecall import xmlrpc
+from remotecaller import xmlrpc
 
 try:
         xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
