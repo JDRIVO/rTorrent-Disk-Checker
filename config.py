@@ -8,7 +8,7 @@ no = False
 # SCGI address found in your rtorrent.rc file
 scgi = '127.0.0.1:5000'
 
-# Check disk space before downloading torrent?
+# Check disk space before downloading a torrent?
 enable_disk_check = yes
 
 # Receive an email when disk is full?
