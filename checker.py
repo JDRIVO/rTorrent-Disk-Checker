@@ -153,7 +153,7 @@ if cfg.enable_disk_check:
 
         if available_space < required_space:
                 
-                if enable_email:
+                if cfg.enable_email:
                         Popen([sys.executable, emailer])
 
                 xmlrpc('d.stop', tuple([torrent_hash]))
