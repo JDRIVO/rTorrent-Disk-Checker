@@ -10,6 +10,7 @@ else:
                 txt.write('1')
 
 try:
+
         try:
                 server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
                 server.login(cfg.account, cfg.password)
