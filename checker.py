@@ -50,6 +50,7 @@ if cfg.enable_disk_check:
         script_path = os.path.dirname(sys.argv[0])
         queue = script_path + '/' + str(random.randrange(0, 99999))
         remover = script_path + '/remover.py'
+        emailer = script_path + '/emailer.py'
         last_dl = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
@@ -151,4 +152,8 @@ if cfg.enable_disk_check:
                 count += 1
 
         if available_space < required_space:
+                
+                if enable_email:
+                        Popen([sys.executable, emailer])
+
                 xmlrpc('d.stop', tuple([torrent_hash]))
