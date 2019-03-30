@@ -1,7 +1,5 @@
-include = True
-exclude = False
-yes = True
-no = False
+include = yes = True
+exclude =  no = False
 
 ############ USER DEFINED VARIABLES START ############
 
