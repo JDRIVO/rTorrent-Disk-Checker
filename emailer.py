@@ -18,7 +18,10 @@ try:
                 server.starttls()
                 server.login(cfg.account, cfg.password)
 except:
-        server.quit()
+        
+        if server:
+                server.quit()
+
         server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
         server.login(cfg.account, cfg.password)
 
