@@ -14,6 +14,7 @@ enable_disk_check = yes
 # Receive an email when disk is full?
 enable_email = no
 
+
 ###### EMAIL SETTINGS - IGNORE IF DISABLED ######
 
 # Amount of minutes to wait before sending an email between torrent downloads
