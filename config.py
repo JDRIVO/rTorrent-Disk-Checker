@@ -6,10 +6,30 @@ no = False
 ############ USER DEFINED VARIABLES START ############
 
 # SCGI address found in your rtorrent.rc file
-scgi = "127.0.0.1:5000"
+scgi = '127.0.0.1:5000'
 
-# no to disable
+# Check disk space before downloading torrent?
 enable_disk_check = yes
+
+# Receive an email when disk is full?
+enable_email = no
+
+###### EMAIL SETTINGS - IGNORE IF DISABLED ######
+
+# Amount of minutes to wait before sending an email between torrent downloads
+interval = 60
+
+smtp_server = 'smtp.gmail.com'
+port = 587
+
+account = 'youremail@gmail.com'
+password = 'yourpassword'
+
+receiver = 'youremail@gmail.com'
+
+subject = 'Warning: Disk Full'
+body = 'Free disk space ASAP.'
+
 
 ###### DISK CHECK SECTION - IGNORE IF DISABLED ######
 
