@@ -55,11 +55,11 @@ else:
                                 pass
 
 with open(queue, 'r') as txt:
-        queued = txt.read()
+        queued = txt.read().strip().split('\n')
 
 with open(queue, 'w') as txt:
 
-        for number in queued.strip().split('\n'):
+        for number in queued:
 
                 if number != queue_position:
                         txt.write(number + '\n')
