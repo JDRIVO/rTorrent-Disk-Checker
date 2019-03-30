@@ -1,6 +1,7 @@
 import os, sys, time, smtplib, config as cfg
 
 lock = os.path.dirname(sys.argv[0]) + '/email.txt'
+server = False
 
 if os.path.isfile(lock):
         quit()
