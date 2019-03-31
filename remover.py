@@ -71,7 +71,6 @@ try:
                 queued = txt.read()
 
         if not queued:
-
                 os.remove(queue)
 except:
         pass
