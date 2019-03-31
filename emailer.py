@@ -1,14 +1,16 @@
-import os, sys, time, smtplib, config as cfg
+import os, sys, datetime, smtplib, config as cfg
 
 lock = os.path.dirname(sys.argv[0]) + '/email.txt'
 server = False
 
 if os.path.isfile(lock):
-        quit()
-else:
+        file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
 
-        with open(lock, 'w+') as txt:
-                txt.write('1')
+        if file_age < datetime.timedelta(minutes=cfg.interval):
+                quit()
+
+with open(lock, 'w+') as txt:
+        txt.write('1')
 
 print('\n1st Traceback block is SSL related\n2nd Traceback block is TLS related\n3rd Traceback block is Non SSL/TLS related\n')
 
@@ -36,6 +38,3 @@ except:
 message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
 server.sendmail(cfg.account, cfg.receiver, message)
 server.quit()
-
-time.sleep(cfg.interval * 60)
-os.remove(lock)
