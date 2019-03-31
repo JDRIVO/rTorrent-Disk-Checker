@@ -66,8 +66,12 @@ with open(queue, 'w') as txt:
 
 time.sleep(5)
 
-with open(queue, 'r') as txt:
-        queued = txt.read()
+try:
+        with open(queue, 'r') as txt:
+                queued = txt.read()
 
-if not queued:
-        os.remove(queue)
+        if not queued:
+
+                os.remove(queue)
+except:
+        pass
