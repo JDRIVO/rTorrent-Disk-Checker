@@ -64,9 +64,10 @@ with open(queue, 'w') as txt:
                 if number != queue_position:
                         txt.write(number + '\n')
 
-time.sleep(180)
+time.sleep(5)
 
-try:
+with open(queue, 'r') as txt:
+        queued = txt.read()
+
+if not queued:
         os.remove(queue)
-except:
-        pass
