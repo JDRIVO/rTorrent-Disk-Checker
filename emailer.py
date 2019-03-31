@@ -10,13 +10,14 @@ else:
         with open(lock, 'w+') as txt:
                 txt.write('1')
 
+print('\n1st Traceback block is SSL related\n2nd Traceback block is TLS related\n3rd Traceback block is Non SSL/TLS related\n')
+
 try:
 
         try:
                 server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
                 server.login(cfg.account, cfg.password)
-        except Exception as e:
-                print(e)
+        except:
 
                 if server:
                         server.quit()
@@ -24,8 +25,7 @@ try:
                 server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
                 server.starttls()
                 server.login(cfg.account, cfg.password)
-except Exception as e:
-        print(e)
+except:
 
         if server:
                 server.quit()
