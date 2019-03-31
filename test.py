@@ -125,7 +125,11 @@ with open('testresult.txt', 'w+') as textfile:
         textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
         for result in deleted:
-                textfile.write(result + '\n')
+
+                if sys.version_info[0] == 3:
+                        textfile.write(result + '\n')
+                else:
+                        textfile.write(result.encode('utf-8') + '\n')
 
 for result in deleted:
         print(result)
