@@ -67,6 +67,7 @@ with open(queue, 'w') as txt:
 time.sleep(5)
 
 try:
+
         with open(queue, 'r') as txt:
                 queued = txt.read()
 
