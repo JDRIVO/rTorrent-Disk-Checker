@@ -8,7 +8,7 @@
 
 **2**. It can check the IMDB ratings/votes of a movie. The script will delete a movie torrent if its IMDB rating/votes don't meet your minimum requirements.
 
-## Setup
+## [Setup](https://github.com/GangaBanga/RTORRENT-IMDB-DISK-CHECKER/blob/master/setup.sh)
 
 Run the setup script by entering the following command in your terminal (Refer to this script for manual setup instructions):
 
