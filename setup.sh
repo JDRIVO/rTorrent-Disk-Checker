@@ -101,6 +101,7 @@ else
     printf '\nSCGI address has been updated in your config.py file.\n'
 fi
 
+printf '\nConfiguration completed.\n\n'
 printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now (Y/N)?\n'
 
 while true; do
@@ -149,5 +150,3 @@ if [ $restart_rtorrent = true ];  then
         printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
     fi
 fi
-
-printf '\nConfiguration completed.\n\n'
