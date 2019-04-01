@@ -12,20 +12,20 @@ if os.path.isfile(lock):
 with open(lock, 'w+') as txt:
         txt.write('1')
 
-print('\n1st Traceback block is SSL related\n2nd Traceback block is TLS related\n3rd Traceback block is Non SSL/TLS related\n')
+print('\n1st Traceback block is TLS related\n2nd Traceback block is SSL related\n3rd Traceback block is Non TLS/SSL related\n')
 
 try:
 
         try:
-                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+                server.starttls()
                 server.login(cfg.account, cfg.password)
         except:
 
                 if server:
                         server.quit()
 
-                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                server.starttls()
+                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
                 server.login(cfg.account, cfg.password)
 except:
 
