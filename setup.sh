@@ -26,7 +26,7 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 4. Python Module Installations Required for IMDB Function (Skip if Unused)
 
-4a. Enter the following commands in your terminal to install parse-torrent-name and ImdbPie:
+4a. Enter the following commands in your terminal to install guessit and ImdbPie:
 
 pip install guessit
 pip install imdbpie
