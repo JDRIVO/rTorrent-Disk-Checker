@@ -1,7 +1,6 @@
 import os, sys, datetime, smtplib, config as cfg
 
 lock = os.path.dirname(sys.argv[0]) + '/email.txt'
-server = False
 
 if os.path.isfile(lock):
         file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
@@ -13,6 +12,7 @@ with open(lock, 'w+') as txt:
         txt.write('1')
 
 print('\n1st Traceback block is TLS related\n2nd Traceback block is SSL related\n3rd Traceback block is Non TLS/SSL related\n')
+server = False
 
 try:
 
