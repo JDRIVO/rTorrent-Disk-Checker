@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, random, config as cfg
+import sys, os, config as cfg
 from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
@@ -48,7 +48,7 @@ if torrent_label in cfg.imdb:
 if cfg.enable_disk_check:
         current_date = datetime.now()
         script_path = os.path.dirname(sys.argv[0])
-        queue = script_path + '/' + str(random.randrange(0, 99999))
+        queue = script_path + '/' + torrent_hash
         remover = script_path + '/remover.py'
         emailer = script_path + '/emailer.py'
         last_dl = script_path + '/hash.txt'
