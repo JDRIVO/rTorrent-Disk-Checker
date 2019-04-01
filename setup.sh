@@ -92,32 +92,6 @@ while true; do
     esac
 done
 
-printf '\nAttempting to restart rtorrent.\n'
-instance=$(pgrep rtorrent)
-
-if [ $instance ]; then
-
-    while true; do
-        kill -KILL $instance
-
-        if : ! pgrep rtorrent; then
-            screen -d -m rtorrent
-
-            if : pgrep rtorrent; then
-                printf '\nRtorrent has been restarted successfully.\n'
-            else
-                printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
-            fi
-
-            break
-        fi
-
-    done
-
-else
-    printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
-fi
-
 scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
 
 if [ -z "$scgi" ]; then
@@ -125,6 +99,55 @@ if [ -z "$scgi" ]; then
 else
     sed -i "7s~.*~scgi = '$scgi'~" config.py
     printf '\nSCGI address has been updated in your config.py file.\n'
+fi
+
+printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now?\n'
+
+while true; do
+    read answer
+    case $answer in
+
+        [yY] )
+                 restart_rtorrent=true
+                 break
+                 ;;
+
+        [nN] )
+                 restart_rtorrent=false
+                 break
+                 ;;
+
+        * )
+              echo 'Enter y or n'
+              ;;
+    esac
+done
+
+if [ $restart_rtorrent = true ];  then
+
+    printf '\nAttempting to restart rtorrent.\n'
+    instance=$(pgrep rtorrent)
+
+    if [ $instance ]; then
+
+        while true; do
+            kill -KILL $instance
+
+            if : ! pgrep rtorrent; then
+                screen -d -m rtorrent
+
+                if : pgrep rtorrent; then
+                    printf '\nRtorrent has been restarted successfully.\n'
+                else
+                    printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
+                fi
+
+                break
+            fi
+        done
+    else
+        printf '\n\033[0;36mFailed to restart rtorrent. Please restart rtorrent manually.\033[0m\n'
+    fi
 fi
 
 printf '\nConfiguration completed.\n\n'
