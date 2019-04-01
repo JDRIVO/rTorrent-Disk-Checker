@@ -23,8 +23,8 @@ def imdb_search():
 
                 imdb = Imdb()
                 torrent_info = guessit(torrent_name)
-
-                search = imdb.get_title_ratings(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])
+                movie = torrent_info['title'] + ' ' + str(torrent_info['year'])
+                search = imdb.get_title_ratings(imdb.search_for_title(movie)[0]['imdb_id'])
                 rating = search['rating']
                 votes = search['ratingCount']
         except:
@@ -35,7 +35,7 @@ def imdb_search():
                 quit()
 
         if skip_foreign:
-                country = imdb.get_title_versions(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])['origins']
+                country = imdb.get_title_versions(imdb.search_for_title(movie)[0]['imdb_id'])['origins']
 
                 if 'US' not in country:
                         xmlrpc('d.erase', tuple([torrent_hash]))
