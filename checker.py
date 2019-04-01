@@ -18,11 +18,11 @@ torrent_hash = sys.argv[4]
 def imdb_search():
 
         try:
-                import PTN
+                from guessit import guessit
                 from imdbpie import Imdb
 
                 imdb = Imdb()
-                torrent_info = PTN.parse(torrent_name)
+                torrent_info = guessit(torrent_name)
 
                 search = imdb.get_title_ratings(imdb.search_for_title(torrent_info['title'] + ' ' + str(torrent_info['year']))[0]['imdb_id'])
                 rating = search['rating']
