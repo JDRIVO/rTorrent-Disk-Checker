@@ -28,7 +28,7 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 4a. Enter the following commands in your terminal to install parse-torrent-name and ImdbPie:
 
-pip install parse-torrent-name
+pip install guessit
 pip install imdbpie
 
 COMMENT
@@ -78,7 +78,7 @@ while true; do
 
         [yY] )
                  pip install imdbpie -q || sudo pip install imdbpie -q || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
-                 pip install parse-torrent-name -q || sudo pip install parse-torrent-name -q || printf '\n\033[0;36mFailed to install Python module: parse-torrent-name\033[0m\n'
+                 pip install guessit -q || sudo pip install guessit -q || printf '\n\033[0;36mFailed to install Python module: guessit\033[0m\n'
                  break
                  ;;
 
