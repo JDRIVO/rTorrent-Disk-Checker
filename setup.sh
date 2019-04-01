@@ -101,7 +101,7 @@ else
     printf '\nSCGI address has been updated in your config.py file.\n'
 fi
 
-printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now?\n'
+printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now (Y/N)?\n'
 
 while true; do
     read answer
