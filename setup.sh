@@ -11,10 +11,10 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py
 2a. Add the following code to ~/.rtorrent.rc !! Update the path to checker.py !! Restart rtorrent once added:
 
 Python 2:
-method.set_key = event.download.inserted_new,checker,"execute=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
+method.set_key = event.download.inserted_new,checker,"d.stop=,$d.hash=", "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
 Python 3:
-method.set_key = event.download.inserted_new,checker,"execute=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
+method.set_key = event.download.inserted_new,checker,"d.stop=,$d.hash=", "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.size_bytes=,$d.hash="
 
 3. SCGI Address Addition
 
@@ -42,7 +42,7 @@ if [ -z "$rtorrent" ]; then
     exit
 fi
 
-sed -i '/event.download.inserted_new,checker,"execute=python/d' $rtorrent
+sed -i '/event.download.inserted_new,checker,"d.stop=/d' $rtorrent
 printf '\nDo you want the script to be run in Python 2 or 3? Python 3 is faster.
 
 Enter 2 for Python 2 or 3 for Python 3.\n'
@@ -68,7 +68,7 @@ while true; do
 done
 
 sed -i "1i\
-method.set_key = event.download.inserted_new,checker,\"execute=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" $rtorrent
+method.set_key = event.download.inserted_new,checker,\"d.stop=,$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" $rtorrent
 
 printf '\nWill you be using the IMDB function of the script (Y/N)?\n'
 
