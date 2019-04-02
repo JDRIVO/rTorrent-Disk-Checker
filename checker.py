@@ -62,10 +62,36 @@ if torrent_label in cfg.imdb:
         imdb_search()
 
 if cfg.enable_disk_check:
-        current_date = datetime.now()
         script_path = os.path.dirname(sys.argv[0])
-        queue = script_path + '/' + torrent_hash
+        queue = script_path + '/queue.txt'
+
+        with open(queue, 'a+') as txt:
+                txt.write(torrent_hash + '\n')
+
+        time.sleep(0.01)
+
+        while True:
+
+                try:
+
+                        with open(queue, 'r') as txt:
+                                queued = txt.read()
+
+                        if queued[0] == torrent_hash:
+                                break
+
+                        if torrent_hash not in queued:
+
+                                with open(queue, 'a') as txt:
+                                        txt.write(torrent_hash + '\n')
+                except:
+                        pass
+
+                time.sleep(0.01)
+        
+        current_date = datetime.now()
         remover = script_path + '/remover.py'
+        remover_queue = script_path + '/' + torrent_hash
         emailer = script_path + '/emailer.py'
         last_torrent = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
@@ -163,13 +189,27 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                Popen([sys.executable, remover, queue, str(count), t_hash, t_path])
+                Popen([sys.executable, remover, remover_queue, str(count), t_hash, t_path])
                 freed_space += t_size
                 count += 1
-
-        if available_space < required_space:
+                              
+        if available_space >= required_space:
+                xmlrpc('d.start', tuple([torrent_hash]))
+        else:
 
                 if cfg.enable_email:
                         Popen([sys.executable, emailer])
+                
+        with open(queue, 'r') as txt:
+                queued = txt.read().strip().split('\n')
 
-                xmlrpc('d.stop', tuple([torrent_hash]))
+        with open(queue, 'w') as txt:
+
+                for torrent in queued:
+
+                        if torrent != torrent_hash:
+                                txt.write(number + '\n')
+
+        quit()
+
+xmlrpc('d.start', tuple([torrent_hash]))
