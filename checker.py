@@ -18,17 +18,34 @@ torrent_hash = sys.argv[4]
 def imdb_search():
 
         try:
+                from threading import Thread
                 from guessit import guessit
                 from imdbpie import Imdb
 
+                def imdb_rating():
+                        ratings.update(imdb.get_title_ratings(movie_imdb))
+
+                def movie_country():
+                        country.extend(imdb.get_title_versions(movie_imdb)['origins'])
+
                 imdb = Imdb()
                 torrent_info = guessit(torrent_name)
-                movie = torrent_info['title'] + ' ' + str(torrent_info['year'])
-                search = imdb.get_title_ratings(imdb.search_for_title(movie)[0]['imdb_id'])
-                rating = search['rating']
-                votes = search['ratingCount']
+                movie_title = torrent_info['title'] + ' ' + str(torrent_info['year'])
+                movie_imdb = imdb.search_for_title(movie_title)[0]['imdb_id']
+
+                ratings = {}
+                country = []
+                t1 = Thread(target=imdb_rating)
+                t2 = Thread(target=movie_country)
+                t1.start()
+                t2.start()
+                t1.join()
+                t2.join()
         except:
                 return
+
+        rating = ratings['rating']
+        votes = ratings['ratingCount']
 
         if rating < minimum_rating or votes < minimum_votes:
                 xmlrpc('d.erase', tuple([torrent_hash]))
@@ -51,17 +68,17 @@ if cfg.enable_disk_check:
         queue = script_path + '/' + torrent_hash
         remover = script_path + '/remover.py'
         emailer = script_path + '/emailer.py'
-        last_dl = script_path + '/hash.txt'
+        last_torrent = script_path + '/hash.txt'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
         completed.sort()
 
         try:
-                last_hash = open(last_dl).readline()
+                last_hash = open(last_torrent).readline()
                 downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
         except:
                 downloading = 0
 
-        with open(last_dl, 'w+') as textfile:
+        with open(last_torrent, 'w+') as textfile:
                 textfile.write(torrent_hash)
 
         disk = os.statvfs('/')
