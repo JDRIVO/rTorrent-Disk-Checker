@@ -52,7 +52,6 @@ def imdb_search():
                 quit()
 
         if skip_foreign:
-                country = imdb.get_title_versions(imdb.search_for_title(movie)[0]['imdb_id'])['origins']
 
                 if 'US' not in country:
                         xmlrpc('d.erase', tuple([torrent_hash]))
