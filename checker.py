@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, config as cfg
+import sys, os, time, config as cfg
 from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
@@ -75,7 +75,7 @@ if cfg.enable_disk_check:
                 try:
 
                         with open(queue, 'r') as txt:
-                                queued = txt.read()
+                                queued = txt.read().strip().split('\n')
 
                         if queued[0] == torrent_hash:
                                 break
@@ -192,14 +192,14 @@ if cfg.enable_disk_check:
                 Popen([sys.executable, remover, remover_queue, str(count), t_hash, t_path])
                 freed_space += t_size
                 count += 1
-                              
+
         if available_space >= required_space:
                 xmlrpc('d.start', tuple([torrent_hash]))
         else:
 
                 if cfg.enable_email:
                         Popen([sys.executable, emailer])
-                
+
         with open(queue, 'r') as txt:
                 queued = txt.read().strip().split('\n')
 
