@@ -18,7 +18,7 @@ while True:
         try:
 
                 with open(queue, 'r') as txt:
-                        queued = txt.read()
+                        queued = txt.read().strip().split('\n')
 
                 if queued[0] == queue_position:
                         break
