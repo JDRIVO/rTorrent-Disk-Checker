@@ -88,7 +88,7 @@ if cfg.enable_disk_check:
                         pass
 
                 time.sleep(0.01)
-        
+
         current_date = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash
