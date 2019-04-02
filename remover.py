@@ -11,7 +11,7 @@ torrent_path = sys.argv[4]
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
 
-time.sleep(0.01)
+time.sleep(0.0001)
 
 while True:
 
@@ -30,7 +30,7 @@ while True:
         except:
                 pass
 
-        time.sleep(0.0001)
+        time.sleep(0.01)
 
 t_hash = tuple([torrent_hash])
 xmlrpc('d.open', t_hash)
