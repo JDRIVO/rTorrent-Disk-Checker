@@ -68,7 +68,7 @@ if cfg.enable_disk_check:
         with open(queue, 'a+') as txt:
                 txt.write(torrent_hash + '\n')
 
-        time.sleep(0.01)
+        time.sleep(0.0001)
 
         while True:
 
