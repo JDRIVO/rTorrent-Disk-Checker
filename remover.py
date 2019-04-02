@@ -11,7 +11,7 @@ torrent_path = sys.argv[4]
 with open(queue, 'a+') as txt:
         txt.write(queue_position + '\n')
 
-time.sleep(0.0001)
+time.sleep(0.001)
 
 while True:
 
