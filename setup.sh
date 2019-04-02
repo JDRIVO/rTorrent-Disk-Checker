@@ -68,7 +68,7 @@ while true; do
 done
 
 sed -i "1i\
-method.set_key = event.download.inserted_new,checker,\"d.stop=,$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" $rtorrent
+method.set_key = event.download.inserted_new,checker,\"d.stop=,\$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.size_bytes=,\$d.hash=\"" $rtorrent
 
 printf '\nWill you be using the IMDB function of the script (Y/N)?\n'
 
