@@ -14,20 +14,11 @@ time.sleep(0.001)
 
 while True:
 
-        try:
+        with open(queue, 'r') as txt:
+                queued = txt.read().strip().splitlines()
 
-                with open(queue, 'r') as txt:
-                        queued = txt.read().strip().split('\n')
-
-                if queued[0] == torrent_hash:
-                        break
-
-                if torrent_hash not in queued:
-
-                        with open(queue, 'a+') as txt:
-                                txt.write(torrent_hash + '\n')
-        except:
-                pass
+        if queued[0] == torrent_hash:
+                break
 
         time.sleep(0.01)
 
@@ -54,7 +45,7 @@ else:
                                 pass
 
 txt = open(queue, mode='r+')
-queued = txt.read().strip().split('\n')
+queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
