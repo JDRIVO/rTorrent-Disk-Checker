@@ -112,7 +112,7 @@ if cfg.enable_disk_check:
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
         exclude = no = False
-        freed_space = count = 0
+        freed_space = 0
         fallback_torrents = []
 
         while freed_space < required_space:
@@ -189,9 +189,8 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                Popen([sys.executable, remover, remover_queue, str(count), t_hash, t_path])
+                Popen([sys.executable, remover, remover_queue, t_hash, t_path])
                 freed_space += t_size
-                count += 1
 
         if available_space >= required_space:
                 xmlrpc('d.start', tuple([torrent_hash]))
