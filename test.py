@@ -46,7 +46,9 @@ def send_email():
         server.quit()
 
 if sys.argv[1] == 'email':
+        print('\n1st Traceback block is TLS related\n2nd Traceback block is SSL related\n3rd Traceback block is Non TLS/SSL related\n')
         send_email()
+        print('\nEmail sent\n')
         sys.exit()
 
 if cfg.enable_disk_check:
