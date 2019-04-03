@@ -70,20 +70,11 @@ if cfg.enable_disk_check:
 
         while True:
 
-                try:
+                with open(queue, 'r') as txt:
+                        queued = txt.read().strip().splitlines()
 
-                        with open(queue, 'r') as txt:
-                                queued = txt.read().strip().split('\n')
-
-                        if queued[0] == torrent_hash:
-                                break
-
-                        if torrent_hash not in queued:
-
-                                with open(queue, 'a+') as txt:
-                                        txt.write(torrent_hash + '\n')
-                except:
-                        pass
+                if queued[0] == torrent_hash:
+                        break
 
                 time.sleep(0.01)
 
@@ -192,7 +183,7 @@ if cfg.enable_disk_check:
                 xmlrpc('d.start', tuple([torrent_hash]))
 
         queue = open(queue, mode='r+')
-        queued = queue.read().strip().split('\n')
+        queued = queue.read().strip().splitlines()
         queue.seek(0)
         [queue.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
         queue.truncate()
