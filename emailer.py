@@ -1,15 +1,16 @@
 import os, sys, datetime, smtplib, config as cfg
 
-lock = os.path.dirname(sys.argv[0]) + '/email.txt'
+def last_email():
+        lock = os.path.dirname(sys.argv[0]) + '/email.txt'
 
-if os.path.isfile(lock):
-        file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
+        if os.path.isfile(lock):
+                file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
 
-        if file_age < datetime.timedelta(minutes=cfg.interval):
-                quit()
+                if file_age < datetime.timedelta(minutes=cfg.interval):
+                        quit()
 
-with open(lock, 'w+') as txt:
-        txt.write('1')
+        with open(lock, 'w+') as txt:
+                txt.write('1')
 
 def send_email():
         server = False
@@ -39,6 +40,7 @@ def send_email():
         server.sendmail(cfg.account, cfg.receiver, message)
         server.quit()
 
+last_email()
 send_email()
 
 if __name__ == '__main__':
