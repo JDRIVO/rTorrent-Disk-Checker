@@ -15,6 +15,8 @@ enable_email = no
 
 ###### EMAIL SETTINGS - IGNORE IF DISABLED ######
 
+# python emailer.py test | will send a test email
+
 # Amount of minutes to wait before sending an email between torrent downloads
 interval = 60
 
