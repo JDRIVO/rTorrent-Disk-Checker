@@ -203,7 +203,7 @@ if cfg.enable_disk_check:
                 for torrent in queued:
 
                         if torrent != torrent_hash:
-                                txt.write(number + '\n')
+                                txt.write(torrent + '\n')
 
         if available_space < required_space and cfg.enable_email:
                 Popen([sys.executable, emailer])
