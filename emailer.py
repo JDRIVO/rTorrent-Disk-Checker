@@ -7,7 +7,7 @@ def last_email():
                 file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
 
                 if file_age < datetime.timedelta(minutes=cfg.interval):
-                        quit()
+                        sys.exit()
 
         with open(lock, 'w+') as txt:
                 txt.write('1')
