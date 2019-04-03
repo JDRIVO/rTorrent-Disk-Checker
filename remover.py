@@ -54,14 +54,8 @@ else:
                                 pass
 
 queued = open(queue).read().strip().split('\n')
-
-with open(queue, 'w') as txt:
-
-        for torrent in queued:
-
-                if torrent != torrent_hash:
-                        txt.write(torrent + '\n')
-
+txt = open(queue, mode='w')
+[txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 time.sleep(5)
 
 try:
