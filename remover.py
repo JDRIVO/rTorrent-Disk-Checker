@@ -4,12 +4,11 @@ import sys, os, time
 from remotecaller import xmlrpc
 
 queue = sys.argv[1]
-queue_position = sys.argv[2]
-torrent_hash = sys.argv[3]
-torrent_path = sys.argv[4]
+torrent_hash = sys.argv[2]
+torrent_path = sys.argv[3]
 
 with open(queue, 'a+') as txt:
-        txt.write(queue_position + '\n')
+        txt.write(torrent_hash + '\n')
 
 time.sleep(0.001)
 
@@ -20,13 +19,13 @@ while True:
                 with open(queue, 'r') as txt:
                         queued = txt.read().strip().split('\n')
 
-                if queued[0] == queue_position:
+                if queued[0] == torrent_hash:
                         break
 
-                if queue_position not in queued:
+                if torrent_hash not in queued:
 
                         with open(queue, 'a') as txt:
-                                txt.write(queue_position + '\n')
+                                txt.write(torrent_hash + '\n')
         except:
                 pass
 
@@ -59,9 +58,9 @@ with open(queue, 'r') as txt:
 
 with open(queue, 'w') as txt:
 
-        for number in queued:
+        for torrent in queued:
 
-                if number != queue_position:
+                if torrent != torrent_hash:
                         txt.write(number + '\n')
 
 time.sleep(5)
