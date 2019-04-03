@@ -8,7 +8,6 @@ except:
         print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
         quit()
 
-print('\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 
 import sys, os, config as cfg
 from datetime import datetime
@@ -20,14 +19,46 @@ except:
 
 startTime = datetime.now()
 
-torrent_size = float(sys.argv[1])
+def send_email():
+        server = False
+
+        try:
+
+                try:
+                        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+                        server.starttls()
+                        server.login(cfg.account, cfg.password)
+                except:
+
+                        if server:
+                                server.quit()
+
+                        server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+                        server.login(cfg.account, cfg.password)
+        except:
+
+                if server:
+                        server.quit()
+
+                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+                server.login(cfg.account, cfg.password)
+
+        message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
+        server.sendmail(cfg.account, cfg.receiver, message)
+        server.quit()
+
+if sys.argv[1] == 'email':
+        send_email()
+        sys.exit()
 
 if cfg.enable_disk_check:
+        torrent_size = float(sys.argv[1])
         remover = os.path.dirname(sys.argv[0]) + '/remover.py'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.directory=', 'd.name='))
         completed.sort()
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
-        downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
+        downloading = 0
+        #downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
         disk = os.statvfs('/')
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
@@ -130,6 +161,8 @@ with open('testresult.txt', 'w+') as textfile:
                         textfile.write(result + '\n')
                 else:
                         textfile.write(result.encode('utf-8') + '\n')
+
+print('\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 
 for result in deleted:
         print(result)
