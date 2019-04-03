@@ -40,9 +40,9 @@ def send_email():
         server.sendmail(cfg.account, cfg.receiver, message)
         server.quit()
 
-last_email()
-send_email()
-
 if __name__ == '__main__':
         print('\n1st Traceback block is TLS related\n2nd Traceback block is SSL related\n3rd Traceback block is Non TLS/SSL related\n')
+        send_email()
+else:
+        last_email()
         send_email()
