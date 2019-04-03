@@ -70,7 +70,6 @@ if cfg.enable_disk_check:
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
         downloading = 0
         #downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
-        disk = os.statvfs('/')
         available_space = (sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
