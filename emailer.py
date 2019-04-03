@@ -40,7 +40,7 @@ def send_email():
         server.sendmail(cfg.account, cfg.receiver, message)
         server.quit()
 
-if sys.argv[1] != 'test':
+if sys.argv[1] == 'notify':
         last_email()
         send_email()
 else:
