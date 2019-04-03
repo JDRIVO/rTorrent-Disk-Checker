@@ -59,9 +59,7 @@ txt = open(queue, mode='w')
 time.sleep(5)
 
 try:
-
-        with open(queue, 'r') as txt:
-                queued = txt.read()
+        queued = open(queue).read()
 
         if not queued:
                 os.remove(queue)
