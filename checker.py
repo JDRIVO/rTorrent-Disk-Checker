@@ -195,8 +195,7 @@ if cfg.enable_disk_check:
         if available_space >= required_space:
                 xmlrpc('d.start', tuple([torrent_hash]))
 
-        with open(queue, 'r') as txt:
-                queued = txt.read().strip().split('\n')
+        queued = open(queue).read().strip().split('\n')
 
         with open(queue, 'w') as txt:
 
