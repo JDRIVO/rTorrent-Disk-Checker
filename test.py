@@ -15,7 +15,7 @@ except:
         print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
         sys.exit()
 
-startTime = datetime.now()
+start = datetime.now()
 
 def send_email():
         server = False
@@ -147,7 +147,7 @@ if cfg.enable_disk_check:
                 freed_space += t_size
                 deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
-time = datetime.now() - startTime
+time = datetime.now() - start
 calc = available_space + freed_space - torrent_size
 
 with open('testresult.txt', 'w+') as textfile:
