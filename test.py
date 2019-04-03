@@ -23,32 +23,43 @@ def send_email():
         try:
 
                 try:
-                        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                        server.starttls()
-                        server.login(cfg.account, cfg.password)
-                except:
+
+                        try:
+                                print('\nAttempting to email using TLS\n')
+                                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+                                server.starttls()
+                                server.login(cfg.account, cfg.password)
+                        except Exception as e:
+                                print('Failed\n\nTLS Related Error:\n')
+                                print(e)
+                                print('\nAttempting to email using SSL\n')
+
+                                if server:
+                                        server.quit()
+
+                                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+                                server.login(cfg.account, cfg.password)
+                except Exception as e:
+                        print('Failed\n\nSSL Related Error:\n')
+                        print(e)
+                        print('\nAttempting to email without TLS/SSL\n')
 
                         if server:
                                 server.quit()
 
-                        server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+                        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
                         server.login(cfg.account, cfg.password)
-        except:
 
-                if server:
-                        server.quit()
-
-                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                server.login(cfg.account, cfg.password)
-
-        message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
-        server.sendmail(cfg.account, cfg.receiver, message)
-        server.quit()
+                message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
+                server.sendmail(cfg.account, cfg.receiver, message)
+                server.quit()
+                print('Succeeded')
+        except Exception as e:
+                print('Failed\n\nNon TLS/SSL Related Error:\n')
+                print(e)
 
 if sys.argv[1] == 'email':
-        print('\n1st Traceback block is TLS related\n2nd Traceback block is SSL related\n3rd Traceback block is Non TLS/SSL related\n')
         send_email()
-        print('\nEmail sent\n')
         sys.exit()
 
 if cfg.enable_disk_check:
