@@ -61,7 +61,7 @@ with open(queue, 'w') as txt:
         for torrent in queued:
 
                 if torrent != torrent_hash:
-                        txt.write(number + '\n')
+                        txt.write(torrent + '\n')
 
 time.sleep(5)
 
