@@ -194,13 +194,8 @@ if cfg.enable_disk_check:
                 xmlrpc('d.start', tuple([torrent_hash]))
 
         queued = open(queue).read().strip().split('\n')
-
-        with open(queue, 'w') as txt:
-
-                for torrent in queued:
-
-                        if torrent != torrent_hash:
-                                txt.write(torrent + '\n')
+        txt = open(queue, mode='w')
+        [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 
         if available_space < required_space and cfg.enable_email:
                 Popen([sys.executable, emailer, 'notify'])
