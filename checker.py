@@ -80,7 +80,7 @@ if cfg.enable_disk_check:
 
                         if torrent_hash not in queued:
 
-                                with open(queue, 'a') as txt:
+                                with open(queue, 'a+') as txt:
                                         txt.write(torrent_hash + '\n')
                 except:
                         pass
