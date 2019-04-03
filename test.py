@@ -62,7 +62,7 @@ if sys.argv[1] == 'email':
         send_email()
         sys.exit()
 elif sys.argv[1] == 'disk':
-        print(str(sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) / 1073741824.0) + ' GB')
+        print(str(sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) / 1073741824.0) + ' GB Free')
         sys.exit()
 
 if cfg.enable_disk_check:
