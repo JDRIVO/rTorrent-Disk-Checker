@@ -51,11 +51,9 @@ def imdb_search():
                 xmlrpc('d.erase', tuple([torrent_hash]))
                 sys.exit()
 
-        if skip_foreign:
-
-                if 'US' not in country:
-                        xmlrpc('d.erase', tuple([torrent_hash]))
-                        sys.exit()
+        if skip_foreign and 'US' not in country:
+                xmlrpc('d.erase', tuple([torrent_hash]))
+                sys.exit()
 
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
