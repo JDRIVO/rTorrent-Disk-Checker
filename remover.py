@@ -53,8 +53,7 @@ else:
                         except:
                                 pass
 
-with open(queue, 'r') as txt:
-        queued = txt.read().strip().split('\n')
+queued = open(queue).read().strip().split('\n')
 
 with open(queue, 'w') as txt:
 
