@@ -1,21 +1,19 @@
 # -*- coding: utf-8 -*-
 
+import sys, os, config as cfg
+from datetime import datetime
 from remotecaller import xmlrpc
+
+try:
+        from urllib import parse as urllib
+except:
+        import urllib
 
 try:
         xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
 except:
         print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
         quit()
-
-
-import sys, os, config as cfg
-from datetime import datetime
-
-try:
-        from urllib import parse as urllib
-except:
-        import urllib
 
 startTime = datetime.now()
 
