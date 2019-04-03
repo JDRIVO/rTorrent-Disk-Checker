@@ -163,10 +163,7 @@ with open('testresult.txt', 'w+') as textfile:
                         textfile.write(result.encode('utf-8') + '\n')
 
 print('\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-
-for result in deleted:
-        print(result)
-
+[print(result) for result in deleted]
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed_space))
 print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
