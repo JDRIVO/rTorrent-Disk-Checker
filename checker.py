@@ -103,9 +103,7 @@ if cfg.enable_disk_check:
         except:
                 downloading = 0
 
-        with open(last_torrent, 'w+') as textfile:
-                textfile.write(torrent_hash)
-
+        open(last_torrent, mode='w+').write(torrent_hash)
         disk = os.statvfs('/')
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
