@@ -13,7 +13,7 @@ try:
         xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
 except:
         print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
-        quit()
+        sys.exit()
 
 startTime = datetime.now()
 
