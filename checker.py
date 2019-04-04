@@ -183,12 +183,6 @@ if cfg.enable_disk_check:
                 t_mp = t_mp[0] if t_mp else '/'
 
                 if t_mp != mount_point:
-                        
-                        try:
-                                del completed[0]
-                        except:
-                                del fallback_torrents[0]
-
                         continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
