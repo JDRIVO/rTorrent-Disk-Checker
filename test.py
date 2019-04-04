@@ -62,7 +62,8 @@ if sys.argv[1] == 'email':
         send_email()
         sys.exit()
 elif sys.argv[1] == 'disk':
-        print(str(sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) / 1073741824.0) + ' GB Free')
+        disk = os.statvfs(cfg.mount_point)
+        print(str((disk.f_bsize * disk.f_bavail) / 1073741824.0) + ' GB Free')
         sys.exit()
 
 if cfg.enable_disk_check:
@@ -71,9 +72,10 @@ if cfg.enable_disk_check:
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.directory=', 'd.name='))
         completed.sort()
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
-        downloading = 0
         #downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
-        available_space = (sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) - downloading) / 1073741824.0
+        downloading = 0
+        disk = os.statvfs(cfg.mount_point)
+        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         current_date = datetime.now()
