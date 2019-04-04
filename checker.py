@@ -12,8 +12,9 @@ except:
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
-torrent_size = int(sys.argv[3]) / 1073741824.0
-torrent_hash = sys.argv[4]
+torrent_hash = sys.argv[3]
+torrent_size = int(sys.argv[4]) / 1073741824.0
+torrent_path = sys.argv[5]
 
 def imdb_search():
 
@@ -93,7 +94,9 @@ if cfg.enable_disk_check:
                 downloading = 0
 
         open(last_torrent, mode='w+').write(torrent_hash)
-        disk = os.statvfs(cfg.mount_point)
+        mount_point = [path for path in ['/' + txt for txt in torrent_path[1:].split('/')] if os.path.ismount(path)]
+        mount_point = mount_point[0] if mount_point else '/'
+        disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
@@ -109,6 +112,12 @@ if cfg.enable_disk_check:
 
                 if completed:
                         t_age, t_label, t_tracker, t_ratio, t_size, t_hash, t_path = completed[0]
+                        t_mp = [path for path in ['/' + txt for txt in t_path[1:].split('/')] if os.path.ismount(path)]
+                        t_mp = t_mp[0] if t_mp else '/'
+
+                        if t_mp != mount_point:
+                                del completed[0]
+                                continue
 
                         if override:
                                 override = False
