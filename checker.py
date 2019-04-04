@@ -13,8 +13,8 @@ except:
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
 torrent_hash = sys.argv[3]
-torrent_size = int(sys.argv[4]) / 1073741824.0
-torrent_path = sys.argv[5]
+torrent_path = sys.argv[4]
+torrent_size = int(sys.argv[5]) / 1073741824.0
 
 def imdb_search():
 
@@ -94,8 +94,8 @@ if cfg.enable_disk_check:
                 downloading = 0
 
         open(last_torrent, mode='w+').write(torrent_hash)
-        split_path = ['/' + folder for folder in torrent_path[1:].split('/')]
-        mount_point = [path for path in [''.join(split_path[0:num + 1]) for num, val in enumerate(split_path)] if os.path.ismount(path)]
+        split_path = torrent_path.split('/')
+        mount_point = [path for path in ['/'.join(split_path[0:num]) for num, val in enumerate(split_path)] if os.path.ismount(path)]
         mount_point = max(t_mp) if t_mp else '/'
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
@@ -180,8 +180,8 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                split_path = ['/' + folder for folder in t_path[1:].split('/')]
-                t_mp = [path for path in [''.join(split_path[0:num + 1]) for num, val in enumerate(split_path)] if os.path.ismount(path)]
+                split_path = t_path.split('/')
+                t_mp = [path for path in ['/'.join(split_path[0:num]) for num, val in enumerate(split_path)] if os.path.ismount(path)]
                 t_mp = max(t_mp) if t_mp else '/'
 
                 if t_mp != mount_point:
