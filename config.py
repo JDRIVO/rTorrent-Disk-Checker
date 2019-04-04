@@ -34,11 +34,6 @@ body = 'Free disk space ASAP.'
 
 ###### DISK CHECK SECTION - IGNORE IF DISABLED ######
 
-# python test.py disk | To check if the script is calculating the correct free space
-
-# Leave alone if you don't know what mount points are
-mount_point = '/'
-
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
 
