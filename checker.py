@@ -35,8 +35,8 @@ def imdb_search():
 
                 ratings = {}
                 country = []
-                t1 = Thread(target=imdb_rating)
-                t2 = Thread(target=movie_country)
+                t1 = Thread(target=movie_country)
+                t2 = Thread(target=imdb_rating)
                 t1.start()
                 t2.start()
                 t1.join()
