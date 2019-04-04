@@ -112,12 +112,6 @@ if cfg.enable_disk_check:
 
                 if completed:
                         t_age, t_label, t_tracker, t_ratio, t_size, t_hash, t_path = completed[0]
-                        t_mp = [path for path in ['/' + txt for txt in t_path[1:].split('/')] if os.path.ismount(path)]
-                        t_mp = t_mp[0] if t_mp else '/'
-
-                        if t_mp != mount_point:
-                                del completed[0]
-                                continue
 
                         if override:
                                 override = False
@@ -184,6 +178,18 @@ if cfg.enable_disk_check:
                 else:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
+
+                t_mp = [path for path in ['/' + txt for txt in t_path[1:].split('/')] if os.path.ismount(path)]
+                t_mp = t_mp[0] if t_mp else '/'
+
+                if t_mp != mount_point:
+                        
+                        try:
+                                del completed[0]
+                        except:
+                                del fallback_torrents[0]
+
+                        continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
                 freed_space += t_size
