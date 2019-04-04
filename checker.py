@@ -93,7 +93,8 @@ if cfg.enable_disk_check:
                 downloading = 0
 
         open(last_torrent, mode='w+').write(torrent_hash)
-        available_space = (sum(disk.f_bsize * disk.f_bavail for disk in [os.statvfs(path) for path in cfg.mount_points]) - downloading) / 1073741824.0
+        disk = os.statvfs(cfg.mount_point)
+        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
