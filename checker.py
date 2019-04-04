@@ -96,7 +96,7 @@ if cfg.enable_disk_check:
         open(last_torrent, mode='w+').write(torrent_hash)
         split_path = torrent_path.split('/')
         mount_point = [path for path in ['/'.join(split_path[0:num]) for num in range(len(split_path))] if os.path.ismount(path)]
-        mount_point = max(mount_point) if t_mp else '/'
+        mount_point = max(mount_point) if mount_point else '/'
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
