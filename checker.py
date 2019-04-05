@@ -181,7 +181,7 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                directory = os.path.dirname(t_path)
+                directory = t_path.rsplit('/', 1)[0]
 
                 if directory not in directories:
                         split_path = t_path.split('/')
