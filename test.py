@@ -61,10 +61,6 @@ def send_email():
 if sys.argv[1] == 'email':
         send_email()
         sys.exit()
-elif sys.argv[1] == 'disk':
-        disk = os.statvfs(cfg.mount_point)
-        print(str((disk.f_bsize * disk.f_bavail) / 1073741824.0) + ' GB Free')
-        sys.exit()
 
 if cfg.enable_disk_check:
         torrent_size = float(sys.argv[1])
