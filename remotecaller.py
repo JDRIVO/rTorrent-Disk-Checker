@@ -2,8 +2,10 @@ from config import scgi
 
 try:
         import xmlrpc.client as xmlrpclib, socket
+        from urllib import parse as urllib
 except:
         import xmlrpclib, socket
+        import urllib
 
 class SCGIRequest(object):
 
@@ -28,7 +30,7 @@ class SCGIRequest(object):
                         response += data
 
                 sock.close()
-                return response
+                return urllib.unquote(response)
 
         def send(self, data):
                 "Send data over scgi to url and get response"
