@@ -14,11 +14,20 @@ time.sleep(0.001)
 
 while True:
 
-        with open(queue, 'r') as txt:
-                queued = txt.read().strip().splitlines()
+        try:
 
-        if queued[0] == torrent_hash:
-                break
+                with open(queue, 'r') as txt:
+                        queued = txt.read().strip().splitlines()
+
+                if queued[0] == torrent_hash:
+                        break
+
+                if torrent_hash not in queued:
+
+                        with open(queue, 'a') as txt:
+                                txt.write(torrent_hash + '\n')
+        except:
+                pass
 
         time.sleep(0.01)
 
