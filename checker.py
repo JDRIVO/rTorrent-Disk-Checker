@@ -194,6 +194,7 @@ if cfg.enable_disk_check:
                                 directories[directory] = False
                                 continue
                 else:
+
                         if not directories[directory]:
                                 continue
 
