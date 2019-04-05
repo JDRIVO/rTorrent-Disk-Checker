@@ -87,7 +87,6 @@ if cfg.enable_disk_check:
 
                 if completed:
                         t_age, t_label, t_tracker, t_ratio, t_size, t_path, t_name = completed[0]
-                        t_label = urllib.unquote(t_label)
 
                         if override:
                                 override = False
