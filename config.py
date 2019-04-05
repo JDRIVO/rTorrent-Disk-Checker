@@ -34,6 +34,8 @@ body = 'Free disk space ASAP.'
 
 ###### DISK CHECK SECTION - IGNORE IF DISABLED ######
 
+# This script will auto detect mount points and only delete torrents inside the moint point that the torrent will be downloaded to
+
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
 
