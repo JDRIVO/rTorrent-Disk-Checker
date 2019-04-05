@@ -51,7 +51,7 @@ if sys.argv[1] == 'email':
         send_email()
         sys.exit()
 
-if cfg.enable_disk_check:
+try:
         torrent_size = float(sys.argv[1])
         remover = os.path.dirname(sys.argv[0]) + '/remover.py'
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.directory=', 'd.name='))
@@ -145,6 +145,8 @@ if cfg.enable_disk_check:
                 count += 1
                 freed_space += t_size
                 deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
+except Exception as e:
+        print(e)
 
 time = datetime.now() - start
 
