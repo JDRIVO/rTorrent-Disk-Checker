@@ -81,8 +81,7 @@ if cfg.enable_disk_check:
                 except:
                         pass
 
-        time.sleep(0.01)
-
+                time.sleep(0.01)
 
         current_date = datetime.now()
         remover = script_path + '/remover.py'
