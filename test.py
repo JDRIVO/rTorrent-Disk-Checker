@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
-
-import sys, os, smtplib, config as cfg
 from datetime import datetime
-from remotecaller import xmlrpc
-
-try:
-        xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
-except:
-        print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
-        sys.exit()
 
 start = datetime.now()
+
+import sys, os, smtplib, config as cfg
+from remotecaller import xmlrpc
 
 def send_email():
         server = False
@@ -153,6 +147,13 @@ if cfg.enable_disk_check:
                 deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
 
 time = datetime.now() - start
+
+try:
+        xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
+except:
+        print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
+        sys.exit()
+
 calc = available_space + freed_space - torrent_size
 
 with open('testresult.txt', 'w+') as textfile:
