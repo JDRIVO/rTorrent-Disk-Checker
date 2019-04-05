@@ -105,6 +105,7 @@ if cfg.enable_disk_check:
         exclude = no = False
         freed_space = 0
         fallback_torrents = []
+        directories = {}
 
         while freed_space < required_space:
 
@@ -180,12 +181,21 @@ if cfg.enable_disk_check:
                         t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                split_path = t_path.split('/')
-                t_mp = [path for path in ['/'.join(split_path[0:num]) for num in range(len(split_path))] if os.path.ismount(path)]
-                t_mp = max(t_mp) if t_mp else '/'
+                directory = os.path.dirname(t_path)
 
-                if t_mp != mount_point:
-                        continue
+                if directory not in directories:
+                        split_path = t_path.split('/')
+                        t_mp = [path for path in ['/'.join(split_path[0:num]) for num in range(len(split_path))] if os.path.ismount(path)]
+                        t_mp = max(t_mp) if t_mp else '/'
+
+                        if t_mp == mount_point:
+                                directories[directory] = True
+                        else:
+                                directories[directory] = False
+                                continue
+                else:
+                        if not directories[directory]:
+                                continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
                 freed_space += t_size
