@@ -1,11 +1,11 @@
 from config import scgi
 
 try:
-        import xmlrpc.client as xmlrpclib, socket
-        from urllib import parse as urllib
-except:
         import xmlrpclib, socket
         import urllib
+except:
+        import xmlrpc.client as xmlrpclib, socket
+        from urllib import parse as urllib
 
 class SCGIRequest(object):
 
