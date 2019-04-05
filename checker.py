@@ -89,9 +89,8 @@ if cfg.enable_disk_check:
                 downloading = 0
 
         open(last_torrent, mode='w+').write(torrent_hash)
-        split_path = torrent_path.split('/')
-        mount_point = [path for path in ['/'.join(split_path[0:end]) for end in range(len(split_path))] if os.path.ismount(path)]
-        mount_point = max(mount_point) if mount_point else '/'
+        mount_point = [path for path in [torrent_path.rsplit('/', num)[0] for num in range(torrent_path.count('/'))] if os.path.ismount(path)]
+        mount_point = mount_point[0] if mount_point else '/'
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
@@ -178,9 +177,8 @@ if cfg.enable_disk_check:
                 directory = t_path.rsplit('/', 1)[0]
 
                 if directory not in directories:
-                        split_path = t_path.split('/')
-                        t_mp = [path for path in ['/'.join(split_path[0:end]) for end in range(len(split_path))] if os.path.ismount(path)]
-                        t_mp = max(t_mp) if t_mp else '/'
+                        t_mp = [path for path in [t_path.rsplit('/', num)[0] for num in range(t_path.count('/'))] if os.path.ismount(path)]
+                        t_mp = t_mp[0] if t_mp else '/'
 
                         if t_mp == mount_point:
                                 directories[directory] = True
