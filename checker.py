@@ -18,7 +18,7 @@ def imdb_search():
                 from guessit import guessit
                 from imdbpie import Imdb
 
-                def imdb_rating():
+                def imdb_ratings():
                         ratings.update(imdb.get_title_ratings(movie_imdb))
 
                 def movie_country():
@@ -32,7 +32,7 @@ def imdb_search():
                 ratings = {}
                 country = []
                 t1 = Thread(target=movie_country)
-                t2 = Thread(target=imdb_rating)
+                t2 = Thread(target=imdb_ratings)
                 t1.start()
                 t2.start()
                 t1.join()
