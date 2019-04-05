@@ -5,11 +5,6 @@ from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
 
-try:
-        from urllib import parse as urllib
-except:
-        import urllib
-
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
 torrent_hash = sys.argv[3]
@@ -124,7 +119,6 @@ if cfg.enable_disk_check:
                                 continue
 
                         if cfg.labels:
-                                t_label = urllib.unquote(t_label)
 
                                 if t_label in cfg.labels:
                                         label_rule = cfg.labels[t_label]
