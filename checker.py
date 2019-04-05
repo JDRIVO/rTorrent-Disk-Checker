@@ -79,7 +79,7 @@ if cfg.enable_disk_check:
         remover_queue = script_path + '/' + torrent_hash
         emailer = script_path + '/emailer.py'
         last_torrent = script_path + '/hash.txt'
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.hash=', 'd.directory='))
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
         completed.sort()
 
         try:
@@ -107,7 +107,7 @@ if cfg.enable_disk_check:
                         break
 
                 if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_hash, t_path = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path = completed[0]
 
                         if override:
                                 override = False
@@ -161,20 +161,23 @@ if cfg.enable_disk_check:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([t_hash, t_path, t_size])
+                                        fallback_torrents.append([t_name, t_hash, t_path, t_size])
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([t_hash, t_path, t_size])
+                                        fallback_torrents.append([t_name, t_hash, t_path, t_size])
 
                                 del completed[0]
                                 continue
 
                         del completed[0]
                 else:
-                        t_hash, t_path, t_size = fallback_torrents[0]
+                        t_name, t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                directory = t_path.rsplit('/', 1)[0]
+                if t_name in t_path:
+                        directory = t_path.rsplit('/', 1)[0]
+                else:
+                        directory = t_path
 
                 if directory not in directories:
                         t_mp = [path for path in [t_path.rsplit('/', num)[0] for num in range(t_path.count('/'))] if os.path.ismount(path)]
