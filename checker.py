@@ -66,13 +66,23 @@ if cfg.enable_disk_check:
 
         while True:
 
-                with open(queue, 'r') as txt:
-                        queued = txt.read().strip().splitlines()
+                try:
 
-                if queued[0] == torrent_hash:
-                        break
+                        with open(queue, 'r') as txt:
+                                queued = txt.read().strip().splitlines()
 
-                time.sleep(0.01)
+                        if queued[0] == torrent_hash:
+                                break
+
+                        if torrent_hash not in queued:
+
+                                with open(queue, 'a') as txt:
+                                        txt.write(torrent_hash + '\n')
+                except:
+                        pass
+
+        time.sleep(0.01)
+
 
         current_date = datetime.now()
         remover = script_path + '/remover.py'
