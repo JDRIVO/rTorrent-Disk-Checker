@@ -43,7 +43,7 @@ if [ -z "$rtorrent" ]; then
 fi
 
 sed -i '/event.download.inserted_new,checker,"d.stop=/d' $rtorrent
-printf '\nDo you want the script to be run in Python 2 or 3? Python 3 is faster.
+printf '\nDo you want the script to be run in Python 2 or 3?
 
 Enter 2 for Python 2 or 3 for Python 3.\n'
 
