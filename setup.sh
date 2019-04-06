@@ -11,9 +11,11 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py
 2a. Add the following code to ~/.rtorrent.rc !! Update the path to checker.py !! Restart rtorrent once added:
 
 Python 2:
+schedule2 = update_cache, 0, 30, "execute.throw.bg=python2,/path/to/cachemaker.py" # 30 is the time in seconds to repeatedly trigger a ratio update of torrents
 method.set_key = event.download.inserted_new,checker,"d.stop=,$d.hash=", "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 Python 3:
+schedule2 = update_cache, 0, 30, "execute.throw.bg=python3,/path/to/cachemaker.py" # 30 is the time in seconds to repeatedly trigger a ratio update of torrents 
 method.set_key = event.download.inserted_new,checker,"d.stop=,$d.hash=", "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 3. SCGI Address Addition
@@ -42,6 +44,7 @@ if [ -z "$rtorrent" ]; then
     exit
 fi
 
+sed -i '/schedule2 = update_cache/d' $rtorrent
 sed -i '/event.download.inserted_new,checker,"d.stop=/d' $rtorrent
 printf '\nDo you want the script to be run in Python 2 or 3?
 
@@ -66,6 +69,19 @@ while true; do
               ;;
     esac
 done
+
+while true; do
+    read -p "Enter the time in seconds to repeatedly trigger a ratio update of your torrents: " update
+    echo "You have entered $update seconds"
+    read -p "Enter y to confirm or n to re-enter: " answer
+
+    if [[ $answer =~ ^[Yy]$ ]]; then
+            break
+    fi
+done
+
+sed -i "1i\
+schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cachemaker.py\"" $rtorrent
 
 sed -i "1i\
 method.set_key = event.download.inserted_new,checker,\"d.stop=,\$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
