@@ -81,10 +81,10 @@ while true; do
 done
 
 sed -i "1i\
-schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cachemaker.py\"" $rtorrent
+method.set_key = event.download.inserted_new,checker,\"d.stop=,\$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
 
 sed -i "1i\
-method.set_key = event.download.inserted_new,checker,\"d.stop=,\$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
+schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cachemaker.py\"" $rtorrent
 
 printf '\nWill you be using the IMDB function of the script (Y/N)?\n'
 
