@@ -6,7 +6,7 @@ from datetime import datetime
 from remotecaller import xmlrpc
 
 try:
-        import torrents import completed
+        from torrents import completed
         from mountpoints import mount_points
 except:
         import cachemaker
