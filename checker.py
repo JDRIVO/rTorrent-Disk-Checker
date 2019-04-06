@@ -9,8 +9,8 @@ try:
         from torrents import completed
         from mountpoints import mount_points
 except:
-        import cachemaker
-        cachemaker.build_cache()
+        import cachebuilder
+        cachebuilder.build_cache()
         from torrents import completed
         from mountpoints import mount_points
 
