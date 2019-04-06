@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, config as cfg
+import sys, os, time, pprint, config as cfg
 from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
+
+try:
+        import torrents import completed
+        from mountpoints import mount_points
+except:
+        import cachemaker
+        cachemaker.build_cache()
+        from torrents import completed
+        from mountpoints import mount_points
 
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
@@ -83,13 +92,12 @@ if cfg.enable_disk_check:
 
                 time.sleep(0.01)
 
+        completed.sort()
         current_date = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash
         emailer = script_path + '/emailer.py'
         last_torrent = script_path + '/hash.txt'
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
-        completed.sort()
 
         try:
                 last_hash = open(last_torrent).readline()
@@ -105,7 +113,7 @@ if cfg.enable_disk_check:
         required_space = torrent_size - (available_space - cfg.minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
-        exclude = no = False
+        exclude = mp_updated = no = False
         freed_space = 0
         fallback_torrents = []
         directories = {}
@@ -116,7 +124,7 @@ if cfg.enable_disk_check:
                         break
 
                 if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0]
 
                         if override:
                                 override = False
@@ -170,10 +178,10 @@ if cfg.enable_disk_check:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([t_name, t_hash, t_path, t_size])
+                                        fallback_torrents.append([parent_directory, t_name, t_hash, t_path, t_size])
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([t_name, t_hash, t_path, t_size])
+                                        fallback_torrents.append([parent_directory, t_name, t_hash, t_path, t_size])
 
                                 del completed[0]
                                 continue
@@ -183,30 +191,23 @@ if cfg.enable_disk_check:
                         t_name, t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
-                if t_name in t_path:
-                        directory = t_path.rsplit('/', 1)[0]
-                else:
-                        directory = t_path
-
-                if directory not in directories:
-                        t_mp = [path for path in [t_path.rsplit('/', num)[0] for num in range(t_path.count('/'))] if os.path.ismount(path)]
+                if parent_directory not in mount_points:
+                        mp_updated = True
+                        t_mp = [path for path in [parent_directory.rsplit('/', num)[0] for num in range(parent_directory.count('/'))] if os.path.ismount(path)]
                         t_mp = t_mp[0] if t_mp else '/'
+                        mount_points[parent_directory] = t_mp
 
-                        if t_mp == mount_point:
-                                directories[directory] = True
-                        else:
-                                directories[directory] = False
-                                continue
-                else:
-
-                        if not directories[directory]:
-                                continue
+                if mount_points[parent_directory] != mount_point:
+                        continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
                 freed_space += t_size
 
         if available_space >= required_space:
                 xmlrpc('d.start', tuple([torrent_hash]))
+
+        if mp_updated:
+                open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
