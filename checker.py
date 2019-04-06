@@ -188,7 +188,7 @@ if cfg.enable_disk_check:
 
                         del completed[0]
                 else:
-                        t_name, t_hash, t_path, t_size = fallback_torrents[0]
+                        parent_directory, t_name, t_hash, t_path, t_size = fallback_torrents[0]
                         del fallback_torrents[0]
 
                 if parent_directory not in mount_points:
