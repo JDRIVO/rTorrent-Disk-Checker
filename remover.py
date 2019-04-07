@@ -2,18 +2,17 @@
 
 import sys, os, time, pprint
 from torrents import completed
+from remotecaller import xmlrpc
 
 queue = sys.argv[1]
 torrent_hash = sys.argv[2]
 torrent_path = sys.argv[3]
 
-completed.remove([l for l in completed if torrent_hash in l][0])
-cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
-cache.seek(0)
-cache.write('completed = ' + pprint.pformat(completed))]
-cache.truncate()
-
-from remotecaller import xmlrpc
+t_hash = tuple([torrent_hash])
+xmlrpc('d.open', t_hash)
+xmlrpc('d.tracker_announce', t_hash)
+files = xmlrpc('f.multicall', (torrent_hash, '', 'f.frozen_path='))
+xmlrpc('d.erase', t_hash)
 
 with open(queue, 'a+') as txt:
         txt.write(torrent_hash + '\n')
@@ -37,12 +36,6 @@ while True:
                 pass
 
         time.sleep(0.01)
-
-t_hash = tuple([torrent_hash])
-xmlrpc('d.open', t_hash)
-xmlrpc('d.tracker_announce', t_hash)
-files = xmlrpc('f.multicall', (torrent_hash, '', 'f.frozen_path='))
-xmlrpc('d.erase', t_hash)
 
 if len(files) <= 1:
         os.remove(files[0][0])
