@@ -2,6 +2,7 @@
 
 import sys, os, time
 from remotecaller import xmlrpc
+from cachebuilder import build_cache
 
 queue = sys.argv[1]
 torrent_hash = sys.argv[2]
@@ -57,6 +58,7 @@ queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
+build_cache()
 time.sleep(5)
 
 try:
