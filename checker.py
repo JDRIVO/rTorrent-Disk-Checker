@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, pprint, config as cfg
+import sys, os, time, config as cfg
 from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
@@ -208,6 +208,7 @@ if cfg.enable_disk_check:
                 xmlrpc('d.start', tupled_hash)
 
         if mp_updated:
+                import pprint
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
         queue = open(queue, mode='r+')
