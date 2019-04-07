@@ -5,15 +5,6 @@ from subprocess import Popen
 from datetime import datetime
 from remotecaller import xmlrpc
 
-try:
-        from torrents import completed
-        from mountpoints import mount_points
-except:
-        import cachebuilder
-        cachebuilder.build_cache()
-        from torrents import completed
-        from mountpoints import mount_points
-
 torrent_name = sys.argv[1]
 torrent_label = sys.argv[2]
 torrent_hash = sys.argv[3]
@@ -90,6 +81,15 @@ if cfg.enable_disk_check:
                         pass
 
                 time.sleep(0.01)
+
+        try:
+                from torrents import completed
+                from mountpoints import mount_points
+        except:
+                import cachebuilder
+                cachebuilder.build_cache()
+                from torrents import completed
+                from mountpoints import mount_points
 
         tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
