@@ -6,6 +6,16 @@ start = datetime.now()
 import sys, os, smtplib, config as cfg
 from remotecaller import xmlrpc
 
+try:
+        from torrents import completed
+        from mountpoints import mount_points
+except:
+        print('Building cache. Please wait.)
+        import cachebuilder
+        cachebuilder.build_cache()
+        print('Cache built. Please run the code again.')
+        sys.exit()
+
 def send_email():
         server = False
 
@@ -53,11 +63,14 @@ if sys.argv[1] == 'email':
 
 try:
         torrent_size = float(sys.argv[1])
-        remover = os.path.dirname(sys.argv[0]) + '/remover.py'
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.directory=', 'd.name='))
         completed.sort()
+        script_path = os.path.dirname(sys.argv[0])
+        queue = script_path + '/queue.txt'
+        remover = script_path + '/remover.py'
+        remover_queue = script_path + '/' + 'hash'
+        emailer = script_path + '/emailer.py'
+        last_torrent = script_path + '/hash.txt'
         downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
-        #downloading = sum(torrent[0] for torrent in downloading) if downloading else 0
         downloading = 0
         disk = os.statvfs('/')
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
@@ -75,7 +88,7 @@ try:
                         break
 
                 if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_path, t_name = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_path, t_name, parent_directory = completed[0]
 
                         if override:
                                 override = False
@@ -129,17 +142,17 @@ try:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([t_age, t_label, t_tracker, t_size, t_name])
+                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([t_age, t_label, t_tracker, t_size, t_name])
+                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
 
                                 del completed[0]
                                 continue
 
                         del completed[0]
                 else:
-                        t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
+                        parent_directory, t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
                         del fallback_torrents[0]
 
                 count += 1
