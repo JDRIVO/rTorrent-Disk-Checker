@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time
+import sys, os, time, pprint
 from remotecaller import xmlrpc
 from cachebuilder import build_cache
 
@@ -58,7 +58,14 @@ queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
-build_cache()
+time.sleep(5)
+
+from torrents import completed
+completed.remove([l for l in completed if torrent_hash in l][0])
+cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
+cache.seek(0)
+cache.write('completed = ' + pprint.pformat(completed))]
+cache.truncate()
 time.sleep(5)
 
 try:
@@ -66,5 +73,6 @@ try:
 
         if not queued:
                 os.remove(queue)
+                build_cache()
 except:
         pass
