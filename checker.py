@@ -92,6 +92,7 @@ if cfg.enable_disk_check:
 
                 time.sleep(0.01)
 
+        tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash
@@ -104,14 +105,14 @@ if cfg.enable_disk_check:
                 from torrent import last_torrent
 
                 if last_torrent[0] == mount_point
-                        downloading = xmlrpc('d.left_bytes', tuple([last_torrent[1]]))
+                        downloading = xmlrpc('d.left_bytes', last_torrent[1])
                 else:
                         downloading = 0
 
         except:
                 downloading = 0
 
-        open(last_torrent, mode='w+').write('last_torrent = ' + str([mount_point, torrent_hash]))
+        open(last_torrent, mode='w+').write('last_torrent = ' + str([mount_point, tupled_hash]))
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
@@ -207,7 +208,7 @@ if cfg.enable_disk_check:
                 freed_space += t_size
 
         if available_space >= required_space:
-                xmlrpc('d.start', tuple([torrent_hash]))
+                xmlrpc('d.start', tupled_hash)
 
         if mp_updated:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
