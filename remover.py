@@ -58,7 +58,6 @@ queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
-time.sleep(5)
 
 from torrents import completed
 completed.remove([l for l in completed if torrent_hash in l][0])
