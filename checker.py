@@ -104,7 +104,7 @@ if cfg.enable_disk_check:
         try:
                 from torrent import last_torrent
 
-                if last_torrent[0] == mount_point
+                if last_torrent[0] == mount_point:
                         downloading = xmlrpc('d.left_bytes', last_torrent[1])
                 else:
                         downloading = 0
