@@ -1,12 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import sys, os, time, pprint
-from remotecaller import xmlrpc
-from cachebuilder import build_cache
+from torrents import completed
 
 queue = sys.argv[1]
 torrent_hash = sys.argv[2]
 torrent_path = sys.argv[3]
+
+completed.remove([l for l in completed if torrent_hash in l][0])
+cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
+cache.seek(0)
+cache.write('completed = ' + pprint.pformat(completed))]
+cache.truncate()
+
+from remotecaller import xmlrpc
+from cachebuilder import build_cache
+
+
 
 with open(queue, 'a+') as txt:
         txt.write(torrent_hash + '\n')
@@ -58,14 +68,6 @@ queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
-
-from torrents import completed
-completed.remove([l for l in completed if torrent_hash in l][0])
-cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
-cache.seek(0)
-cache.write('completed = ' + pprint.pformat(completed))]
-cache.truncate()
-time.sleep(5)
 
 try:
         queued = open(queue).read()
