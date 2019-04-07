@@ -29,8 +29,7 @@ def build_cache():
                         mount_point = mount_point[0] if mount_point else '/'
                         mount_points[parent_directory] = mount_point
 
-                with open(mp_cache, 'w+') as txt:
-                        txt.write('mount_points = ' + pprint.pformat(mount_points))
+                open(mp_cache, mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
 if __name__ == "__main__":
         build_cache()
