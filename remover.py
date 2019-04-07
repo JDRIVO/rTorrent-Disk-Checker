@@ -14,7 +14,6 @@ cache.write('completed = ' + pprint.pformat(completed))]
 cache.truncate()
 
 from remotecaller import xmlrpc
-from cachebuilder import build_cache
 
 with open(queue, 'a+') as txt:
         txt.write(torrent_hash + '\n')
@@ -72,6 +71,5 @@ try:
 
         if not queued:
                 os.remove(queue)
-                build_cache()
 except:
         pass
