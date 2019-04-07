@@ -89,7 +89,7 @@ try:
                         break
 
                 if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_path, t_name, parent_directory = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0]
 
                         if override:
                                 override = False
