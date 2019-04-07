@@ -16,8 +16,6 @@ cache.truncate()
 from remotecaller import xmlrpc
 from cachebuilder import build_cache
 
-
-
 with open(queue, 'a+') as txt:
         txt.write(torrent_hash + '\n')
 
