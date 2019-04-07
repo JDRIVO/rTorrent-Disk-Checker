@@ -11,14 +11,14 @@ def build_cache():
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
         completed = [list + [list[7].rsplit('/', 1)[0]] if list[5] in list[7] else list + [list[7]] for list in completed]
 
-        if not os.path.isfile(torrent_cache):
-                cache = open(torrent_cache, mode='w+')
-                cache.write('completed = ' + pprint.pformat(completed))
-        else:
+        if os.path.isfile(torrent_cache):
                 cache = open(torrent_cache, mode='r+')
                 cache.seek(0)
                 cache.write('completed = ' + pprint.pformat(completed))
                 cache.truncate()
+        else:
+                cache = open(torrent_cache, mode='w+')
+                cache.write('completed = ' + pprint.pformat(completed))
 
         if not os.path.isfile(mp_cache):
                 mount_points = {}
