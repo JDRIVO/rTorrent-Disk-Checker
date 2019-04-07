@@ -70,7 +70,6 @@ if sys.argv[1] == 'email':
 
 try:
         torrent_size = float(sys.argv[1])
-        completed.sort()
         script_path = os.path.dirname(sys.argv[0])
         queue = script_path + '/queue.txt'
         remover = script_path + '/remover.py'
