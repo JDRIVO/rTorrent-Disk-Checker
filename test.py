@@ -11,7 +11,7 @@ try:
         from torrents import completed
         from mountpoints import mount_points
 except:
-        print('Building cache. Please wait.)
+        print('Building cache. Please wait.')
         import cachebuilder
         cachebuilder.build_cache()
         print('Cache built. Please run the code again.')
