@@ -76,7 +76,6 @@ if cfg.enable_disk_check:
         while True:
 
                 try:
-
                         with open(queue, 'r') as txt:
                                 queued = txt.read().strip().splitlines()
 
