@@ -117,7 +117,7 @@ if cfg.enable_disk_check:
         include = override = True
         exclude = mp_updated = no = False
         freed_space = 0
-        fallback_torrents = []
+        fallback_torrents, deleted = [], []
 
         while freed_space < required_space:
 
@@ -202,6 +202,7 @@ if cfg.enable_disk_check:
                         continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
+                deleted.append(t_hash)
                 freed_space += t_size
 
         if available_space >= required_space:
@@ -210,6 +211,13 @@ if cfg.enable_disk_check:
         if mp_updated:
                 import pprint
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
+
+
+        [completed.remove(torrent) for torrent in completed for t_hash in deleted if t_hash in torrent]
+        cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
+        cache.seek(0)
+        cache.write('completed = ' + pprint.pformat(completed))]
+        cache.truncate()
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
