@@ -13,7 +13,13 @@ try:
 except:
         print('Building cache. Please wait.')
         import cachebuilder
-        cachebuilder.build_cache()
+
+        try:
+                cachebuilder.build_cache()
+        except:
+                print('Failed\nRun the script with its full path like:\npython /path/to/test.py 69')
+                sys.exit()
+
         print('Cache built. Please run the code again.')
         sys.exit()
 
