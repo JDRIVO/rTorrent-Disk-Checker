@@ -116,7 +116,6 @@ if cfg.enable_disk_check:
         exclude = mp_updated = no = False
         freed_space = 0
         fallback_torrents = []
-        directories = {}
 
         while freed_space < required_space:
 
