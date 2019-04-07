@@ -97,7 +97,7 @@ if cfg.enable_disk_check:
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash
         emailer = script_path + '/emailer.py'
-        last_torrent = script_path + '/torrent.py'
+        last_hash = script_path + '/torrent.py'
         mount_point = [path for path in [torrent_path.rsplit('/', num)[0] for num in range(torrent_path.count('/'))] if os.path.ismount(path)]
         mount_point = mount_point[0] if mount_point else '/'
 
@@ -112,7 +112,7 @@ if cfg.enable_disk_check:
         except:
                 downloading = 0
 
-        open(last_torrent, mode='w+').write('last_torrent = ' + str([mount_point, tupled_hash]))
+        open(last_hash, mode='w+').write('last_torrent = ' + str([mount_point, tupled_hash]))
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
