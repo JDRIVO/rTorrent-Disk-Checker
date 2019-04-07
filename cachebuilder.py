@@ -25,12 +25,8 @@ def build_cache():
 
                 for list in completed:
                         parent_directory = list[8]
-
-                        try:
-                                mount_point = [path for path in [parent_directory.rsplit('/', num)[0] for num in range(parent_directory.count('/'))] if os.path.ismount(path)][0]
-                        except:
-                                mount_point = '/'
-
+                        mount_point = [path for path in [parent_directory.rsplit('/', num)[0] for num in range(parent_directory.count('/'))] if os.path.ismount(path)][0]
+                        mount_point = mount_point[0] if mount_point else '/'
                         mount_points[parent_directory] = mount_point
 
                 with open(mp_cache, 'w+') as txt:
