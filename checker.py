@@ -212,7 +212,6 @@ if cfg.enable_disk_check:
                 import pprint
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
-
         for x in range(0, 2):
                 from torrents import completed
                 [completed.remove(torrent) for torrent in completed for t_hash in deleted if t_hash in torrent]
