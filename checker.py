@@ -107,7 +107,6 @@ if cfg.enable_disk_check:
                         downloading = xmlrpc('d.left_bytes', last_torrent[1])
                 else:
                         downloading = 0
-
         except:
                 downloading = 0
 
