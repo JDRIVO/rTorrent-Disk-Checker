@@ -215,12 +215,16 @@ if cfg.enable_disk_check:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
         for x in range(0, 2):
-                from torrents import completed
-                [completed.pop(index[0]) for index in deleted if index[1] in completed[index]]
-                cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
-                cache.seek(0)
-                cache.write('completed = ' + pprint.pformat(completed))]
-                cache.truncate()
+                
+                try:
+                        from torrents import completed
+                        [completed.pop(index[0]) for index in deleted if index[1] in completed[index]]
+                        cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
+                        cache.seek(0)
+                        cache.write('completed = ' + pprint.pformat(completed))]
+                        cache.truncate()
+                except:
+                        pass
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
