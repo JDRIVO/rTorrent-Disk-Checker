@@ -94,6 +94,7 @@ try:
                         break
 
                 if completed:
+                        torrent = completed[0]
                         t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0]
 
                         if override:
@@ -148,17 +149,17 @@ try:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
+                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name, torrent])
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
+                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name, torrent])
 
                                 del completed[0]
                                 continue
 
                         del completed[0]
                 else:
-                        parent_directory, t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
+                        parent_directory, t_age, t_label, t_tracker, t_size, t_name, torrent = fallback_torrents[0]
                         del fallback_torrents[0]
 
                 count += 1
