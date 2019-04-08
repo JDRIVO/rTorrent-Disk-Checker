@@ -58,6 +58,7 @@ queued = txt.read().strip().splitlines()
 txt.seek(0)
 [txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
 txt.truncate()
+time.sleep(5)
 
 try:
         queued = open(queue).read()
