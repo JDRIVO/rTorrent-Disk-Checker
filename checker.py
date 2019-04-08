@@ -214,24 +214,26 @@ if cfg.enable_disk_check:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
         if deleted:
+                import cacher
 
                 try:
                         from importlib import reload
                 except:
                         pass
 
-                for x in range(0, 2):
+                try:
+                        reload(torrents)
+                        completed = torrents.completed
+                        [completed.remove(torrent) for torrent in deleted]
+                        cacher.enter_queue('checker')
+                        cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
+                        cache.seek(0)
+                        cache.write('completed = ' + pprint.pformat(completed))
+                        cache.truncate()
+                except:
+                        pass
 
-                        try:
-                                reload(torrents)
-                                completed = torrents.completed
-                                [completed.remove(torrent) for torrent in deleted]
-                                cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
-                                cache.seek(0)
-                                cache.write('completed = ' + pprint.pformat(completed))
-                                cache.truncate()
-                        except:
-                                pass
+                cacher.leave_queue('checker')
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
