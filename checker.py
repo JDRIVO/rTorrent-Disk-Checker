@@ -92,7 +92,6 @@ if cfg.enable_disk_check:
                 from mountpoints import mount_points
 
         completed = torrents.completed
-        completed = sorted(completed.items(), key=lambda x: x[1])
         tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
         remover = script_path + '/remover.py'
@@ -127,7 +126,8 @@ if cfg.enable_disk_check:
                         break
 
                 if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0][1]
+                        torrent = completed[0]
+                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0]
 
                         if override:
                                 override = False
@@ -181,17 +181,17 @@ if cfg.enable_disk_check:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size))
+                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size, torrent))
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size))
+                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size, torrent))
 
                                 del completed[0]
                                 continue
 
                         del completed[0]
                 else:
-                        parent_directory, t_name, t_hash, t_path, t_size = fallback_torrents[0]
+                        parent_directory, t_name, t_hash, t_path, t_size, torrent = fallback_torrents[0]
                         del fallback_torrents[0]
 
                 if parent_directory not in mount_points:
@@ -204,7 +204,7 @@ if cfg.enable_disk_check:
                         continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
-                deleted.append(t_hash)
+                deleted.append(torrent)
                 freed_space += t_size
 
         if available_space >= required_space:
@@ -225,7 +225,7 @@ if cfg.enable_disk_check:
                         try:
                                 reload(torrents)
                                 completed = torrents.completed
-                                completed = {k: v for k, v in completed.iteritems() if v[6] not in deleted}
+                                [completed.remove(torrent) for torrent in deleted]
                                 cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
                                 cache.seek(0)
                                 cache.write('completed = ' + pprint.pformat(completed))
