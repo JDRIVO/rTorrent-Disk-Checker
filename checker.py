@@ -217,10 +217,10 @@ if cfg.enable_disk_check:
 
         if deleted:
 
-                                try:
-                                        from importlib import reload
-                                except:
-                                        pass
+                try:
+                        from importlib import reload
+                except:
+                        pass
 
                 for x in range(0, 2):
 
