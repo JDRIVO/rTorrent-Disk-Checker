@@ -217,15 +217,15 @@ if cfg.enable_disk_check:
 
         if deleted:
 
+                                try:
+                                        from importlib import reload
+                                except:
+                                        pass
+
                 for x in range(0, 2):
 
                         try:
-                                try:
-                                        reload(torrents)
-                                except:
-                                        from importlib import reload
-                                        reload(torrents)
-
+                                reload(torrents)
                                 completed = torrents.completed
 
                                 if [completed.pop(index[0]) for index in deleted if index[1] in completed[index[0]]]:
