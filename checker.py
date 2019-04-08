@@ -88,10 +88,10 @@ if cfg.enable_disk_check:
         except:
                 import cachebuilder
                 cachebuilder.build_cache()
-                from torrents import completed
+                import torrents
                 from mountpoints import mount_points
 
-        completed = list(completed)
+        completed = torrents.completed
         tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
         remover = script_path + '/remover.py'
@@ -220,7 +220,13 @@ if cfg.enable_disk_check:
                 for x in range(0, 2):
 
                         try:
-                                from torrents import completed
+                                try:
+                                        reload(torrents)
+                                except:
+                                        from importlib import reload
+                                        reload(torrents)
+
+                                completed = torrents.completed
 
                                 if [completed.pop(index[0]) for index in deleted if index[1] in completed[index[0]]]:
                                         cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
