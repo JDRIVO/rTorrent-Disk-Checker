@@ -204,7 +204,7 @@ if cfg.enable_disk_check:
                         continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
-                deleted.append(index)
+                deleted.append((index, t_hash))
                 freed_space += t_size
 
         if available_space >= required_space:
@@ -214,10 +214,9 @@ if cfg.enable_disk_check:
                 import pprint
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
-        from torrents import completed
-        [completed.pop(index) for index in deleted]
-
         for x in range(0, 2):
+                from torrents import completed
+                [completed.pop(index[0]) for index in deleted if index[1] in completed[index]
                 cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
                 cache.seek(0)
                 cache.write('completed = ' + pprint.pformat(completed))]
