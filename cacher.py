@@ -48,6 +48,11 @@ def build_cache():
         enter_queue('schedule')
 
         if os.path.isfile(torrent_cache):
+                file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(torrent_cache))
+
+                if file_age < datetime.timedelta(seconds=1):
+                        time.sleep(0.05)
+
                 cache = open(torrent_cache, mode='r+')
                 cache.seek(0)
                 cache.write('completed = ' + pprint.pformat(completed))
