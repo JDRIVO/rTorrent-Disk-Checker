@@ -225,6 +225,7 @@ if cfg.enable_disk_check:
                         try:
                                 reload(torrents)
                                 completed = torrents.completed
+
                                 if [completed.remove(torrent) for torrent in deleted]:
                                         cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
                                         cache.seek(0)
