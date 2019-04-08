@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, pprint
+import sys, os, time
 from torrents import completed
 from remotecaller import xmlrpc
 
