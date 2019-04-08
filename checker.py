@@ -91,6 +91,7 @@ if cfg.enable_disk_check:
                 from torrents import completed
                 from mountpoints import mount_points
 
+        completed = list(completed)
         tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
         remover = script_path + '/remover.py'
