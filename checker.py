@@ -216,7 +216,7 @@ if cfg.enable_disk_check:
 
         for x in range(0, 2):
                 from torrents import completed
-                [completed.pop(index[0]) for index in deleted if index[1] in completed[index]
+                [completed.pop(index[0]) for index in deleted if index[1] in completed[index]]
                 cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
                 cache.seek(0)
                 cache.write('completed = ' + pprint.pformat(completed))]
