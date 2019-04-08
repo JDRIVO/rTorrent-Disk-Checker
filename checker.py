@@ -181,10 +181,10 @@ if cfg.enable_disk_check:
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
                                 if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_name, t_hash, t_path, t_size, index])
+                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size, index))
 
                                 elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_name, t_hash, t_path, t_size, index])
+                                        fallback_torrents.append((parent_directory, t_name, t_hash, t_path, t_size, index))
 
                                 del completed[0]
                                 continue
