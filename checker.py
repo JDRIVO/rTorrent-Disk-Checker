@@ -83,7 +83,7 @@ if cfg.enable_disk_check:
                 time.sleep(0.01)
 
         try:
-                from torrents import completed
+                import torrents
                 from mountpoints import mount_points
         except:
                 import cachebuilder
