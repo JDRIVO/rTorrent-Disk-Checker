@@ -215,25 +215,29 @@ if cfg.enable_disk_check:
 
         if deleted:
                 import cacher
+                updated = False
 
                 try:
                         from importlib import reload
                 except:
                         pass
 
-                try:
-                        reload(torrents)
-                        completed = torrents.completed
+               reload(torrents)
+               completed = torrents.completed
+                
+               try:
                         [completed.remove(torrent) for torrent in deleted]
+                        updated = True
+               except:
+                        pass
+                
+                if updated:
                         cacher.enter_queue('checker')
                         cache = open(os.path.dirname(sys.argv[0]) + '/torrents.py', mode='r+')
                         cache.seek(0)
                         cache.write('completed = ' + pprint.pformat(completed))
                         cache.truncate()
-                except:
-                        pass
-
-                cacher.leave_queue('checker')
+                        cacher.leave_queue('checker')
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
