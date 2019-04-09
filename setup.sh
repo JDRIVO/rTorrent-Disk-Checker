@@ -11,11 +11,11 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py
 2a. Add the following code to ~/.rtorrent.rc !! Update the path to cacher.py & checker.py !! Restart rtorrent once added:
 
 Python 2:
-schedule2 = update_cache, 0, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to repeatedly trigger a ratio update of torrents
+schedule2 = update_cache, 0, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, "d.stop=,$d.hash=", "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 Python 3:
-schedule2 = update_cache, 0, 30, "execute.throw.bg=python3,/path/to/cacher.py" # 30 is the time in seconds to repeatedly trigger a ratio update of torrents 
+schedule2 = update_cache, 0, 30, "execute.throw.bg=python3,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, "d.stop=,$d.hash=", "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 3. SCGI Address Addition
@@ -71,7 +71,7 @@ while true; do
 done
 
 while true; do
-    printf '\nEnter the time in seconds to repeatedly trigger a ratio update of your torrents: '
+    printf '\nEnter the time in seconds to repeatedly update torrent information: '
     read update
     printf "\nYou have entered $update seconds\n"
     printf '\nEnter [Y] to confirm or [N] to re-enter: '
