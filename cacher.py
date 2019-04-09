@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, shutil, pprint, datetime
+import sys, os, time, shutil, pprint
 from remotecaller import xmlrpc
 
 script_path = os.path.dirname(sys.argv[0])
