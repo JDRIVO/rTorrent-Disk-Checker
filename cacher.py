@@ -6,7 +6,7 @@ from remotecaller import xmlrpc
 script_path = os.path.dirname(sys.argv[0])
 queue = script_path + '/cachequeue.txt'
 torrent_cache = script_path + '/torrents.py'
-cache_copy = script_path + '/torrents2.py'
+cache_copy = script_path + '/torrentscopy.py'
 mp_cache = script_path + '/mountpoints.py'
 
 def enter_queue(identity):
