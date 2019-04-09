@@ -27,9 +27,7 @@ def send_email():
         server = False
 
         try:
-
                 try:
-
                         try:
                                 print('\nAttempting to email using TLS\n')
                                 server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
