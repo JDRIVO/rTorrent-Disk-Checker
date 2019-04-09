@@ -201,7 +201,7 @@ if cfg.enable_disk_check:
 
                 if mount_points[parent_directory] != mount_point:
                         continue
-                        
+
                 try:
                         xmlrpc('d.open', tuple([t_hash]))
                 except:
