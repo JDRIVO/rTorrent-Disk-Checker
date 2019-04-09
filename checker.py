@@ -83,15 +83,14 @@ if cfg.enable_disk_check:
                 time.sleep(0.01)
 
         try:
-                import torrents
+                from torrents import completed
                 from mountpoints import mount_points
         except:
                 import cacher
                 cacher.build_cache('checker')
-                import torrents
+                from torrents import completed
                 from mountpoints import mount_points
 
-        completed = torrents.completed
         tupled_hash = tuple([torrent_hash])
         current_date = datetime.now()
         remover = script_path + '/remover.py'
