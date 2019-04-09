@@ -14,7 +14,6 @@ with open(lock, 'w+') as txt:
 server = False
 
 try:
-
         try:
                 server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
                 server.starttls()
@@ -27,7 +26,6 @@ try:
                 server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
                 server.login(cfg.account, cfg.password)
 except:
-
         if server:
                 server.quit()
 
