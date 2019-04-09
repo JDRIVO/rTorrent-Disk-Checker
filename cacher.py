@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, pprint, datetime
+import sys, os, time, shutil, pprint, datetime
 from remotecaller import xmlrpc
 
 script_path = os.path.dirname(sys.argv[0])
 queue = script_path + '/cachequeue.txt'
 torrent_cache = script_path + '/torrents.py'
+cache_copy = script_path + '/torrents2.py'
 mp_cache = script_path + '/mountpoints.py'
 
 def enter_queue(identity):
@@ -57,10 +58,9 @@ def build_cache():
                         time.sleep(0.05)
                         completed = retrieve_torrents()
 
-                cache = open(torrent_cache, mode='r+')
-                cache.seek(0)
+                cache = open(cache_copy, mode='w+')
                 cache.write('completed = ' + pprint.pformat(completed))
-                cache.truncate()
+                shutil.move(cache_copy, torrent_cache)
         else:
                 cache = open(torrent_cache, mode='w+')
                 cache.write('completed = ' + pprint.pformat(completed))
