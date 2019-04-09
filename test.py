@@ -12,10 +12,10 @@ try:
         from mountpoints import mount_points
 except:
         print('Building cache. Please wait.')
-        import cachebuilder
+        import cacher
 
         try:
-                cachebuilder.build_cache()
+                cacher.build_cache('test')
         except:
                 print('Failed\nRun the script with its full path like:\npython /path/to/test.py 69')
                 sys.exit()
