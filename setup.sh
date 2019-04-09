@@ -48,7 +48,7 @@ sed -i '/schedule2 = update_cache/d' $rtorrent
 sed -i '/event.download.inserted_new, checker, "d.stop=/d' $rtorrent
 printf '\nDo you want the script to be run in Python 2 or 3?
 
-Enter 2 for Python 2 or 3 for Python 3: '
+Enter [2] for Python 2 or [3] for Python 3: '
 
 while true; do
     read answer
@@ -88,7 +88,7 @@ method.set_key = event.download.inserted_new, checker, \"d.stop=,\$d.hash=\", \"
 sed -i "1i\
 schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cacher.py\"" $rtorrent
 
-printf '\nWill you be using the IMDB function of the script [Y]/[N]?\n'
+printf '\nWill you be using the IMDB function of the script [Y]/[N]?: '
 
 while true; do
     read answer
