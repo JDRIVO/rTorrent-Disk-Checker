@@ -42,7 +42,7 @@ def leave_queue(identity):
         txt.truncate()
 
 def build_cache(identity):
-        enter_queue(indentity)
+        enter_queue(identity)
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
         completed.sort()
         [list.append(list[7].rsplit('/', 1)[0]) if list[5] in list[7] else list.append(list[7]) for list in completed]
@@ -55,7 +55,7 @@ def build_cache(identity):
                 cache = open(torrent_cache, mode='w+')
                 cache.write('completed = ' + pprint.pformat(completed))
 
-        leave_queue(indentity)
+        leave_queue(identity)
 
         if not os.path.isfile(mp_cache):
                 mount_points = {}
