@@ -41,23 +41,13 @@ def leave_queue(identity):
         [txt.write(queuer + '\n') for queuer in queued if queuer != identity]
         txt.truncate()
 
-def retrieve_torrents():
+def build_cache(identity):
+        enter_queue(indentity)
         completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
         completed.sort()
         [list.append(list[7].rsplit('/', 1)[0]) if list[5] in list[7] else list.append(list[7]) for list in completed]
-        return completed
-
-def build_cache():
-        completed = retrieve_torrents()
-        enter_queue('schedule')
 
         if os.path.isfile(torrent_cache):
-                file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(torrent_cache))
-
-                if file_age < datetime.timedelta(seconds=1):
-                        time.sleep(0.05)
-                        completed = retrieve_torrents()
-
                 cache = open(cache_copy, mode='w+')
                 cache.write('completed = ' + pprint.pformat(completed))
                 shutil.move(cache_copy, torrent_cache)
@@ -65,7 +55,7 @@ def build_cache():
                 cache = open(torrent_cache, mode='w+')
                 cache.write('completed = ' + pprint.pformat(completed))
 
-        leave_queue('schedule')
+        leave_queue(indentity)
 
         if not os.path.isfile(mp_cache):
                 mount_points = {}
@@ -79,4 +69,4 @@ def build_cache():
                 open(mp_cache, mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
 if __name__ == "__main__":
-        build_cache()
+        build_cache('schedule')
