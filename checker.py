@@ -86,8 +86,8 @@ if cfg.enable_disk_check:
                 import torrents
                 from mountpoints import mount_points
         except:
-                import cachebuilder
-                cachebuilder.build_cache()
+                import cacher
+                cacher.build_cache('checker')
                 import torrents
                 from mountpoints import mount_points
 
