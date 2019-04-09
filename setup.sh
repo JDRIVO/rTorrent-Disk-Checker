@@ -120,7 +120,9 @@ else
 fi
 
 printf '\nConfiguration completed.\n'
-printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now [Y]/[N]?\n'
+printf '\nRtorrent has to be restarted in order for the changes to take effect.
+
+Do you want to the script to attempt a rtorrent restart now [Y]/[N]?: '
 
 while true; do
     read answer
