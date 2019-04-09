@@ -205,6 +205,7 @@ if cfg.enable_disk_check:
                 try:
                         xmlrpc('d.open', tuple([t_hash]))
                 except:
+                        del completed[0]
                         continue
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path])
