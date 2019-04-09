@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time
+import sys, os, cacher, time
 from torrents import completed
 from remotecaller import xmlrpc
 
@@ -64,5 +64,6 @@ try:
 
         if not queued:
                 os.remove(queue)
+                cacher.build_cache(torrent_hash)
 except:
         pass
