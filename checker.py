@@ -205,6 +205,7 @@ if cfg.enable_disk_check:
                 try:
                         xmlrpc('d.open', tuple([t_hash]))
                 except:
+
                         if completed:
                                 del completed[0]
                         else:
