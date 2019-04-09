@@ -8,7 +8,7 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py
 
 2. rtorrent.rc File Modification
 
-2a. Add the following code to ~/.rtorrent.rc !! Update the path to checker.py !! Restart rtorrent once added:
+2a. Add the following code to ~/.rtorrent.rc !! Update the path to cacher.py & checker.py !! Restart rtorrent once added:
 
 Python 2:
 schedule2 = update_cache, 0, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to repeatedly trigger a ratio update of torrents
@@ -48,7 +48,7 @@ sed -i '/schedule2 = update_cache/d' $rtorrent
 sed -i '/event.download.inserted_new, checker, "d.stop=/d' $rtorrent
 printf '\nDo you want the script to be run in Python 2 or 3?
 
-Enter 2 for Python 2 or 3 for Python 3.\n'
+Enter 2 for Python 2 or 3 for Python 3: '
 
 while true; do
     read answer
@@ -71,9 +71,10 @@ while true; do
 done
 
 while true; do
-    read -p "Enter the time in seconds to repeatedly trigger a ratio update of your torrents: " update
-    echo "You have entered $update seconds"
-    read -p "Enter y to confirm or n to re-enter: " answer
+    printf '\nEnter the time in seconds to repeatedly trigger a ratio update of your torrents: '
+    read update
+    printf "\nYou have entered $update seconds\n"
+    printf '\nEnter [Y] to confirm or [N] to re-enter: '
 
     if [[ $answer =~ ^[Yy]$ ]]; then
             break
@@ -86,15 +87,15 @@ method.set_key = event.download.inserted_new, checker, \"d.stop=,\$d.hash=\", \"
 sed -i "1i\
 schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cacher.py\"" $rtorrent
 
-printf '\nWill you be using the IMDB function of the script (Y/N)?\n'
+printf '\nWill you be using the IMDB function of the script [Y]/[N]?\n'
 
 while true; do
     read answer
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q || sudo pip install imdbpie -q || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
-                 pip install guessit -q || sudo pip install guessit -q || printf '\n\033[0;36mFailed to install Python module: guessit\033[0m\n'
+                 pip install imdbpie -q && printf '\nimdbpie installed\n'|| sudo pip install imdbpie -q && printf '\nimdbpie installed\n' || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
+                 pip install guessit -q && printf '\nguessit installed\n' || sudo pip install guessit -q && printf '\nguessit installed\n' || printf '\n\033[0;36mFailed to install Python module: guessit\033[0m\n'
                  break
                  ;;
 
@@ -118,7 +119,7 @@ else
 fi
 
 printf '\nConfiguration completed.\n'
-printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now (Y/N)?\n'
+printf '\nRtorrent has to be restarted in order for the changes to take effect. Do you want to the script to attempt a rtorrent restart now [Y]/[N]?\n'
 
 while true; do
     read answer
@@ -135,7 +136,7 @@ while true; do
                  ;;
 
         * )
-              echo 'Enter y or n'
+              echo 'Enter [Y] or [N]'
               ;;
     esac
 done
