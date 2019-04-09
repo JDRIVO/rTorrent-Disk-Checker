@@ -75,6 +75,7 @@ while true; do
     read update
     printf "\nYou have entered $update seconds\n"
     printf '\nEnter [Y] to confirm or [N] to re-enter: '
+    read answer
 
     if [[ $answer =~ ^[Yy]$ ]]; then
             break
