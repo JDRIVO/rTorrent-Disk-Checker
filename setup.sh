@@ -95,7 +95,7 @@ while true; do
     case $answer in
 
         [yY] )
-                 pip install imdbpie -q && printf '\nimdbpie installed\n'|| sudo pip install imdbpie -q && printf '\nimdbpie installed\n' || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
+                 pip install imdbpie -q && printf '\nimdbpie installed\n' || sudo pip install imdbpie -q && printf '\nimdbpie installed\n' || printf '\n\033[0;36mFailed to install Python module: imdbpie\033[0m\n\n'
                  pip install guessit -q && printf '\nguessit installed\n' || sudo pip install guessit -q && printf '\nguessit installed\n' || printf '\n\033[0;36mFailed to install Python module: guessit\033[0m\n'
                  break
                  ;;
