@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, shutil, pprint
+import sys, os, time, shutil, pprint, random
 from remotecaller import xmlrpc
 
 script_path = os.path.dirname(sys.argv[0])
@@ -63,5 +63,4 @@ def build_cache(identity):
                 open(mp_cache, mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
 if __name__ == "__main__":
-        import random
         build_cache('schedule' + str(random.randint(0, 99999999999)))
