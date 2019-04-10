@@ -5,8 +5,7 @@ try:
         import urllib, urlparse
 except:
         import xmlrpc.client as xmlrpclib, socket
-        from urllib import parse
-        urllib = urlparse = parse
+        from urllib import parse as urllib
 
 class SCGIRequest(object):
         def __init__(self, url):
