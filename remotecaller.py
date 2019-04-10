@@ -2,21 +2,28 @@ from config import scgi
 
 try:
         import xmlrpclib, socket
-        import urllib
+        import urllib, urlparse
 except:
         import xmlrpc.client as xmlrpclib, socket
-        from urllib import parse as urllib
+        from urllib import parse
+        urllib = urlparse = parse
 
 class SCGIRequest(object):
-
         def __init__(self, url):
                 self.url = url
 
         def __send(self, scgireq):
-                host, port = self.url.split(':')
-                addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-                sock = socket.socket(*addrinfo[0][:3])
-                sock.connect(addrinfo[0][4])
+                scheme, netloc, path, query, frag = urlparse.urlsplit(self.url)
+                host, port = urllib.splitport(netloc)
+
+                if netloc:
+                        addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                        sock = socket.socket(*addrinfo[0][:3])
+                        sock.connect(addrinfo[0][4])
+                else:
+                        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                        sock.connect(path)
+
                 sock.send(scgireq.encode())
                 sfile = sock.makefile()
                 response = ''
