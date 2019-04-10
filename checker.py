@@ -202,7 +202,7 @@ if cfg.enable_disk_check:
                         continue
 
                 try:
-                        xmlrpc('d.open', tupled_hash)
+                        xmlrpc('d.open', tuple([t_hash]))
                 except:
                         continue
 
