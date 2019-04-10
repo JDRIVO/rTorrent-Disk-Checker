@@ -116,7 +116,7 @@ if [ -z "$scgi" ]; then
     printf '\n\033[0;36mUnable to locate a SCGI address or unix socket file path. Check your rtorrent.rc file and update the SCGI variable in config.py.\033[0m\n'
 else
     sed -i "7s~.*~scgi = '$scgi'~" config.py
-    printf '\nSCGI address has been updated in your config.py file.\n'
+    printf '\nSCGI has been updated in your config.py file.\n'
 fi
 
 printf '\nConfiguration completed.\n'
