@@ -13,16 +13,15 @@ class SCGIRequest(object):
                 self.url = url
 
         def __send(self, scgireq):
-                scheme, netloc, path, query, frag = urlparse.urlsplit(self.url)
-                host, port = urllib.splitport(netloc)
 
-                if netloc:
+                try:
+                        host, port = self.url.split(':')
                         addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
                         sock = socket.socket(*addrinfo[0][:3])
                         sock.connect(addrinfo[0][4])
-                else:
+                except:
                         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                        sock.connect(path)
+                        sock.connect(self.url)
 
                 sock.send(scgireq.encode())
                 sfile = sock.makefile()
