@@ -20,11 +20,11 @@ method.set_key = event.download.inserted_new, checker, "d.stop=,$d.hash=", "exec
 
 3. SCGI Address Addition
 
-3a. Enter the following command in your terminal to obtain your SCGI address/port:
+3a. Enter the following command in your terminal to obtain your SCGI address/port or unix socket file path:
 
 grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
-3b. Update the scgi variable in line 7 of config.py with your own SCGI address/port.
+3b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
 
 4. Python Module Installations Required for IMDB Function (Skip if Unused)
 
@@ -113,7 +113,7 @@ done
 scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
 
 if [ -z "$scgi" ]; then
-    printf '\n\033[0;36mSCGI address not found. Locate it in your rtorrent.rc file and manually update it in the config.py file.\033[0m\n'
+    printf '\n\033[0;36mUnable to locate a SCGI address or unix socket file path. Check your rtorrent.rc file and update the SCGI variable in config.py.\033[0m\n'
 else
     sed -i "7s~.*~scgi = '$scgi'~" config.py
     printf '\nSCGI address has been updated in your config.py file.\n'
