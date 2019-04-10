@@ -19,7 +19,6 @@ try:
                 server.starttls()
                 server.login(cfg.account, cfg.password)
         except:
-
                 if server:
                         server.quit()
 
