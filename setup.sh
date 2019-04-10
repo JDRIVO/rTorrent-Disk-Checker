@@ -65,7 +65,7 @@ while true; do
                  ;;
 
         * )
-              echo 'Enter 2 or 3'
+              printf '\nEnter [2] or [3]: '
               ;;
     esac
 done
@@ -105,7 +105,7 @@ while true; do
                  ;;
 
         * )
-              echo 'Enter y or n'
+              printf '\nEnter [Y] or [N]: '
               ;;
     esac
 done
@@ -139,7 +139,7 @@ while true; do
                  ;;
 
         * )
-              echo 'Enter [Y] or [N]'
+              printf '\nEnter [2] or [3]: '
               ;;
     esac
 done
