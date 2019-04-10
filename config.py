@@ -3,7 +3,7 @@ exclude =  no = False
 
 ############ USER DEFINED VARIABLES START ############
 
-# SCGI address found in your rtorrent.rc file
+# SCGI address or path to unix socket file found in your rtorrent.rc file
 scgi = '127.0.0.1:5000'
 
 # Check disk space before downloading a torrent?
