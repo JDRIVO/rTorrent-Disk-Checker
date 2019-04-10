@@ -139,7 +139,7 @@ while true; do
                  ;;
 
         * )
-              printf '\nEnter [2] or [3]: '
+              printf '\nEnter [Y] or [N]: '
               ;;
     esac
 done
