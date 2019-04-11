@@ -7,10 +7,11 @@ from remotecaller import xmlrpc
 queue = sys.argv[1]
 torrent_hash = sys.argv[2]
 torrent_path = sys.argv[3]
+subtractions = sys.argv[4]
 
+files = xmlrpc('f.multicall', (torrent_hash, '', 'f.size_bytes=', 'f.frozen_path='))
 t_hash = tuple([torrent_hash])
 xmlrpc('d.tracker_announce', t_hash)
-files = xmlrpc('f.multicall', (torrent_hash, '', 'f.frozen_path='))
 xmlrpc('d.erase', t_hash)
 
 with open(queue, 'a+') as txt:
@@ -23,7 +24,11 @@ while True:
         try:
                 with open(queue, 'r') as txt:
                         queued = txt.read().strip().splitlines()
+        except:
+                        with open(queue, 'a+') as txt:
+                                txt.write(torrent_hash + '\n')
 
+        try:
                 if queued[0] == torrent_hash:
                         break
 
@@ -37,9 +42,22 @@ while True:
         time.sleep(0.01)
 
 if len(files) <= 1:
-        os.remove(files[0][0])
+
+        try:
+                with open(subtractions, 'a+') as txt:
+                        txt.write(str(files[0][0]))
+
+                os.remove(files[0][1])
+        except:
+                pass
 else:
-        [os.remove(file[0]) for file in files]
+
+        for file in files:
+
+                with open(subtractions, 'a+') as txt:
+                        txt.write(str(file[0]))
+
+                os.remove(file[1])
 
         try:
                 os.rmdir(torrent_path)
