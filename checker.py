@@ -110,13 +110,14 @@ if cfg.enable_disk_check:
 
                 if last_mount == mount_point:
                         downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
+                        unaccounted = 0
+                        unaccounted_additions = sum([int(num) for num in open(last_additions, mode='r').readlines()])
 
                         try:
-                                unaccounted_additions = sum([int(num) for num in open(last_additions, mode='r').readlines()])
                                 unaccounted_subtractions = sum([int(num) for num in open(last_subtractions, mode='r').readlines()])
                                 unaccounted = unaccounted_additions - unaccounted_subtractions
                         except:
-                                unaccounted = 0
+                                pass
                 else:
                         downloading = 0
                         unaccounted = 0
