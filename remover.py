@@ -45,7 +45,7 @@ if len(files) <= 1:
 
         try:
                 with open(subtractions, 'a+') as txt:
-                        txt.write(str(files[0][0]))
+                        txt.write(str(files[0][0]) + '\n')
 
                 os.remove(files[0][1])
         except:
@@ -55,7 +55,7 @@ else:
         for file in files:
 
                 with open(subtractions, 'a+') as txt:
-                        txt.write(str(file[0]))
+                        txt.write(str(file[0]) + '\n')
 
                 os.remove(file[1])
 
