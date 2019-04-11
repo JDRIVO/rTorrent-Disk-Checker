@@ -220,8 +220,8 @@ if cfg.enable_disk_check:
                 except:
                         continue
 
-               with open(additions, 'a+') as txt:
-                       txt.write(str(t_size) + '\n')
+                with open(additions, 'a+') as txt:
+                        txt.write(str(t_size) + '\n')
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path, subtractions])
                 freed_space += t_size
