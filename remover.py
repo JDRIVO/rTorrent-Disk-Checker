@@ -25,8 +25,8 @@ while True:
                 with open(queue, 'r') as txt:
                         queued = txt.read().strip().splitlines()
         except:
-                        with open(queue, 'a+') as txt:
-                                txt.write(torrent_hash + '\n')
+                with open(queue, 'a+') as txt:
+                        txt.write(torrent_hash + '\n')
 
         try:
                 if queued[0] == torrent_hash:
