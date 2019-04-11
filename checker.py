@@ -105,8 +105,8 @@ if cfg.enable_disk_check:
                 from torrent import last_torrent
 
                 last_mount, last_hash = last_torrent
-                last_additions = script_path + last_hash + 'add.txt'
-                last_subtractions = script_path + last_hash + 'sub.txt'
+                last_additions = script_path + '/' + last_hash + 'add.txt'
+                last_subtractions = script_path + '/' + last_hash + 'sub.txt'
 
                 if last_mount == mount_point:
                         downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
