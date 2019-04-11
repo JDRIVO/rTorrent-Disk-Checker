@@ -221,7 +221,7 @@ if cfg.enable_disk_check:
                         continue
 
                 with open(additions, 'a+') as txt:
-                        txt.write(str(t_size) + '\n')
+                        txt.write(str(t_size * 1073741824.0) + '\n')
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path, subtractions])
                 freed_space += t_size
