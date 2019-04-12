@@ -4,7 +4,7 @@ Manual Setup Instructions:
 
 1. Make the scripts executable by pasting the following command in your terminal:
 
-chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py
+chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cleaner.py
 
 2. rtorrent.rc File Modification
 
@@ -37,7 +37,7 @@ pip install imdbpie
 
 COMMENT
 
-chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py
+chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cleaner.py
 
 rtorrent="/home/$USER/.rtorrent.rc"
 
