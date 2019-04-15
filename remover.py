@@ -50,7 +50,7 @@ except:
 if len(files) <= 1:
         
         try:
-                freed_bytes += file[0][0]
+                freed_bytes += files[0][0]
 
                 with open(subtractions, 'r+') as txt:
                         txt.write(str(freed_bytes))
