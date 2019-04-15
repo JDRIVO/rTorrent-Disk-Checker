@@ -21,7 +21,11 @@ def enter_queue(identity):
                 try:
                         with open(queue, 'r') as txt:
                                 queued = txt.read().strip().splitlines()
+                except:
+                        with open(queue, 'a+') as txt:
+                                txt.write(identity + '\n')
 
+                try:
                         if queued[0] == identity:
                                 break
 
