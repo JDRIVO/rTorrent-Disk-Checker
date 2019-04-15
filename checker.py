@@ -120,7 +120,6 @@ if cfg.enable_disk_check:
 
                 try:
                         unaccounted = sum(additions) - sum([int(open(script_path + '/' + list[0] + 'sub.txt', mode='r').read()) for list in history])
-
                 except:
                         unaccounted = 0
         except:
