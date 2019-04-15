@@ -41,11 +41,18 @@ while True:
 
         time.sleep(0.01)
 
+try:
+        freed_bytes = int(open(subtractions, mode='r').read())
+except:
+        open(subtractions, mode='w+').close()
+        freed_bytes = 0
+
 if len(files) <= 1:
+        freed_bytes += file[0][1]
 
         try:
-                with open(subtractions, 'a+') as txt:
-                        txt.write(str(files[0][0]) + '\n')
+                with open(subtractions, 'r+') as txt:
+                        txt.write(str(freed_bytes))
 
                 os.remove(files[0][1])
         except:
@@ -53,9 +60,10 @@ if len(files) <= 1:
 else:
 
         for file in files:
+                freed_bytes += file[0]
 
-                with open(subtractions, 'a+') as txt:
-                        txt.write(str(file[0]) + '\n')
+                with open(subtractions, 'r+') as txt:
+                        txt.write(str(freed_bytes))
 
                 os.remove(file[1])
 
