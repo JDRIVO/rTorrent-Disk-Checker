@@ -48,7 +48,7 @@ except:
         freed_bytes = 0
 
 if len(files) <= 1:
-        freed_bytes += file[0][1]
+        freed_bytes += file[0][0]
 
         try:
                 with open(subtractions, 'r+') as txt:
