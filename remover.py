@@ -50,10 +50,10 @@ except:
 if len(files) <= 1:
         freed_bytes += file[0][0]
 
-        try:
-                with open(subtractions, 'r+') as txt:
-                        txt.write(str(freed_bytes))
+        with open(subtractions, 'r+') as txt:
+                txt.write(str(freed_bytes))
 
+        try:
                 os.remove(files[0][1])
         except:
                 pass
