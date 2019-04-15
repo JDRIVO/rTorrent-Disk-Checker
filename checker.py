@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import sys, os, time, config as cfg
+import sys, os, time, pprint, config as cfg
 from subprocess import Popen
-from datetime import datetime
+from datetime import datetime, timedelta
 from remotecaller import xmlrpc
 
 torrent_name = sys.argv[1]
@@ -69,7 +69,11 @@ if cfg.enable_disk_check:
                 try:
                         with open(queue, 'r') as txt:
                                 queued = txt.read().strip().splitlines()
+                except:
+                        with open(queue, 'a+') as txt:
+                                txt.write(torrent_hash + '\n')
 
+                try:
                         if queued[0] == torrent_hash:
                                 break
 
@@ -92,35 +96,35 @@ if cfg.enable_disk_check:
                 from mountpoints import mount_points
 
         tupled_hash = tuple([torrent_hash])
-        current_date = datetime.now()
+        current_time = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash + '.txt'
-        additions = script_path + '/' + torrent_hash + 'add.txt'
         subtractions = script_path + '/' + torrent_hash + 'sub.txt'
         emailer = script_path + '/emailer.py'
         mount_point = [path for path in [torrent_path.rsplit('/', num)[0] for num in range(torrent_path.count('/'))] if os.path.ismount(path)]
         mount_point = mount_point[0] if mount_point else '/'
 
         try:
-                from torrent import last_torrent
+                from torrent import downloads
 
-                last_mount, last_hash = last_torrent
-                last_additions = script_path + '/' + last_hash + 'add.txt'
-                last_subtractions = script_path + '/' + last_hash + 'sub.txt'
+                last_mount, downloaded, last_hash, additions = downloads[0]
 
                 if last_mount == mount_point:
                         downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
-                        unaccounted_additions = sum([int(num) for num in open(last_additions, mode='r').readlines()])
-
-                        try:
-                                unaccounted_subtractions = sum([int(num) for num in open(last_subtractions, mode='r').readlines()])
-                                unaccounted = unaccounted_additions - unaccounted_subtractions
-                        except:
-                                unaccounted = unaccounted_additions
                 else:
                         downloading = 0
+
+                additions = [0]
+                downloads = [list for list in downloads if current_time - list[1] < timedelta(minutes=3)]
+                history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
+
+                try:
+                        unaccounted = sum(additions) - sum([int(open(script_path + '/' + list[0] + 'sub.txt', mode='r').read()) for list in history])
+
+                except:
                         unaccounted = 0
         except:
+                downloads = []
                 downloading = 0
                 unaccounted = 0
 
@@ -130,7 +134,7 @@ if cfg.enable_disk_check:
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
         exclude = mp_updated = no = False
-        freed_space = 0
+        freed_space = deleted = 0
         fallback_torrents = []
 
         while freed_space < required_space:
@@ -186,7 +190,7 @@ if cfg.enable_disk_check:
                                         del completed[0]
                                         continue
 
-                        t_age = (current_date - datetime.utcfromtimestamp(t_age)).days
+                        t_age = (current_time - datetime.utcfromtimestamp(t_age)).days
                         t_ratio /= 1000.0
                         t_size_g = t_size_b / 1073741824.0
 
@@ -220,26 +224,21 @@ if cfg.enable_disk_check:
                 except:
                         continue
 
-                with open(additions, 'a+') as txt:
-                        txt.write(str(t_size_b) + '\n')
+                if not deleted:
+                        open(subtractions, mode='w+').write('0')
 
                 Popen([sys.executable, remover, remover_queue, t_hash, t_path, subtractions])
+                deleted += t_size_b
                 freed_space += t_size_g
 
         if available_space >= required_space:
                 xmlrpc('d.start', tupled_hash)
 
         if mp_updated:
-                import pprint
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
-        open(script_path + '/torrent.py', mode='w+').write('last_torrent = ' + str([mount_point, torrent_hash]))
-
-        try:
-                os.remove(last_additions)
-                os.remove(last_subtractions)
-        except:
-                pass
+        downloads.insert(0, (mount_point, current_time, torrent_hash, deleted))
+        open(script_path + '/torrent.py', mode='w+').write('import datetime\ndownloads = ' + pprint.pformat(downloads))
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
@@ -249,5 +248,8 @@ if cfg.enable_disk_check:
 
         if available_space < required_space and cfg.enable_email:
                 Popen([sys.executable, emailer])
+
+        time.sleep(300)
+        os.remove(subtractions)
 else:
         xmlrpc('d.start', tuple([torrent_hash]))
