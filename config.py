@@ -39,6 +39,12 @@ body = 'Free disk space ASAP.'
 # The minimum amount of free space (in Gigabytes) to maintain
 minimum_space = 5
 
+# Optional - Specify minimum space values for specific mount points
+minimum_space_mp = {
+#                        '/' : 5,
+#                        '/torrents' : 100,
+                   } 
+
 # GENERAL RULES START
 
 # All minimum requirements must be met by a torrent to be deleted
@@ -65,12 +71,12 @@ fallback_ratio = 1.1
 # Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 trackers = {
-#                     "demonoid.pw" : [include],
-#                     "hdme.eu" : [exclude],
-#                     "redacted.ch" : [1, 7, 1.2, no, no],
-#                     "hd-torrents.org" : [3, 5, 1.3, 9, 1.3],
-#                     "privatehd.to" : [5, 6, 1.2, 12, no],
-#                     "apollo.rip" : [2, 5, 1.4, no, 1.8],
+#                     'demonoid.pw' : [include],
+#                     'hdme.eu' : [exclude],
+#                     'redacted.ch' : [1, 7, 1.2, no, no],
+#                     'hd-torrents.org' : [3, 5, 1.3, 9, 1.3],
+#                     'privatehd.to' : [5, 6, 1.2, 12, no],
+#                     'apollo.rip' : [2, 5, 1.4, no, 1.8],
            }
 
 # Only delete torrents from trackers with a tracker rule (yes/no)
@@ -84,9 +90,9 @@ trackers_only = yes
 # Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
 
 labels = {
-#                     "Trash" : [include],
-#                     "TV" : [exclude],
-#                     "HD" : [1, 5, 1.2, 15, 1.2],
+#                     'Trash' : [include],
+#                     'TV' : [exclude],
+#                     'HD' : [1, 5, 1.2, 15, 1.2],
          }
 
 # Only delete torrents with labels that have a label rule (yes/no)
@@ -103,8 +109,8 @@ exclude_unlabelled = no
 # Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
 
 imdb = {
-#                     "Hollywood Blockbusters" : [7, 80000, yes],
-#                     "Bollywood Classics" : [8, 60000, no],
+#                     'Hollywood Blockbusters' : [7, 80000, yes],
+#                     'Bollywood Classics' : [8, 60000, no],
        }
 
 ############ USER DEFINED VARIABLES END ############
