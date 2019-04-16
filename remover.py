@@ -54,6 +54,7 @@ if len(files) <= 1:
 
                 with open(subtractions, 'r+') as txt:
                         txt.write(str(freed_bytes))
+                        txt.truncate()
 
                 os.remove(files[0][1])
         except:
@@ -65,6 +66,7 @@ else:
 
                 with open(subtractions, 'r+') as txt:
                         txt.write(str(freed_bytes))
+                        txt.truncate()
 
                 os.remove(file[1])
 
