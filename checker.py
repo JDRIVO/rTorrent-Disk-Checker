@@ -129,7 +129,8 @@ if cfg.enable_disk_check:
 
         disk = os.statvfs(mount_point)
         available_space = (disk.f_bsize * disk.f_bavail + unaccounted - downloading) / 1073741824.0
-        required_space = torrent_size - (available_space - cfg.minimum_space)
+        minimum_space = cfg.minimum_space_mp[mount_point] if mount_point in cfg.minimum_space_mp else cfg.minimum_space
+        required_space = torrent_size - (available_space - minimum_space)
         requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
         exclude = mp_updated = no = False
