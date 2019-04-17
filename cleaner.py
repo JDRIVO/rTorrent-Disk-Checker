@@ -1,4 +1,4 @@
-import sys, os, time
+import sys, os
 
 directory = os.path.dirname(sys.argv[0])
 files = os.listdir(directory)
