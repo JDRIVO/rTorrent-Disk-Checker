@@ -12,12 +12,12 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cl
 
 Python 2:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python2,/path/to/cleaner.py"
-schedule2 = update_cache, 0, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
+schedule2 = update_cache, 1, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, "d.stop=,$d.hash=", "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 Python 3:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python3,/path/to/cleaner.py"
-schedule2 = update_cache, 0, 30, "execute.throw.bg=python3,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
+schedule2 = update_cache, 1, 30, "execute.throw.bg=python3,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, "d.stop=,$d.hash=", "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 3. SCGI Addition
@@ -89,7 +89,7 @@ sed -i "1i\
 method.set_key = event.download.inserted_new, checker, \"d.stop=,\$d.hash=\", \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
 
 sed -i "1i\
-schedule2 = update_cache, 0, $update, \"execute.throw.bg=$version,$PWD/cacher.py\"" $rtorrent
+schedule2 = update_cache, 1, $update, \"execute.throw.bg=$version,$PWD/cacher.py\"" $rtorrent
 
 sed -i "1i\
 schedule2 = cleanup, 0, 0, \"execute.throw.bg=$version,$PWD/cleaner.py\"" $rtorrent
