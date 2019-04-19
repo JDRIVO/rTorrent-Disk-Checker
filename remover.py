@@ -48,7 +48,7 @@ except:
         freed_bytes = 0
 
 if len(files) <= 1:
-        
+
         try:
                 freed_bytes += files[0][0]
 
