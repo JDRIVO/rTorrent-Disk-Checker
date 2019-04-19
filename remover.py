@@ -10,7 +10,7 @@ torrent_path = sys.argv[3]
 subtractions = sys.argv[4]
 
 files = xmlrpc('f.multicall', (torrent_hash, '', 'f.size_bytes=', 'f.frozen_path='))
-t_hash = tuple([torrent_hash])
+t_hash = (torrent_hash,)
 xmlrpc('d.tracker_announce', t_hash)
 xmlrpc('d.erase', t_hash)
 
