@@ -117,9 +117,10 @@ if cfg.enable_disk_check:
                 additions = []
                 downloads = [list for list in downloads if current_time - list[1] < timedelta(minutes=3)]
                 history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
+                history = [list[0] for list in history]
 
                 try:
-                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + list[0] + 'sub.txt', mode='r').read()) for list in history)
+                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + list + 'sub.txt').read()) for list in history)
                 except:
                         unaccounted = 0
         except:
