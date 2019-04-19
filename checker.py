@@ -95,7 +95,7 @@ if cfg.enable_disk_check:
                 from torrents import completed
                 from mountpoints import mount_points
 
-        tupled_hash = tuple([torrent_hash])
+        tupled_hash = (torrent_hash,)
         current_time = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash + '.txt'
@@ -114,12 +114,12 @@ if cfg.enable_disk_check:
                 else:
                         downloading = 0
 
-                additions = [0]
+                additions = []
                 downloads = [list for list in downloads if current_time - list[1] < timedelta(minutes=3)]
                 history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
 
                 try:
-                        unaccounted = sum(additions) - sum([int(open(script_path + '/' + list[0] + 'sub.txt', mode='r').read()) for list in history])
+                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + list[0] + 'sub.txt', mode='r').read()) for list in history)
                 except:
                         unaccounted = 0
         except:
@@ -220,7 +220,7 @@ if cfg.enable_disk_check:
                         continue
 
                 try:
-                        xmlrpc('d.open', tuple([t_hash]))
+                        xmlrpc('d.open', (t_hash,))
                 except:
                         continue
 
