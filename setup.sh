@@ -41,7 +41,7 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cl
 
 rtorrent="/home/$USER/.rtorrent.rc"
 
-if [ -z "$rtorrent" ]; then
+if [ ! -f "$rtorrent" ]; then
     echo 'rtorrent.rc file not found. Terminating script.'
     exit
 fi
