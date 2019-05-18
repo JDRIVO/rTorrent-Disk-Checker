@@ -132,7 +132,7 @@ if cfg.enable_disk_check:
         available_space = (disk.f_bsize * disk.f_bavail + unaccounted - downloading) / 1073741824.0
         minimum_space = cfg.minimum_space_mp[mount_point] if mount_point in cfg.minimum_space_mp else cfg.minimum_space
         required_space = torrent_size - (available_space - minimum_space)
-        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.minimum_seeders, cfg.fallback_age, cfg.fallback_ratio
         include = override = True
         exclude = mp_updated = no = False
         freed_space = deleted = 0
@@ -148,7 +148,7 @@ if cfg.enable_disk_check:
 
                         if override:
                                 override = False
-                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
+                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = requirements
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
@@ -166,7 +166,7 @@ if cfg.enable_disk_check:
 
                                         if rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
+                                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = label_rule
 
                                 elif cfg.labels_only:
                                         del completed[0]
@@ -185,7 +185,7 @@ if cfg.enable_disk_check:
 
                                         if rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
+                                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = tracker_rule
 
                                 elif cfg.trackers_only:
                                         del completed[0]
@@ -194,6 +194,11 @@ if cfg.enable_disk_check:
                         t_age = (current_time - datetime.utcfromtimestamp(t_age)).days
                         t_ratio /= 1000.0
                         t_size_g = t_size_b / 1073741824.0
+                        t_seed = max([tracker[1] for tracker in t_tracker])
+                        
+                        if t_seed < min_seed:
+                                del completed[0]
+                                continue
 
                         if t_age < min_age or t_ratio < min_ratio or t_size_g < min_size:
 

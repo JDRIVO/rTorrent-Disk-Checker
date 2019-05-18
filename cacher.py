@@ -47,7 +47,7 @@ def leave_queue(identity):
 
 def build_cache(identity):
         enter_queue(identity)
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
+        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=,t.scrape_complete=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
         completed.sort()
         [list.append(list[7].rsplit('/', 1)[0]) if list[5] in list[7] else list.append(list[7]) for list in completed]
         cache = open(cache_copy, mode='w+')

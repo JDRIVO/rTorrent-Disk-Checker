@@ -79,7 +79,7 @@ try:
         disk = os.statvfs('/')
         available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
         required_space = torrent_size - (available_space - cfg.minimum_space)
-        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.minimum_seeders, cfg.fallback_age, cfg.fallback_ratio
         current_date = datetime.now()
         include = override = True
         exclude = no = False
@@ -96,7 +96,7 @@ try:
 
                         if override:
                                 override = False
-                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
+                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = requirements
 
                         if cfg.exclude_unlabelled and not t_label:
                                 del completed[0]
@@ -114,7 +114,7 @@ try:
 
                                         if rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
+                                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = label_rule
 
                                 elif cfg.labels_only:
                                         del completed[0]
@@ -133,7 +133,7 @@ try:
 
                                         if rule is not include:
                                                 override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
+                                                min_size, min_age, min_ratio, min_seed, fb_age, fb_ratio = tracker_rule
 
                                 elif cfg.trackers_only:
                                         del completed[0]
@@ -142,6 +142,11 @@ try:
                         t_age = (current_date - datetime.utcfromtimestamp(t_age)).days
                         t_ratio /= 1000.0
                         t_size /= 1073741824.0
+                        t_seed = max([tracker[1] for tracker in t_tracker])
+                        
+                        if t_seed < min_seed:
+                                del completed[0]
+                                continue
 
                         if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
 
