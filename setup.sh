@@ -51,28 +51,28 @@ fi
 allocation=$(grep -oP "system.file.allocate.* = \K.*" $rtorrent)
 
 if [ $allocation == 1 ]; then
-	printf '\nThe script has detected that system.file.allocate is set to 1. This can cause the script to delete more files than necessary.'
-	printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit\n'
+    printf '\nThe script has detected that system.file.allocate is set to 1. This can cause the script to delete more files than necessary.'
+    printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit\n'
 
-	while true; do
-			read answer
-			case $answer in
+    while true; do
+            read answer
+            case $answer in
 
-					[yY] )
-									sed -i '/system.file.allocate/d' $rtorrent
-									sed -i "1i system.file.allocate.set = 0" $rtorrent
-									break
-									;;
+                    [yY] )
+                                    sed -i '/system.file.allocate/d' $rtorrent
+                                    sed -i "1i system.file.allocate.set = 0" $rtorrent
+                                    break
+                                    ;;
 
-					[qQ] )
-									exit
-								;;
+                    [qQ] )
+                                    exit
+                                ;;
 
-					* )
-									printf '\nEnter [Y] or [Q]: '
-									;;
-			esac
-	done
+                    * )
+                                    printf '\nEnter [Y] or [Q]: '
+                                    ;;
+            esac
+    done
 fi
 
 sed -i '/schedule2 = cleanup/d' $rtorrent
