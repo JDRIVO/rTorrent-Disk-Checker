@@ -114,8 +114,9 @@ if cfg.enable_disk_check:
                         if downloading:
                                 downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point)
                         else:
-                                torrent_history[torrent_hash] = mount_point
                                 downloading = 0
+                                
+                        torrent_history[torrent_hash] = mount_point
                 except:
                         torrent_history = {torrent_hash:mount_point}
 
