@@ -105,22 +105,29 @@ if cfg.enable_disk_check:
         mount_point = mount_point[0] if mount_point else '/'
 
         try:
-                from torrent import downloads
-
-                last_mount, downloaded, last_hash, additions = downloads[0]
-
-                if last_mount == mount_point:
-                        downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
-                else:
-                        downloading = 0
-
-                additions = []
-                downloads = [list for list in downloads if current_time - list[1] < timedelta(minutes=3)]
-                history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
-                history = [list[0] for list in history]
 
                 try:
-                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + list + 'sub.txt').read()) for list in history)
+                        from torrent_history import torrent_history
+
+                        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
+
+                        if downloading:
+                                downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point)
+                        else:
+                                torrent_history[torrent_hash] = mount_point
+                                downloading = 0
+                except:
+                        torrent_history = {torrent_hash:mount_point}
+
+                from torrent import downloads
+
+                additions = []
+                downloads = [x for x in downloads if current_time - x[1] < timedelta(minutes=3)]
+                history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
+                history = [x[0] for x in history]
+
+                try:
+                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + t_hash + 'sub.txt').read()) for t_hash in history)
                 except:
                         unaccounted = 0
         except:
@@ -240,6 +247,7 @@ if cfg.enable_disk_check:
 
         downloads.insert(0, (mount_point, current_time, torrent_hash, deleted))
         open(script_path + '/torrent.py', mode='w+').write('import datetime\ndownloads = ' + pprint.pformat(downloads))
+        open(script_path + '/torrent_history.py', mode='w+').write('torrent_history = ' + pprint.pformat(torrent_history))
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
