@@ -106,18 +106,11 @@ if cfg.enable_disk_check:
 
         try:
                 from torrent_history import torrent_history
-
-                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
-
-                if downloading:
-                        downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point)
-                else:
-                        downloading = 0
-                                
-                torrent_history[torrent_hash] = mount_point
-                
                 from torrent import downloads
 
+                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
+                downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point) if downloading else 0
+                torrent_history[torrent_hash] = mount_point
                 additions = []
                 downloads = [x for x in downloads if current_time - x[1] < timedelta(minutes=3)]
                 history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
