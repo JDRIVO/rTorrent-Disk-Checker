@@ -14,12 +14,14 @@ chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cl
 
 Python 2:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python2,/path/to/cleaner.py"
-schedule2 = update_cache, 1, 30, "execute.throw.bg=python2,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
+schedule2 = update_cache, 1, 30, "execute.throw.bg=python2,/path/to/cacher.py"
+#                            30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 Python 3:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python3,/path/to/cleaner.py"
-schedule2 = update_cache, 1, 30, "execute.throw.bg=python3,/path/to/cacher.py" # 30 is the time in seconds to update torrent information
+schedule2 = update_cache, 1, 30, "execute.throw.bg=python3,/path/to/cacher.py"
+#                            30 is the time in seconds to update torrent information
 method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 3. SCGI Addition
