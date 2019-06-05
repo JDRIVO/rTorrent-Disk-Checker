@@ -66,7 +66,7 @@ if [ $allocation == 1 ]; then
 
                     [qQ] )
                                     exit
-                                ;;
+                                    ;;
 
                     * )
                                     printf '\nEnter [Y] or [Q]: '
