@@ -105,22 +105,17 @@ if cfg.enable_disk_check:
         mount_point = mount_point[0] if mount_point else '/'
 
         try:
+                from torrent_history import torrent_history
 
-                try:
-                        from torrent_history import torrent_history
+                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
 
-                        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
-
-                        if downloading:
-                                downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point)
-                        else:
-                                downloading = 0
-                                
-                        torrent_history[torrent_hash] = mount_point
-                except:
+                if downloading:
+                        downloading = sum(t_bytes for t_bytes, t_hash in downloading if torrent_history[t_hash] == mount_point)
+                else:
                         downloading = 0
-                        torrent_history = {torrent_hash:mount_point}
-
+                                
+                torrent_history[torrent_hash] = mount_point
+                
                 from torrent import downloads
 
                 additions = []
@@ -133,8 +128,9 @@ if cfg.enable_disk_check:
                 except:
                         unaccounted = 0
         except:
-                downloads = []
                 downloading = 0
+                torrent_history = {torrent_hash:mount_point}
+                downloads = []
                 unaccounted = 0
 
         disk = os.statvfs(mount_point)
