@@ -121,8 +121,8 @@ if cfg.enable_disk_check:
                         unaccounted = 0
         except:
                 downloading = 0
-                torrents = {torrent_hash:mount_point}
-                downloads = []
+                recent_torrents = {torrent_hash:mount_point}
+                torrents = []
                 unaccounted = 0
 
         disk = os.statvfs(mount_point)
@@ -235,7 +235,7 @@ if cfg.enable_disk_check:
         if mp_updated:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
-        downloads.insert(0, (mount_point, current_time, torrent_hash, deleted))
+        torrents.insert(0, (mount_point, current_time, torrent_hash, deleted))
         open(script_path + '/torrent_history', mode='w+').write('import datetime\ntorrents = ' + pprint.pformat(torrents)
                                                                  + '\nrecent_torrents = ' + pprint.pformat(recent_torrents))
 
