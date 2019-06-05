@@ -236,7 +236,7 @@ if cfg.enable_disk_check:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
         recent_torrents.insert(0, (mount_point, current_time, torrent_hash, deleted))
-        open(script_path + '/torrent_history', mode='w+').write('import datetime\ntorrents = ' + pprint.pformat(torrents)
+        open(script_path + '/torrent_history.py', mode='w+').write('import datetime\ntorrents = ' + pprint.pformat(torrents)
                                                                  + '\nrecent_torrents = ' + pprint.pformat(recent_torrents))
 
         queue = open(queue, mode='r+')
