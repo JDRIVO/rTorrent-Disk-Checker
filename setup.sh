@@ -2,6 +2,8 @@
 
 Manual Setup Instructions:
 
+Ensure system.file.allocate.set = 0. This is the default setting in rtorrent so it's not necessary to include it in your rtorrent.rc file.
+
 1. Make the scripts executable by pasting the following command in your terminal:
 
 chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cleaner.py
@@ -44,6 +46,33 @@ rtorrent="/home/$USER/.rtorrent.rc"
 if [ ! -f "$rtorrent" ]; then
     echo 'rtorrent.rc file not found. Terminating script.'
     exit
+fi
+
+allocation=$(grep -oP "system.file.allocate.* = \K.*" $rtorrent)
+
+if [ $allocation == 1 ]; then
+	printf '\nThe script has detected that system.file.allocate is set to 1. This can cause the script to delete more files than necessary.'
+	printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit\n'
+
+	while true; do
+			read answer
+			case $answer in
+
+					[yY] )
+									sed -i '/system.file.allocate/d' $rtorrent
+									sed -i "1i system.file.allocate.set = 0" $rtorrent
+									break
+									;;
+
+					[qQ] )
+									exit
+								;;
+
+					* )
+									printf '\nEnter [Y] or [Q]: '
+									;;
+			esac
+	done
 fi
 
 sed -i '/schedule2 = cleanup/d' $rtorrent
