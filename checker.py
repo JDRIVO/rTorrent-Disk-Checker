@@ -112,7 +112,7 @@ if cfg.enable_disk_check:
                 torrents[torrent_hash] = mount_point
                 additions = []
                 recent_torrents = [x for x in recent_torrents if current_time - x[1] < timedelta(minutes=3)]
-                d_queue = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in recent_torrents if m_point == mount_point]
+                d_queue = [(t_hash, additions.append(t_bytes)) for m_point, d_time, t_hash, t_bytes in recent_torrents if m_point == mount_point]
                 d_queue = [x[0] for x in d_queue]
 
                 try:
