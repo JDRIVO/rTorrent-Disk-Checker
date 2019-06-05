@@ -52,7 +52,7 @@ allocation=$(grep -oP "system.file.allocate.* = \K.*" $rtorrent)
 
 if [ $allocation == 1 ]; then
     printf '\nThe script has detected that system.file.allocate is set to 1. This can cause the script to delete more files than necessary.'
-    printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit\n'
+    printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit: '
 
     while true; do
             read answer
