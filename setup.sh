@@ -60,7 +60,7 @@ if [ $allocation == 1 ]; then
 
                     [yY] )
                                     sed -i '/system.file.allocate/d' $rtorrent
-                                    sed -i "1i system.file.allocate.set = 0" $rtorrent
+                                    sed -i '1i system.file.allocate.set = 0' $rtorrent
                                     break
                                     ;;
 
