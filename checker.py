@@ -118,6 +118,7 @@ if cfg.enable_disk_check:
                                 
                         torrent_history[torrent_hash] = mount_point
                 except:
+                        downloading = 0
                         torrent_history = {torrent_hash:mount_point}
 
                 from torrent import downloads
