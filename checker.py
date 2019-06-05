@@ -121,8 +121,8 @@ if cfg.enable_disk_check:
                         unaccounted = 0
         except:
                 downloading = 0
-                recent_torrents = {torrent_hash:mount_point}
-                torrents = []
+                torrents = {torrent_hash:mount_point}
+                recent_torrents = []
                 unaccounted = 0
 
         disk = os.statvfs(mount_point)
