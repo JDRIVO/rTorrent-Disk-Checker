@@ -100,7 +100,6 @@ if cfg.enable_disk_check:
                 from torrents import completed
                 from mountpoints import mount_points
 
-        tupled_hash = (torrent_hash,)
         current_time = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash + '.txt'
@@ -242,7 +241,7 @@ if cfg.enable_disk_check:
                 freed_space += t_size_g
 
         if available_space >= required_space:
-                xmlrpc('d.start', tupled_hash)
+                xmlrpc('d.start', (torrent_hash,))
 
         if mp_updated:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
