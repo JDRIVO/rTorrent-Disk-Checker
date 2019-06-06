@@ -124,14 +124,14 @@ if cfg.enable_disk_check:
                 except:
                         unaccounted = 0
         except:
-                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash='))
+                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash=', 'd.left_bytes='))
 
-                for t_directory, t_hash in downloading:
+                for t_directory, t_hash, t_bytes in downloading:
                         mp = [path for path in [t_directory.rsplit('/', num)[0] for num in range(t_directory.count('/'))] if os.path.ismount(path)]
                         mp = mp[0] if mp else '/'
                         torrents[t_hash] = mp
 
-                downloading = 0
+                downloading = sum(t_bytes for t_directory, t_hash, t_bytes in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
                 recent_torrents = []
                 unaccounted = 0
 
