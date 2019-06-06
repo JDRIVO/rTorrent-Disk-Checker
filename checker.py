@@ -46,18 +46,22 @@ def imdb_search():
         votes = ratings['ratingCount']
 
         if rating < minimum_rating or votes < minimum_votes:
-                xmlrpc('d.erase', tuple([torrent_hash]))
+                xmlrpc('d.erase', (torrent_hash,))
                 sys.exit()
 
         if skip_foreign and 'US' not in country:
-                xmlrpc('d.erase', tuple([torrent_hash]))
+                xmlrpc('d.erase', (torrent_hash,))
                 sys.exit()
+
+if torrent_magnet:
+        xmlrpc('d.start', (torrent_hash,))
+        sys.exit()
 
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
-if cfg.enable_disk_check and not torrent_magnet:
+if cfg.enable_disk_check:
         queue = script_path + '/queue.txt'
 
         with open(queue, 'a+') as txt:
@@ -259,4 +263,4 @@ if cfg.enable_disk_check and not torrent_magnet:
         time.sleep(300)
         os.remove(subtractions)
 else:
-        xmlrpc('d.start', tuple([torrent_hash]))
+        xmlrpc('d.start', (torrent_hash,))
