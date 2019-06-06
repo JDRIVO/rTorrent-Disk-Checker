@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from remotecaller import xmlrpc
 
 script_path = os.path.dirname(sys.argv[0])
-torrent_magnet = sys.argv[1]
+torrent_magnet = int(sys.argv[1])
 torrent_name = sys.argv[2]
 torrent_label = sys.argv[3]
 torrent_hash = sys.argv[4]
@@ -57,7 +57,7 @@ if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
-if cfg.enable_disk_check and not torrent_magnet == '1':
+if cfg.enable_disk_check and not torrent_magnet:
         queue = script_path + '/queue.txt'
 
         with open(queue, 'a+') as txt:
