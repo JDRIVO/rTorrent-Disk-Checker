@@ -112,7 +112,7 @@ if cfg.enable_disk_check:
                 from torrent_history import torrents, recent_torrents
 
                 downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
-                downloading = sum(t_bytes for t_bytes, t_hash in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point) if downloading else 0
+                downloading = sum(t_bytes for t_bytes, t_hash in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
                 torrents[torrent_hash] = mount_point
                 additions = []
                 recent_torrents = [x for x in recent_torrents if current_time - x[1] < timedelta(minutes=3)]
@@ -124,15 +124,12 @@ if cfg.enable_disk_check:
                 except:
                         unaccounted = 0
         except:
-                torrents = {torrent_hash:mount_point}
                 downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash='))
 
-                if downloading:
-
-                        for t_directory, t_hash in downloading:
-                                mp = [path for path in [t_directory.rsplit('/', num)[0] for num in range(t_directory.count('/'))] if os.path.ismount(path)]
-                                mp = mp[0] if mp else '/'
-                                torrents[t_hash] = mp
+                for t_directory, t_hash in downloading:
+                        mp = [path for path in [t_directory.rsplit('/', num)[0] for num in range(t_directory.count('/'))] if os.path.ismount(path)]
+                        mp = mp[0] if mp else '/'
+                        torrents[t_hash] = mp
 
                 downloading = 0
                 recent_torrents = []
