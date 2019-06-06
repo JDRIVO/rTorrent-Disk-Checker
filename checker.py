@@ -124,6 +124,7 @@ if cfg.enable_disk_check:
                 except:
                         unaccounted = 0
         except:
+                torrents = {}
                 downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash=', 'd.left_bytes='))
 
                 for t_directory, t_hash, t_bytes in downloading:
