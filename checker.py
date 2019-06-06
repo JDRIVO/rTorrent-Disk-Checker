@@ -53,14 +53,11 @@ def imdb_search():
                 xmlrpc('d.erase', tuple([torrent_hash]))
                 sys.exit()
 
-if torrent_magnet == '1':
-        sys.exit()
-
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
-if cfg.enable_disk_check:
+if cfg.enable_disk_check and not torrent_magnet == '1':
         queue = script_path + '/queue.txt'
 
         with open(queue, 'a+') as txt:
