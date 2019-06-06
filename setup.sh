@@ -16,13 +16,13 @@ Python 2:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python2,/path/to/cleaner.py"
 schedule2 = update_cache, 1, 30, "execute.throw.bg=python2,/path/to/cacher.py"
 #                            30 is the time in seconds to update torrent information
-method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python2,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
+method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python2,/path/to/checker.py,$d.is_meta=,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 Python 3:
 schedule2 = cleanup, 0, 0, "execute.throw.bg=python3,/path/to/cleaner.py"
 schedule2 = update_cache, 1, 30, "execute.throw.bg=python3,/path/to/cacher.py"
 #                            30 is the time in seconds to update torrent information
-method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python3,/path/to/checker.py,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
+method.set_key = event.download.inserted_new, checker, d.stop=, "execute.throw.bg=python3,/path/to/checker.py,$d.is_meta=,$d.name=,$d.custom1=,$d.hash=,$d.directory=,$d.size_bytes="
 
 3. SCGI Addition
 
@@ -43,11 +43,50 @@ COMMENT
 
 chmod +x checker.py config.py remotecaller.py remover.py emailer.py cacher.py cleaner.py
 
-rtorrent="/home/$USER/.rtorrent.rc"
+readarray -t rtorrent <<< "$(find /home/$user -name *rtorrent.rc)"
 
 if [ ! -f "$rtorrent" ]; then
     echo 'rtorrent.rc file not found. Terminating script.'
     exit
+fi
+
+rtorrent_files="${#rtorrent[@]}"
+
+if [ $rtorrent_files -gt 1 ]; then
+    printf '\nMultiple rtorrent.rc files found.\n\n'
+    len=1
+
+    for file in "${rtorrent[@]}"; do
+        echo "[$len] $file"
+        let "len++"
+    done
+
+    printf '\nSelect a file by enterting its corresponding number: '
+
+    while true; do
+
+        read answer
+        case $answer in
+
+            [1-$rtorrent_files] )
+                selection="${rtorrent[$answer-1]}"
+                printf "\nYou have selected $selection\n"
+                printf '\nEnter [Y] to confirm or [N] to re-enter: '
+
+                read answer
+
+                if [[ $answer =~ ^[Yy]$ ]]; then
+                    rtorrent=$selection
+                    break
+                fi
+                ;;
+
+            * )
+                printf "\nEnter a number between 1 and $rtorrent_files: "
+                ;;
+
+        esac
+    done
 fi
 
 allocation=$(grep -oP "system.file.allocate.* = \K.*" $rtorrent)
@@ -57,23 +96,24 @@ if [ $allocation == 1 ]; then
     printf '\n\nEnter [Y] to permit the script to set system.file.allocate to 0 or Enter [Q] to exit: '
 
     while true; do
-            read answer
-            case $answer in
+        read answer
+        case $answer in
 
-                    [yY] )
-                                    sed -i '/system.file.allocate/d' $rtorrent
-                                    sed -i '1i system.file.allocate.set = 0' $rtorrent
-                                    break
-                                    ;;
+            [yY] )
+                sed -i '/system.file.allocate/d' $rtorrent
+                sed -i '1i system.file.allocate.set = 0' $rtorrent
+                break
+                ;;
 
-                    [qQ] )
-                                    exit
-                                    ;;
+            [qQ] )
+                exit
+                ;;
 
-                    * )
-                                    printf '\nEnter [Y] or [Q]: '
-                                    ;;
-            esac
+            * )
+                printf '\nEnter [Y] or [Q]: '
+                ;;
+
+        esac
     done
 fi
 
@@ -105,7 +145,7 @@ while true; do
 done
 
 while true; do
-    printf '\nEnter the time in seconds to repeatedly update torrent information: '
+    printf '\nEnter a number representing the time in seconds to update torrent information: '
     read update
     printf "\nYou have entered $update seconds\n"
     printf '\nEnter [Y] to confirm or [N] to re-enter: '
@@ -117,7 +157,7 @@ while true; do
 done
 
 sed -i "1i\
-method.set_key = event.download.inserted_new, checker, d.stop=, \"execute.throw.bg=$version,$PWD/checker.py,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
+method.set_key = event.download.inserted_new, checker, d.stop=, \"execute.throw.bg=$version,$PWD/checker.py,\$d.is_meta=,\$d.name=,\$d.custom1=,\$d.hash=,\$d.directory=,\$d.size_bytes=\"" $rtorrent
 
 sed -i "1i\
 schedule2 = update_cache, 1, $update, \"execute.throw.bg=$version,$PWD/cacher.py\"" $rtorrent
