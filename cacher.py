@@ -67,4 +67,4 @@ def build_cache(identity):
                 open(mp_cache, mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
 if __name__ == "__main__":
-        build_cache('schedule' + str(random.randint(0, 99999999999)))
+        build_cache('schedule' + str(int(time.time())))
