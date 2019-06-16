@@ -240,7 +240,7 @@ if cfg.enable_disk_check:
                 deleted += t_size_b
                 freed_space += t_size_g
 
-        if available_space >= required_space:
+        if freed_space >= required_space:
                 xmlrpc('d.start', (torrent_hash,))
 
         if mp_updated:
@@ -256,7 +256,7 @@ if cfg.enable_disk_check:
         [queue.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
         queue.truncate()
 
-        if available_space < required_space and cfg.enable_email:
+        if freed_space < required_space and cfg.enable_email:
                 Popen([sys.executable, emailer])
 
         time.sleep(300)
