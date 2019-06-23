@@ -5,11 +5,13 @@ from subprocess import Popen
 from datetime import datetime, timedelta
 from remotecaller import xmlrpc
 
-torrent_name = sys.argv[1]
-torrent_label = sys.argv[2]
-torrent_hash = sys.argv[3]
-torrent_path = sys.argv[4]
-torrent_size = int(sys.argv[5]) / 1073741824.0
+script_path = os.path.dirname(sys.argv[0])
+torrent_magnet = int(sys.argv[1])
+torrent_name = sys.argv[2]
+torrent_label = sys.argv[3]
+torrent_hash = sys.argv[4]
+torrent_path = sys.argv[5]
+torrent_size = int(sys.argv[6]) / 1073741824.0
 
 def imdb_search():
 
@@ -44,19 +46,22 @@ def imdb_search():
         votes = ratings['ratingCount']
 
         if rating < minimum_rating or votes < minimum_votes:
-                xmlrpc('d.erase', tuple([torrent_hash]))
+                xmlrpc('d.erase', (torrent_hash,))
                 sys.exit()
 
         if skip_foreign and 'US' not in country:
-                xmlrpc('d.erase', tuple([torrent_hash]))
+                xmlrpc('d.erase', (torrent_hash,))
                 sys.exit()
+
+if torrent_magnet:
+        xmlrpc('d.start', (torrent_hash,))
+        sys.exit()
 
 if torrent_label in cfg.imdb:
         minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
         imdb_search()
 
 if cfg.enable_disk_check:
-        script_path = os.path.dirname(sys.argv[0])
         queue = script_path + '/queue.txt'
 
         with open(queue, 'a+') as txt:
@@ -95,7 +100,6 @@ if cfg.enable_disk_check:
                 from torrents import completed
                 from mountpoints import mount_points
 
-        tupled_hash = (torrent_hash,)
         current_time = datetime.now()
         remover = script_path + '/remover.py'
         remover_queue = script_path + '/' + torrent_hash + '.txt'
@@ -105,27 +109,31 @@ if cfg.enable_disk_check:
         mount_point = mount_point[0] if mount_point else '/'
 
         try:
-                from torrent import downloads
+                from torrent_history import torrents, recent_torrents
 
-                last_mount, downloaded, last_hash, additions = downloads[0]
-
-                if last_mount == mount_point:
-                        downloading = xmlrpc('d.left_bytes', tuple([last_hash]))
-                else:
-                        downloading = 0
-
+                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
+                downloading = sum(t_bytes for t_bytes, t_hash in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
+                torrents[torrent_hash] = mount_point
                 additions = []
-                downloads = [list for list in downloads if current_time - list[1] < timedelta(minutes=3)]
-                history = [(t_hash, additions.append(add)) for m_point, d_time, t_hash, add in downloads if m_point == mount_point]
-                history = [list[0] for list in history]
+                recent_torrents = [x for x in recent_torrents if current_time - x[1] < timedelta(minutes=3)]
+                d_queue = [(t_hash, additions.append(t_bytes)) for m_point, d_time, t_hash, t_bytes in recent_torrents if m_point == mount_point]
+                d_queue = [x[0] for x in d_queue]
 
                 try:
-                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + list + 'sub.txt').read()) for list in history)
+                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + t_hash + 'sub.txt').read()) for t_hash in d_queue)
                 except:
                         unaccounted = 0
         except:
-                downloads = []
-                downloading = 0
+                torrents = {}
+                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash=', 'd.left_bytes='))
+
+                for t_directory, t_hash, t_bytes in downloading:
+                        mp = [path for path in [t_directory.rsplit('/', num)[0] for num in range(t_directory.count('/'))] if os.path.ismount(path)]
+                        mp = mp[0] if mp else '/'
+                        torrents[t_hash] = mp
+
+                downloading = sum(t_bytes for t_directory, t_hash, t_bytes in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
+                recent_torrents = []
                 unaccounted = 0
 
         disk = os.statvfs(mount_point)
@@ -232,14 +240,15 @@ if cfg.enable_disk_check:
                 deleted += t_size_b
                 freed_space += t_size_g
 
-        if available_space >= required_space:
-                xmlrpc('d.start', tupled_hash)
+        if freed_space >= required_space:
+                xmlrpc('d.start', (torrent_hash,))
 
         if mp_updated:
                 open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
 
-        downloads.insert(0, (mount_point, current_time, torrent_hash, deleted))
-        open(script_path + '/torrent.py', mode='w+').write('import datetime\ndownloads = ' + pprint.pformat(downloads))
+        recent_torrents.insert(0, (mount_point, current_time, torrent_hash, deleted))
+        open(script_path + '/torrent_history.py', mode='w+').write('import datetime\n\ntorrents = ' + pprint.pformat(torrents)
+                                                                 + '\n\nrecent_torrents = ' + pprint.pformat(recent_torrents))
 
         queue = open(queue, mode='r+')
         queued = queue.read().strip().splitlines()
@@ -247,10 +256,10 @@ if cfg.enable_disk_check:
         [queue.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
         queue.truncate()
 
-        if available_space < required_space and cfg.enable_email:
+        if freed_space < required_space and cfg.enable_email:
                 Popen([sys.executable, emailer])
 
         time.sleep(300)
         os.remove(subtractions)
 else:
-        xmlrpc('d.start', tuple([torrent_hash]))
+        xmlrpc('d.start', (torrent_hash,))

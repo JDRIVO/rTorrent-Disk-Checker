@@ -195,3 +195,4 @@ for result in deleted:
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed_space))
 print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
+print("Note: This script inspects the '/' mount point")
