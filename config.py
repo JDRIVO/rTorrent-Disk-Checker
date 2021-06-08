@@ -6,33 +6,17 @@ exclude =  no = False
 # SCGI address or unix socket file path found in your rtorrent.rc file
 scgi = '127.0.0.1:5000'
 
-# Check disk space before downloading a torrent?
-enable_disk_check = yes
+# Unix domain socket
+socket_file  = 'unix_socket'
+
+# The time between cache creation iterations
+cache_interval = 60
 
 # Receive an email when disk is full?
 enable_email = no
 
 
-###### EMAIL SETTINGS - IGNORE IF DISABLED ######
-
-# python test.py email | will send a test email
-
-# Amount of minutes to wait before sending an email between torrent downloads
-interval = 60
-
-smtp_server = 'smtp.gmail.com'
-port = 587
-
-account = 'youremail@gmail.com'
-password = 'yourpassword'
-
-receiver = 'youremail@gmail.com'
-
-subject = 'Warning: Disk Full'
-body = 'Free disk space ASAP.'
-
-
-###### DISK CHECK SECTION - IGNORE IF DISABLED ######
+###### DISK CHECK SECTION ######
 
 # This script will auto detect mount points and only delete torrents inside the moint point that the torrent will be downloaded to
 
@@ -102,15 +86,20 @@ labels_only = no
 exclude_unlabelled = no
 
 
-###### IMDB SECTION - IGNORE IF UNWANTED ######
+###### EMAIL SETTINGS - IGNORE IF DISABLED ######
 
-# The IMDB function will only execute if the torrent is attached to a label with an IMDB rule
+# python test.py email | will send a test email
 
-# Value Order: 1. Minimum IMDB Rating 2. Minimum Votes 3. Skip Foreign Movies (yes/no)
+# Amount of minutes to wait before sending an email between torrent downloads
+interval = 60
 
-imdb = {
-#                     'Hollywood Blockbusters' : [7, 80000, yes],
-#                     'Bollywood Classics' : [8, 60000, no],
-       }
+smtp_server = 'smtp.gmail.com'
+port = 587
 
-############ USER DEFINED VARIABLES END ############
+account = 'youremail@gmail.com'
+password = 'yourpassword'
+
+receiver = 'youremail@gmail.com'
+
+subject = 'Warning: Disk Full'
+body = 'Free disk space ASAP.'

@@ -1,36 +1,40 @@
-import os, sys, datetime, smtplib, config as cfg
+import datetime
+import smtplib
+import config as cfg
 
-lock = os.path.dirname(sys.argv[0]) + '/email.txt'
+def email(cache):
 
-if os.path.isfile(lock):
-        file_age = datetime.datetime.now() - datetime.datetime.fromtimestamp(os.path.getctime(lock))
+	if cache.lastNotification:
+		period = datetime.datetime.now() - cache.lastNotification
 
-        if file_age < datetime.timedelta(minutes=cfg.interval):
-                sys.exit()
+		if period < datetime.timedelta(minutes=cfg.interval):
+			return
 
-with open(lock, 'w+') as txt:
-        txt.write('1')
+	server = False
 
-server = False
+	try:
 
-try:
-        try:
-                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                server.starttls()
-                server.login(cfg.account, cfg.password)
-        except:
-                if server:
-                        server.quit()
+		try:
+			server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+			server.starttls()
+			server.login(cfg.account, cfg.password)
+		except:
 
-                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
-                server.login(cfg.account, cfg.password)
-except:
-        if server:
-                server.quit()
+			if server:
+				server.quit()
 
-        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-        server.login(cfg.account, cfg.password)
+			server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
+			server.login(cfg.account, cfg.password)
+	except:
 
-message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
-server.sendmail(cfg.account, cfg.receiver, message)
-server.quit()
+		if server:
+			server.quit()
+
+		server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
+		server.login(cfg.account, cfg.password)
+
+	message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
+	server.sendmail(cfg.account, cfg.receiver, message)
+	server.quit()
+
+	cache.lastNotification = datetime.datetime.now()
