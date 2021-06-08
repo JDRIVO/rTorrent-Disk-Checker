@@ -18,6 +18,7 @@ class Checker(SCGIRequest):
 		self.deleter = Deleter(cache, deleterQueue)
 
 	def	check(self, torrentInfo):
+		self.cache.lock = True
 		importlib.reload(cfg)
 		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
 		torrentSize = float(torrentSize)
@@ -144,6 +145,7 @@ class Checker(SCGIRequest):
 			t.start()
 			freedSpace += tSizeGigabytes
 
+		self.cache.lock = False
 		self.checkerQueue.release = True
 
 		if freedSpace >= requiredSpace:

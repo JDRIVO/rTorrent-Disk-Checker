@@ -10,14 +10,15 @@ class Deleter(SCGIRequest):
 
 	def process(self, torrentInfo):
 		torrentHash, torrentPath, mountPoint = torrentInfo
+		self.cache.pending.append(torrentHash)
 		files = self.send('f.multicall', (torrentHash, '', 'f.size_bytes=', 'f.frozen_path=') )
 		tHash = (torrentHash,)
 		self.send('d.tracker_announce', tHash)
 		self.send('d.erase', tHash)
-		self.deleterQueue.queueAdd( (torrentPath, mountPoint, files) )
+		self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
 
 	def delete(self, torrentInfo):
-		torrentPath, mountPoint, files = torrentInfo
+		torrentHash, torrentPath, mountPoint, files = torrentInfo
 
 		if len(files) <= 1:
 
@@ -43,3 +44,5 @@ class Deleter(SCGIRequest):
 						os.rmdir(root)
 					except:
 						pass
+
+		self.cache.pending.remove(torrentHash)
