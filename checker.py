@@ -20,12 +20,7 @@ class Checker(SCGIRequest):
 		importlib.reload(cfg)
 		torrentMagnet, torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
 
-		torrentMagnet = int(torrentMagnet)
 		torrentSize = float(torrentSize)
-
-		if torrentMagnet:
-			self.send('d.start', (torrentHash,) )
-			return
 
 		completedTorrents = self.cache.torrents
 		torrentsDownloading = self.cache.torrentsDownloading
