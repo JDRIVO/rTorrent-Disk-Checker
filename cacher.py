@@ -1,6 +1,8 @@
 import os
 import time
+import importlib
 from remote_caller import SCGIRequest
+import config as cfg
 
 class Cache(SCGIRequest):
 
@@ -11,7 +13,7 @@ class Cache(SCGIRequest):
 		self.torrentsDownloading = {}
 		self.torrents = None
 
-	def getTorrents(self, interval):
+	def getTorrents(self):
 
 		while True:
 			torrents = self.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
@@ -27,7 +29,8 @@ class Cache(SCGIRequest):
 					if torrentHash not in downloading:
 						del self.torrentsDownloading[torrentHash]
 
-			time.sleep(interval)
+			importlib.reload(cfg)
+			time.sleep(cfg.cache_interval)
 
 	def getMountPoints(self):
 		self.mountPoints = {}

@@ -13,7 +13,7 @@ checkerQueue = queuer.CheckerQueue()
 deleterQueue = queuer.DeleterQueue()
 
 cache = Cache()
-t = Thread(target=cache.getTorrents, args=(cfg.cache_interval,) )
+t = Thread(target=cache.getTorrents)
 t.start()
 cache.getMountPoints()
 
