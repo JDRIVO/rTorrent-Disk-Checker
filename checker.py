@@ -19,7 +19,6 @@ class Checker(SCGIRequest):
 	def	check(self, torrentInfo):
 		importlib.reload(cfg)
 		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
-
 		torrentSize = float(torrentSize)
 
 		completedTorrents = self.cache.torrents
