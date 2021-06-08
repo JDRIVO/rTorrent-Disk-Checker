@@ -30,6 +30,7 @@ class CheckerQueue:
 		self.queue.put(item)
 
 class DeleterQueue:
+
 	def __init__(self):
 		self.queue = Queue()
 
