@@ -2,7 +2,7 @@ import socket
 import sys
 import config as cfg
 
-torrent_magnet = sys.argv[1]
+torrent_magnet = int(sys.argv[1])
 torrent_name = sys.argv[2]
 torrent_label = sys.argv[3]
 torrent_hash = sys.argv[4]
