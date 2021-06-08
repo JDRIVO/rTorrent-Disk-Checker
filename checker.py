@@ -29,17 +29,17 @@ class Checker(SCGIRequest):
 		mountPoints = self.cache.mountPoints
 		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
 
-		if parentDirectory not in mountPoints:
+		if parentDirectory in mountPoints:
+			mountPoint = mountPoints[parentDirectory]
+		else:
 			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			mountPoints[parentDirectory] = mountPoint
-		else:
-			mountPoint = mountPoints[parentDirectory]
 
-		if mountPoint not in pendingDeletions:
-			unaccounted = pendingDeletions[mountPoint] = 0
-		else:
+		if mountPoint in pendingDeletions:
 			unaccounted = pendingDeletions[mountPoint]
+		else:
+			unaccounted = pendingDeletions[mountPoint] = 0
 
 		if torrentsDownloading:
 			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
