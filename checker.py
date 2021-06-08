@@ -7,6 +7,7 @@ from datetime import datetime
 from threading import Thread
 from remote_caller import SCGIRequest
 from emailer import email
+from deleter import Deleter
 
 class Checker(SCGIRequest):
 
@@ -14,7 +15,7 @@ class Checker(SCGIRequest):
 		super().__init__()
 		self.cache = cache
 		self.checkerQueue = checkerQueue
-		self.deleterQueue = deleterQueue
+		self.deleter = Deleter(cache, deleterQueue)
 
 	def	check(self, torrentInfo):
 		importlib.reload(cfg)
@@ -139,7 +140,7 @@ class Checker(SCGIRequest):
 				continue
 
 			pendingDeletions[mountPoint] += tSizeBytes
-			t = Thread(target=self.deleterQueue.queueAdd, args=( (tHash, tPath, mountPoint),) )
+			t = Thread(target=self.deleter.process, args=( (tHash, tPath, mountPoint),) )
 			t.start()
 			freedSpace += tSizeGigabytes
 
