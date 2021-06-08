@@ -18,7 +18,7 @@ class Checker(SCGIRequest):
 
 	def	check(self, torrentInfo):
 		importlib.reload(cfg)
-		torrentMagnet, torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
 
 		torrentSize = float(torrentSize)
 

@@ -19,6 +19,6 @@ else:
 	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	s.connect(cfg.socket_file)
 
-	message = f"{torrent_magnet}, {torrent_name}, {torrent_label}, {torrent_hash}, {torrent_path}, {torrent_size}"
+	message = f"{torrent_name}, {torrent_label}, {torrent_hash}, {torrent_path}, {torrent_size}"
 	message = bytes(f"{len(message):<{headerSize}}" + message, "utf-8")
 	s.send(message)
