@@ -7,7 +7,7 @@ import config as cfg
 import queuer
 
 socketFile = cfg.socket_file
-os.remove(socketFile) if os.path.exists(socketFile) else None
+if os.path.exists(socketFile): os.remove(socketFile)
 
 checkerQueue = queuer.CheckerQueue()
 deleterQueue = queuer.DeleterQueue()
