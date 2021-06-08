@@ -9,7 +9,7 @@ scgi = '127.0.0.1:5000'
 # Unix domain socket
 socket_file  = 'unix_socket'
 
-# The time between cache creation iterations
+# The wait time between cache creation iterations in seconds
 cache_interval = 60
 
 # Receive an email when disk is full?
