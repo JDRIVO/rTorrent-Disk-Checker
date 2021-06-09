@@ -49,11 +49,6 @@ class Checker(SCGIRequest):
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			mountPoints[parentDirectory] = mountPoint
 
-		if mountPoint in pendingDeletions:
-			unaccounted = pendingDeletions[mountPoint]
-		else:
-			unaccounted = pendingDeletions[mountPoint] = 0
-
 		if torrentsDownloading:
 
 			try:
@@ -66,6 +61,11 @@ class Checker(SCGIRequest):
 
 		else:
 			downloading = 0
+
+		if mountPoint in pendingDeletions:
+			unaccounted = pendingDeletions[mountPoint]
+		else:
+			unaccounted = pendingDeletions[mountPoint] = 0
 
 		torrentsDownloading[torrentHash] = mountPoint
 		disk = os.statvfs(mountPoint)
