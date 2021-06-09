@@ -2,12 +2,19 @@ import sys
 import os
 import time
 import importlib
-import config as cfg
+import logging
 from datetime import datetime
 from threading import Thread
 from remote_caller import SCGIRequest
 from emailer import email
 from deleter import Deleter
+
+logging.basicConfig(filename='checker.log', level=logging.DEBUG)
+
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical(e)
 
 class Checker(SCGIRequest):
 
@@ -18,8 +25,14 @@ class Checker(SCGIRequest):
 		self.deleter = Deleter(cache, deleterQueue)
 
 	def	check(self, torrentInfo):
+
+		try:
+			importlib.reload(cfg)
+		except Exception as e:
+			logging.critical(e)
+			return
+
 		self.cache.lock = True
-		importlib.reload(cfg)
 		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
 		torrentSize = float(torrentSize)
 
