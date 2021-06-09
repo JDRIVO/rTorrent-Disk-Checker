@@ -14,7 +14,7 @@ logging.basicConfig(filename='checker.log', level=logging.DEBUG)
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical(e)
+	logging.critical('config.py error: ' + str(e) )
 
 class Checker(SCGIRequest):
 
