@@ -38,5 +38,5 @@ else:
 
 if error:
 	import logging
-	logging.basicConfig(filename='client.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
+	logging.basicConfig(filename='client.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
 	logging.critical(error)
