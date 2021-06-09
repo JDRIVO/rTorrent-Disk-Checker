@@ -9,12 +9,10 @@ from remote_caller import SCGIRequest
 from emailer import email
 from deleter import Deleter
 
-logging.basicConfig(filename='checker.log', level=logging.DEBUG)
-
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical('config.py error: ' + str(e) )
+	logging.critical('checker.py - Config Error: Couldn\'t import config file: ' + str(e) )
 
 class Checker(SCGIRequest):
 
@@ -32,7 +30,7 @@ class Checker(SCGIRequest):
 		except Exception as e:
 			self.cache.lock = False
 			self.checkerQueue.release = True
-			logging.critical('config.py error: ' + str(e) )
+			logging.critical('checker.py - Config Error: Couldn\'t import config file: ' + str(e) )
 			return
 
 		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
@@ -183,5 +181,5 @@ class Checker(SCGIRequest):
 			try:
 				email(self.cache)
 			except Exception as e:
-				logging.error('emailer.py error: ' + str(e) )
+				logging.error('checker.py - Email Error: Couldn\'t send email: ' + str(e) )
 				return

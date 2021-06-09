@@ -1,4 +1,5 @@
 import os
+import logging
 from remote_caller import SCGIRequest
 
 class Deleter(SCGIRequest):
@@ -18,7 +19,8 @@ class Deleter(SCGIRequest):
 			self.send('d.tracker_announce', tHash)
 			self.send('d.erase', tHash)
 			self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
-		except:
+		except Exception as e:
+			logging.error('deleter.py - XMLRPC Error: Couldn\'t delete torrent from rtorrent: ' + str(e) )
 			self.cache.pendingDeletions[mountPoint] -= torrentSize
 			self.cache.pending.remove(torrentHash)
 
@@ -30,8 +32,8 @@ class Deleter(SCGIRequest):
 			try:
 				self.cache.pendingDeletions[mountPoint] -= files[0][0]
 				os.remove(files[0][1])
-			except:
-				pass
+			except Exception as e:
+				logging.error(f"deleter.py - File Deletion Error: Skipping file: {files[0][1]}: " + str(e) )
 
 		else:
 
@@ -41,13 +43,14 @@ class Deleter(SCGIRequest):
 
 			try:
 				os.rmdir(torrentPath)
-			except:
+			except Exception as e:
+				logging.error(f"deleter.py - Folder Deletion Error: Skipping folder: {file[1]}: " + str(e) )
 
 				for root, directories, files in os.walk(torrentPath, topdown=False):
 
 					try:
 						os.rmdir(root)
-					except:
-						pass
+					except Exception as e:
+						logging.error(f"deleter.py - Folder Deletion Error: Skipping folder: {root}: " + str(e) )
 
 		self.cache.pending.remove(torrentHash)

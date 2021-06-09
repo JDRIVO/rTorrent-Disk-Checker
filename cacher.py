@@ -1,8 +1,13 @@
 import os
 import time
 import importlib
+import logging
 from remote_caller import SCGIRequest
-import config as cfg
+
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical('cacher.py - Config Error: Setting cache_interval to default value of 300: ' + str(e) )
 
 class Cache(SCGIRequest):
 
@@ -40,8 +45,14 @@ class Cache(SCGIRequest):
 					if torrentHash not in downloading:
 						del self.torrentsDownloading[torrentHash]
 
-			importlib.reload(cfg)
-			time.sleep(cfg.cache_interval)
+			try:
+				importlib.reload(cfg)
+				interval = cfg.cache_interval
+			except Exception as e:
+				logging.critical('cacher.py - Config Error: Setting cache_interval to default value of 300: ' + str(e) )
+				interval = 300
+
+			time.sleep(interval)
 
 	def getMountPoints(self):
 		self.mountPoints = {}

@@ -1,10 +1,19 @@
+import logging
+logging.basicConfig(filename='server.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %I:%M:%S %p')
+
 import socket
 import time
 import os
+import sys
 from threading import Thread
 from cacher import Cache
-import config as cfg
 import queuer
+
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical('server.py - Config Error: Couldn\'t import socket_file: ' + str(e) )
+	sys.exit(1)
 
 socketFile = cfg.socket_file
 if os.path.exists(socketFile): os.remove(socketFile)
@@ -28,24 +37,29 @@ t.setDaemon(True)
 t.start()
 
 headerSize = 10
-s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-s.bind(socketFile)
-s.listen(50)
 
-while True:
-	completeMessage = b''
-	newMessage = True
-	clientsocket, address = s.accept()
+try:
+	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+	s.bind(socketFile)
+	s.listen(50)
 
 	while True:
-		message = clientsocket.recv(1024)
+		completeMessage = b''
+		newMessage = True
+		clientsocket, address = s.accept()
 
-		if newMessage:
-			messageLength = int(message[:headerSize])
-			newMessage = False
+		while True:
+			message = clientsocket.recv(1024)
 
-		completeMessage += message
+			if newMessage:
+				messageLength = int(message[:headerSize])
+				newMessage = False
 
-		if len(completeMessage) - headerSize == messageLength:
-			checkerQueue.queueAdd(completeMessage[headerSize:].decode('utf-8').split(', ') )
-			break
+			completeMessage += message
+
+			if len(completeMessage) - headerSize == messageLength:
+				checkerQueue.queueAdd(completeMessage[headerSize:].decode('utf-8').split(', ') )
+				break
+
+except Exception as e:
+	logging.critical('server.py - Server Error: Server closing: ' + str(e) )
