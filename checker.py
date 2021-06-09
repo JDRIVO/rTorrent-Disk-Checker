@@ -182,5 +182,5 @@ class Checker(SCGIRequest):
 			try:
 				email(self.cache)
 			except Exception as e:
-				logging.critical('emailer.py error: ' + str(e) )
+				logging.error('emailer.py error: ' + str(e) )
 				return
