@@ -47,6 +47,8 @@ class Checker(SCGIRequest):
 				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
 				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
 			except:
+				self.cache.lock = False
+				self.checkerQueue.release = True
 				return
 
 		else:
