@@ -25,16 +25,16 @@ class Checker(SCGIRequest):
 	def	check(self, torrentInfo):
 		self.cache.lock = True
 
+		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentSize = float(torrentSize)
+
 		try:
 			importlib.reload(cfg)
 		except Exception as e:
 			self.cache.lock = False
 			self.checkerQueue.release = True
-			logging.critical('checker.py - Config Error: Couldn\'t import config file: ' + str(e) )
+			logging.critical("checker.py - Config Error: Couldn't import config file: {torrentName}: " + str(e) )
 			return
-
-		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
-		torrentSize = float(torrentSize)
 
 		completedTorrents = self.cache.torrents
 		torrentsDownloading = self.cache.torrentsDownloading
@@ -57,7 +57,7 @@ class Checker(SCGIRequest):
 			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
-				logging.critical(f"checker.py - XMLRPC Error: Couldn\'t retrieve torrents: {torrentName}: " + str(e) )
+				logging.critical(f"checker.py - XMLRPC Error: Couldn't retrieve torrents: {torrentName}: " + str(e) )
 				return
 
 		else:
@@ -175,7 +175,7 @@ class Checker(SCGIRequest):
 			try:
 				self.send('d.start', (torrentHash,) )
 			except Exception as e:
-				logging.error(f"checker.py - XMLRPC Error: Couldn\'t start torrent: {torrentName} " + str(e) )
+				logging.error(f"checker.py - XMLRPC Error: Couldn't start torrent: {torrentName}: " + str(e) )
 				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
