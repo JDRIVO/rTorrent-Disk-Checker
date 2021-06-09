@@ -39,7 +39,11 @@ class Deleter(SCGIRequest):
 
 			for file in files:
 				self.cache.pendingDeletions[mountPoint] -= file[0]
-				os.remove(file[1])
+
+				try:
+					os.remove(file[1])
+				except Exception as e:
+					logging.error(f"deleter.py: File Deletion Error: Skipping file: {file[1]}: {e}")
 
 			try:
 				os.rmdir(torrentPath)

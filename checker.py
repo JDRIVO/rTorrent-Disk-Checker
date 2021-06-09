@@ -175,7 +175,7 @@ class Checker(SCGIRequest):
 			try:
 				self.send('d.start', (torrentHash,) )
 			except Exception as e:
-				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: ")
+				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: {e}")
 				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
