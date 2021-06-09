@@ -42,8 +42,13 @@ class Checker(SCGIRequest):
 			unaccounted = pendingDeletions[mountPoint] = 0
 
 		if torrentsDownloading:
-			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-			downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
+
+			try:
+				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
+			except:
+				return
+
 		else:
 			downloading = 0
 
@@ -141,7 +146,7 @@ class Checker(SCGIRequest):
 				continue
 
 			pendingDeletions[mountPoint] += tSizeBytes
-			t = Thread(target=self.deleter.process, args=( (tHash, tPath, mountPoint),) )
+			t = Thread(target=self.deleter.process, args=( (tHash, tSizeBytes, tPath, mountPoint),) )
 			t.start()
 			freedSpace += tSizeGigabytes
 
@@ -149,7 +154,11 @@ class Checker(SCGIRequest):
 		self.checkerQueue.release = True
 
 		if freedSpace >= requiredSpace:
-			self.send('d.start', (torrentHash,) )
+
+			try:
+				self.send('d.start', (torrentHash,) )
+			except:
+				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
 			email(self.cache)

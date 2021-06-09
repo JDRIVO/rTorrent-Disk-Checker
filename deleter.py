@@ -9,13 +9,18 @@ class Deleter(SCGIRequest):
 		self.deleterQueue = deleterQueue
 
 	def process(self, torrentInfo):
-		torrentHash, torrentPath, mountPoint = torrentInfo
+		torrentHash, torrentSize, torrentPath, mountPoint = torrentInfo
 		self.cache.pending.append(torrentHash)
-		files = self.send('f.multicall', (torrentHash, '', 'f.size_bytes=', 'f.frozen_path=') )
-		tHash = (torrentHash,)
-		self.send('d.tracker_announce', tHash)
-		self.send('d.erase', tHash)
-		self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
+
+		try:
+			files = self.send('f.multicall', (torrentHash, '', 'f.size_bytes=', 'f.frozen_path=') )
+			tHash = (torrentHash,)
+			self.send('d.tracker_announce', tHash)
+			self.send('d.erase', tHash)
+			self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
+		except:
+			self.cache.pendingDeletions[mountPoint] -= torrentSize
+			self.cache.pending.remove(torrentHash)
 
 	def delete(self, torrentInfo):
 		torrentHash, torrentPath, mountPoint, files = torrentInfo

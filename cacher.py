@@ -22,7 +22,12 @@ class Cache(SCGIRequest):
 			while self.lock or self.pending:
 				time.sleep(60)
 
-			torrents = self.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
+			try:
+				torrents = self.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
+			except:
+				time.sleep(60)
+				continue
+
 			torrents.sort()
 			[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
 			self.torrents = torrents
