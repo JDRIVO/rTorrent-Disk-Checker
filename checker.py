@@ -54,9 +54,10 @@ class Checker(SCGIRequest):
 			try:
 				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
 				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
-			except:
+			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
+				logging.critical('checker.py - XMLRPC Error: Couldn\'t retrieve torrents: ' + str(e) )
 				return
 
 		else:
