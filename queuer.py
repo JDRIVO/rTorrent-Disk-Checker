@@ -38,14 +38,14 @@ class DeleterQueue:
 
 		while True:
 			item = self.queue.get()
-			self.startDeler(item)
+			self.startDeleter(item)
 			self.queue.task_done()
 
 	def createDeleter(self, cache):
 		from deleter import Deleter
 		self.deleter = Deleter(cache, self)
 
-	def startDeler(self, item):
+	def startDeleter(self, item):
 		self.deleter.delete(item)
 
 	def queueAdd(self, item):

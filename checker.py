@@ -12,7 +12,7 @@ from deleter import Deleter
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical('checker.py - Config Error: Couldn\'t import config file: ' + str(e) )
+	logging.critical(f"checker.py: Config Error: Couldn't import config file: {e}")
 
 class Checker(SCGIRequest):
 
@@ -33,7 +33,7 @@ class Checker(SCGIRequest):
 		except Exception as e:
 			self.cache.lock = False
 			self.checkerQueue.release = True
-			logging.critical(f"checker.py - Config Error: Couldn't import config file: {torrentName}: " + str(e) )
+			logging.critical(f"checker.py: Config Error: Couldn't import config file: {torrentName}: {e}")
 			return
 
 		completedTorrents = self.cache.torrents
@@ -57,7 +57,7 @@ class Checker(SCGIRequest):
 			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
-				logging.critical(f"checker.py - XMLRPC Error: Couldn't retrieve torrents: {torrentName}: " + str(e) )
+				logging.critical(f"checker.py: XMLRPC Error: Couldn't retrieve torrents: {torrentName}: {e}")
 				return
 
 		else:
@@ -68,12 +68,12 @@ class Checker(SCGIRequest):
 		else:
 			unaccounted = pendingDeletions[mountPoint] = 0
 
-		torrentsDownloading[torrentHash] = mountPoint
 		disk = os.statvfs(mountPoint)
 		availableSpace = (disk.f_bsize * disk.f_bavail + unaccounted - downloading) / 1073741824.0
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+		torrentsDownloading[torrentHash] = mountPoint
 
 		include = override = True
 		exclude = False
@@ -175,7 +175,7 @@ class Checker(SCGIRequest):
 			try:
 				self.send('d.start', (torrentHash,) )
 			except Exception as e:
-				logging.error(f"checker.py - XMLRPC Error: Couldn't start torrent: {torrentName}: " + str(e) )
+				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: ")
 				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
@@ -183,5 +183,5 @@ class Checker(SCGIRequest):
 			try:
 				email(self.cache)
 			except Exception as e:
-				logging.error('checker.py - Email Error: Couldn\'t send email: ' + str(e) )
+				logging.error(f"checker.py: Email Error: Couldn't send email: {e}")
 				return

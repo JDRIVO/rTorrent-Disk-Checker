@@ -12,7 +12,7 @@ import queuer
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical('server.py - Config Error: Couldn\'t import socket_file: ' + str(e) )
+	logging.critical(f"server.py: Config Error: Couldn't import socket_file: {e}")
 	sys.exit(1)
 
 socketFile = cfg.socket_file
@@ -62,4 +62,4 @@ try:
 				break
 
 except Exception as e:
-	logging.critical('server.py - Server Error: Server closing: ' + str(e) )
+	logging.critical(f"server.py: Server Error: Server closing: {e}")

@@ -7,7 +7,7 @@ from remote_caller import SCGIRequest
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical('cacher.py - Config Error: Setting cache_interval to default value of 300: ' + str(e) )
+	logging.critical(f"cacher.py: Config Error: Setting cache_interval to default value of 300: {e}")
 
 class Cache(SCGIRequest):
 
@@ -49,7 +49,7 @@ class Cache(SCGIRequest):
 				importlib.reload(cfg)
 				interval = cfg.cache_interval
 			except Exception as e:
-				logging.critical('cacher.py - Config Error: Setting cache_interval to default value of 300: ' + str(e) )
+				logging.critical(f"cacher.py: Config Error: Setting cache_interval to default value of 300: {e}")
 				interval = 300
 
 			time.sleep(interval)
