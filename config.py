@@ -6,7 +6,7 @@ exclude =  no = False
 # SCGI address or unix socket file path found in your rtorrent.rc file
 scgi = '127.0.0.1:5000'
 
-# Unix domain socket
+# Unix domain socket - Automated creation by script
 socket_file  = 'unix_socket'
 
 # The wait time between cache creation iterations in seconds
