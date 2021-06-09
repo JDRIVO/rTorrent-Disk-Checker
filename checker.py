@@ -43,7 +43,7 @@ class Checker(SCGIRequest):
 
 		if torrentsDownloading:
 			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-			downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
+			downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
 		else:
 			downloading = 0
 
