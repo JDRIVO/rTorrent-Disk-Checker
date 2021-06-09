@@ -4,7 +4,7 @@
                  - a torrent is added by any program (autodl-irssi, RSS Downloader etc)
                  - a torrent is added remotely or directly 
 
-**1**. It can check your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the script will delete torrents based on criteria defined in [config.py](https://github.com/GangaBanga/RTORRENT-IMDB-DISK-CHECKER/blob/master/config.py). The script will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	
+This script checks your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the script will delete torrents based on criteria defined in [config.py](https://github.com/GangaBanga/RTORRENT-IMDB-DISK-CHECKER/blob/master/config.py). The script will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	
 
 ## [Setup](https://github.com/GangaBanga/RTORRENT-IMDB-DISK-CHECKER/blob/master/setup.sh)
 
