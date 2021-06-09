@@ -75,6 +75,7 @@ class Checker(SCGIRequest):
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+
 		include = override = True
 		exclude = False
 		freedSpace = 0
