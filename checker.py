@@ -30,7 +30,7 @@ class Checker(SCGIRequest):
 			importlib.reload(cfg)
 		except Exception as e:
 			self.checkerQueue.release = True
-			logging.critical(e)
+			logging.critical('config.py error: ' + str(e) )
 			return
 
 		self.cache.lock = True
@@ -177,4 +177,9 @@ class Checker(SCGIRequest):
 				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
-			email(self.cache)
+
+			try:
+				email(self.cache)
+			except Exception as e:
+				logging.critical('emailer.py error: ' + str(e) )
+				return
