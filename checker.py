@@ -29,6 +29,7 @@ class Checker(SCGIRequest):
 		try:
 			importlib.reload(cfg)
 		except Exception as e:
+			self.checkerQueue.release = True
 			logging.critical(e)
 			return
 
