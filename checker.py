@@ -33,7 +33,7 @@ class Checker(SCGIRequest):
 		except Exception as e:
 			self.cache.lock = False
 			self.checkerQueue.release = True
-			logging.critical("checker.py - Config Error: Couldn't import config file: {torrentName}: " + str(e) )
+			logging.critical(f"checker.py - Config Error: Couldn't import config file: {torrentName}: " + str(e) )
 			return
 
 		completedTorrents = self.cache.torrents
