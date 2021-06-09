@@ -25,15 +25,16 @@ class Checker(SCGIRequest):
 		self.deleter = Deleter(cache, deleterQueue)
 
 	def	check(self, torrentInfo):
+		self.cache.lock = True
 
 		try:
 			importlib.reload(cfg)
 		except Exception as e:
+			self.cache.lock = False
 			self.checkerQueue.release = True
 			logging.critical('config.py error: ' + str(e) )
 			return
 
-		self.cache.lock = True
 		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
 		torrentSize = float(torrentSize)
 
