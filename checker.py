@@ -57,7 +57,7 @@ class Checker(SCGIRequest):
 			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
-				logging.critical('checker.py - XMLRPC Error: Couldn\'t retrieve torrents: ' + str(e) )
+				logging.critical(f"checker.py - XMLRPC Error: Couldn\'t retrieve torrents: {torrentName}: " + str(e) )
 				return
 
 		else:
@@ -174,7 +174,8 @@ class Checker(SCGIRequest):
 
 			try:
 				self.send('d.start', (torrentHash,) )
-			except:
+			except Exception as e:
+				logging.error(f"checker.py - XMLRPC Error: Couldn\'t start torrent: {torrentName} " + str(e) )
 				return
 
 		if freedSpace < requiredSpace and cfg.enable_email:
