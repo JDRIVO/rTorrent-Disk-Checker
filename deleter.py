@@ -28,9 +28,9 @@ class Deleter(SCGIRequest):
 		torrentHash, torrentPath, mountPoint, files = torrentInfo
 
 		if len(files) <= 1:
+			self.cache.pendingDeletions[mountPoint] -= files[0][0]
 
 			try:
-				self.cache.pendingDeletions[mountPoint] -= files[0][0]
 				os.remove(files[0][1])
 			except Exception as e:
 				logging.error(f"deleter.py: File Deletion Error: Skipping file: {files[0][1]}: {e}")
