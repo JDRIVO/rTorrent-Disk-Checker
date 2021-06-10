@@ -21,7 +21,7 @@ class Checker(SCGIRequest):
 		self.deleter = Deleter(cache, deleterQueue)
 
 	def	check(self, torrentInfo):
-		torrentName, torrentLabel, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
 		torrentSize = float(torrentSize)
 
 		try:
