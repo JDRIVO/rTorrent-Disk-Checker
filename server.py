@@ -14,16 +14,13 @@ except Exception as e:
 	logging.critical(f"server.py: Config Error: Couldn't import socket_file: {e}")
 	sys.exit(1)
 
-socketFile = cfg.socket_file
-if os.path.exists(socketFile): os.remove(socketFile)
-
-checkerQueue = queuer.CheckerQueue()
-deleterQueue = queuer.DeleterQueue()
-
 cache = Cache()
 t = Thread(target=cache.getTorrents)
 t.start()
 cache.getMountPoints()
+
+checkerQueue = queuer.CheckerQueue()
+deleterQueue = queuer.DeleterQueue()
 
 checkerQueue.createChecker(cache, deleterQueue)
 deleterQueue.createDeleter(cache)
@@ -36,6 +33,8 @@ t.setDaemon(True)
 t.start()
 
 headerSize = 10
+socketFile = cfg.socket_file
+if os.path.exists(socketFile): os.remove(socketFile)
 
 try:
 	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

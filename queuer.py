@@ -13,6 +13,7 @@ class CheckerQueue:
 			item = self.queue.get()
 
 			if self.release:
+				self.cache.lock = True
 				self.startChecker(item)
 				self.release = False
 
@@ -20,6 +21,7 @@ class CheckerQueue:
 
 	def createChecker(self, cache, deleterQueue):
 		from checker import Checker
+		self.cache = cache
 		self.checker = Checker(cache, self, deleterQueue)
 
 	def startChecker(self, item):
