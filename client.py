@@ -1,6 +1,5 @@
 import sys
 
-torrentMagnet = int(sys.argv[1])
 torrentName = sys.argv[2]
 torrentLabel = sys.argv[3]
 torrentHash = sys.argv[4]
@@ -9,7 +8,7 @@ torrentSize = int(sys.argv[6]) / 1073741824.0
 
 error = False
 
-if torrentMagnet:
+if int(sys.argv[1]):
 
 	try:
 		from remote_caller import SCGIRequest
