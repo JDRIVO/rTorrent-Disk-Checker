@@ -22,7 +22,7 @@ class SCGIRequest(object):
                         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
                         sock.connect(self.url)
 
-                sock.send(scgireq.encode())
+                sock.send(scgireq.encode() )
                 sfile = sock.makefile()
                 response = ''
 
@@ -39,7 +39,7 @@ class SCGIRequest(object):
 
         def send(self, data):
                 "Send data over scgi to url and get response"
-                scgiresp = self.__send(self.add_required_scgi_headers(data))
+                scgiresp = self.__send(self.add_required_scgi_headers(data) )
                 return ''.join(scgiresp.split('\n')[4:])
 
         @staticmethod
@@ -55,7 +55,7 @@ class SCGIRequest(object):
         @staticmethod
         def add_required_scgi_headers(data, headers = []):
                 "Wrap data in an scgi request,\nsee spec at: http://python.ca/scgi/protocol.txt"
-                headers = SCGIRequest.make_headers([('CONTENT_LENGTH', str(len(data))), ('SCGI', '1'),] + headers)
+                headers = SCGIRequest.make_headers([('CONTENT_LENGTH', str(len(data) ) ), ('SCGI', '1'),] + headers)
                 enc_headers = SCGIRequest.encode_netstring(headers)
                 return enc_headers + data
 
