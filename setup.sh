@@ -10,17 +10,18 @@ execute.throw.bg = python3, "/path/to/server.py"
 method.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"
 method.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,/path/to/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="
 
-2. Run python setup.py. If it fails, restart rtorrent and then progress to step 3.
+2. SCGI Addition
 
-3. SCGI Addition
-
-3a. Enter the following command in your terminal to obtain your SCGI address/port or unix socket file path:
+2a. Enter the following command in your terminal to obtain your SCGI address/port or unix socket file path:
 
 grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
-3b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
+2b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
+
+3. Run python setup.py. If it fails, you will need restart rtorrent.
 
 COMMENT
+
 
 rtorrent="$HOME/.rtorrent.rc"
 
