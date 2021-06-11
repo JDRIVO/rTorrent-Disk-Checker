@@ -146,7 +146,7 @@ while freedSpace < requiredSpace:
 		continue
 
 	try:
-		rtxmlrpc.send('d.open', (tHash,) )
+		rtxmlrpc.send('d.state', (tHash,) )
 	except:
 		continue
 
