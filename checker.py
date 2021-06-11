@@ -33,6 +33,7 @@ class Checker(SCGIRequest):
 			return
 
 		completedTorrents = self.cache.torrents
+		completedTorrentsCopy = completedTorrents[:]
 		torrentsDownloading = self.cache.torrentsDownloading
 		pendingDeletions = self.cache.pendingDeletions
 		mountPoints = self.cache.mountPoints
@@ -49,7 +50,7 @@ class Checker(SCGIRequest):
 
 			try:
 				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and tHash in torrentsDownloading and torrentsDownloading[tHash] == mountPoint)
+				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
 			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
@@ -60,12 +61,12 @@ class Checker(SCGIRequest):
 			downloading = 0
 
 		if mountPoint in pendingDeletions:
-			unaccounted = pendingDeletions[mountPoint]
+			deletions = pendingDeletions[mountPoint]
 		else:
-			unaccounted = pendingDeletions[mountPoint] = 0
+			deletions = pendingDeletions[mountPoint] = 0
 
 		disk = os.statvfs(mountPoint)
-		availableSpace = (disk.f_bsize * disk.f_bavail + unaccounted - downloading) / 1073741824.0
+		availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
@@ -79,18 +80,18 @@ class Checker(SCGIRequest):
 
 		while freedSpace < requiredSpace:
 
-			if not completedTorrents and not fallbackTorrents:
+			if not completedTorrentsCopy and not fallbackTorrents:
 				break
 
-			if completedTorrents:
-				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrents[0]
+			if completedTorrentsCopy:
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy[0]
 
 				if override:
 					override = False
 					minSize, minAge, minRatio, fbAge, fbRatio = requirements
 
 				if cfg.exclude_unlabelled and not tLabel:
-					del completedTorrents[0]
+					del completedTorrentsCopy[0]
 					continue
 
 				if cfg.labels:
@@ -100,7 +101,7 @@ class Checker(SCGIRequest):
 						rule = labelRule[0]
 
 						if rule is exclude:
-							del completedTorrents[0]
+							del completedTorrentsCopy[0]
 							continue
 
 						if rule is not include:
@@ -108,7 +109,7 @@ class Checker(SCGIRequest):
 							minSize, minAge, minRatio, fbAge, fbRatio = labelRule
 
 					elif cfg.labels_only:
-						del completedTorrents[0]
+						del completedTorrentsCopy[0]
 						continue
 
 				if cfg.trackers and not override:
@@ -119,7 +120,7 @@ class Checker(SCGIRequest):
 						rule = trackerRule[0]
 
 						if rule is exclude:
-							del completedTorrents[0]
+							del completedTorrentsCopy[0]
 							continue
 
 						if rule is not include:
@@ -127,28 +128,27 @@ class Checker(SCGIRequest):
 							minSize, minAge, minRatio, fbAge, fbRatio = trackerRule
 
 						elif cfg.trackers_only:
-							del completedTorrents[0]
+							del completedTorrentsCopy[0]
 							continue
 
-				tAge = (currentDate - datetime.utcfromtimestamp(tAge) ).days
-				tRatio /= 1000.0
+				tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
+				tRatioConverted = tRatio / 1000.0
 				tSizeGigabytes = tSizeBytes / 1073741824.0
 
-				if tAge < minAge or tRatio < minRatio or tSizeGigabytes < minSize:
+				if tAgeConverted < minAge or tRatioConverted < minRatio or tSizeGigabytes < minSize:
 
-						if fbAge is not False and tAge >= fbAge and tSizeGigabytes >= minSize:
-							fallbackTorrents.append( (parentDirectory, tHash, tPath, tSizeBytes, tSizeGigabytes) )
+						if fbAge is not False and tAgeConverted >= fbAge and tSizeGigabytes >= minSize:
+							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+						elif fbRatio is not False and tRatioConverted >= fbRatio and tSizeGigabytes >= minSize:
+							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
 
-						elif fbRatio is not False and tRatio >= fbRatio and tSizeGigabytes >= minSize:
-							fallbackTorrents.append( (parentDirectory, tHash, tPath, tSizeBytes, tSizeGigabytes) )
-
-						del completedTorrents[0]
+						del completedTorrentsCopy[0]
 						continue
 
-				del completedTorrents[0]
+				del completedTorrentsCopy[0]
 
 			else:
-				parentDirectory, tHash, tPath, tSizeBytes, tSizeGigabytes = fallbackTorrents.pop(0)
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
 
 			if mountPoints[parentDirectory] != mountPoint:
 				continue
@@ -161,6 +161,7 @@ class Checker(SCGIRequest):
 			pendingDeletions[mountPoint] += tSizeBytes
 			t = Thread(target=self.deleter.process, args=( (tHash, tSizeBytes, tPath, mountPoint),) )
 			t.start()
+			completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
 			freedSpace += tSizeGigabytes
 
 		self.cache.lock = False
