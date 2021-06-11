@@ -18,8 +18,8 @@ Run the setup script by entering the following command in your terminal (Refer t
 
 Results will output to your terminal and a text file named **testresult.txt**
 
-Enter the following command in your terminal to run it:
+The script accepts two arguments. 1. Torrent Size ( GB ) 2. Mount Point ( 0 will default to mount '/' )
 
-`python test.py 69`
+`python test.py 69 0`
 
-**69** = torrent size in gigabytes
+To send a test email: `python emailer.py`
