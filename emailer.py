@@ -2,13 +2,15 @@ import datetime
 import smtplib
 import config as cfg
 
-def email(cache):
+def email(cache, test=False):
 
-	if cache.lastNotification:
-		period = datetime.datetime.now() - cache.lastNotification
+	if not test:
 
-		if period < datetime.timedelta(minutes=cfg.interval):
-			return
+		if cache.lastNotification:
+			period = datetime.datetime.now() - cache.lastNotification
+
+			if period < datetime.timedelta(minutes=cfg.interval):
+				return
 
 	server = False
 
@@ -38,3 +40,6 @@ def email(cache):
 	server.quit()
 
 	cache.lastNotification = datetime.datetime.now()
+
+if __name__ == "__main__":
+	email(None, test=True)
