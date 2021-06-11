@@ -20,7 +20,6 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 3b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
 
-
 COMMENT
 
 rtorrent="$HOME/.rtorrent.rc"
