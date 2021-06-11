@@ -24,7 +24,7 @@ COMMENT
 
 rtorrent="$HOME/.rtorrent.rc"
 
-if [[ ! -f "$rtorrent" ]]; then
+if [[ ! -f $rtorrent ]]; then
 	echo '.rtorrent.rc file not found in $HOME. Terminating script.'
 	exit
 fi
@@ -69,7 +69,7 @@ sed -i "1iexecute.throw.bg = python3, \"$PWD/server.py\"" $rtorrent
 
 scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
 
-if [[ -z "$scgi" ]]; then
+if [[ -z $scgi ]]; then
 	printf '\n\033[0;36mUnable to locate a SCGI address or unix socket file path. Check your rtorrent.rc file and update the SCGI variable in config.py.\033[0m\n'
 	printf '\nRtorrent has to be restarted in order for the changes to take effect.'
 else
