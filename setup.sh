@@ -4,7 +4,7 @@ Manual Setup Instructions:
 
 Ensure system.file.allocate.set = 0. This is the default setting in rtorrent so it's not necessary to include it in your rtorrent.rc file.
 
-1. Add the following code to your ~/.rtorrent.rc file !! making sure to update the path to server.py & client.py !!
+1. Add the following code to your ~/.rtorrent.rc file !! making sure to update the paths to server.py & client.py !!
 
 execute.throw.bg = python3, "/path/to/server.py"
 method.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"
