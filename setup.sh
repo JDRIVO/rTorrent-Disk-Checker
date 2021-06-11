@@ -6,7 +6,7 @@ Ensure system.file.allocate.set = 0. This is the default setting in rtorrent so 
 
 1. Add the following code to your ~/.rtorrent.rc !! making sure you update the path to server.py & client.py !!
 
-execute.throw.bg = python3, /path/to/server.py
+execute.throw.bg = python3, "/path/to/server.py"
 method.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"
 method.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,/path/to/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="
 
