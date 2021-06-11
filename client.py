@@ -18,5 +18,6 @@ try:
 	message = bytes(f"{len(message):<{headerSize}}" + message, "utf-8")
 	s.send(message)
 except Exception as e:
+	import logging
 	logging.basicConfig(filename='client.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
 	logging.critical(f"Server Error: Couldn't process torrent: {torrentName}: {e}")
