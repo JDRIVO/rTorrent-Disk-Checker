@@ -18,7 +18,7 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 2b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
 
-3. Run python setup.py. If it fails, you will need restart rtorrent.
+3. Run python setup.py. If it fails, you will need restart rtorrent for the changes to the rtorrent.rc file to take effect.
 
 COMMENT
 
