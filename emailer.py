@@ -39,7 +39,8 @@ def email(cache, test=False):
 	server.sendmail(cfg.account, cfg.receiver, message)
 	server.quit()
 
-	cache.lastNotification = datetime.datetime.now()
+	if not test:
+		cache.lastNotification = datetime.datetime.now()
 
 if __name__ == "__main__":
 	email(None, test=True)
