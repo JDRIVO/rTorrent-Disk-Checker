@@ -148,7 +148,7 @@ class Checker(SCGIRequest):
 				del completedTorrentsCopy[0]
 
 			else:
-				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
 
 			if mountPoints[parentDirectory] != mountPoint:
 				continue
