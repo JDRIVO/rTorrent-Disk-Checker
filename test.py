@@ -162,12 +162,12 @@ availableSpaceAfter = availableSpace + freedSpace - torrentSize
 with open('testresult.txt', 'w+') as textfile:
 	textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (finish, count, freedSpace) )
 	textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (availableSpace, availableSpaceAfter, torrentSize) )
-	textfile.write('TA = Torrent Age  TN = Torrent Name	 TL = Torrent Label	 TT = Torrent Tracker\n\n')
+	textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
 	for torrent in deletedTorrents:
 		print(torrent)
 		textfile.write(torrent + '\n')
 
-print('TA = Torrent Age	 TN = Torrent Name	TL = Torrent Label	TT = Torrent Tracker\n')
+print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace) )
 print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (availableSpace, availableSpaceAfter, torrentSize) )
