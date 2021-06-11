@@ -1,3 +1,7 @@
+## Requirements:
+rTorrent 0.9.7+
+Python 3+
+
 ## Script Explanation
 
 #### This script is capable of the following when:
