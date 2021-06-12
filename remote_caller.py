@@ -1,63 +1,65 @@
 from config import scgi
 
 try:
-		import xmlrpclib, socket
-		import urllib
+        import xmlrpclib, socket
+        import urllib, urlparse
 except:
-		import xmlrpc.client as xmlrpclib, socket
-		from urllib import parse as urllib
+        import xmlrpc.client as xmlrpclib, socket
+        from urllib import parse as urllib
 
-class SCGIRequest:
+class SCGIRequest(object):
+        def __init__(self, url):
+                self.url = url
 
-		def __init__(self):
-			self.url = scgi
+        def __send(self, scgireq):
 
-		def send(self, methodname, params):
-			"Send data over scgi to url and get response"
-			data = xmlrpclib.dumps(params, methodname)
-			scgiresp = self.__send(self.addRequiredSCGIHeaders(data) )
-			xmlresp = ''.join(scgiresp.split('\n')[4:])
-			return xmlrpclib.loads(xmlresp)[0][0]
+                try:
+                        host, port = self.url.split(':')
+                        addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+                        sock = socket.socket(*addrinfo[0][:3])
+                        sock.connect(addrinfo[0][4])
+                except:
+                        sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                        sock.connect(self.url)
 
-		def __send(self, scgireq):
+                sock.send(scgireq.encode() )
+                sfile = sock.makefile()
+                response = ''
 
-			try:
-				host, port = self.url.split(':')
-				addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-				sock = socket.socket(*addrinfo[0][:3])
-				sock.connect(addrinfo[0][4])
-			except:
-				sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-				sock.connect(self.url)
+                while True:
+                        data = sfile.read(1024)
 
-			sock.send(scgireq.encode() )
-			sfile = sock.makefile()
-			response = ''
+                        if not data:
+                                break
 
-			while True:
-				data = sfile.read(1024)
+                        response += data
 
-				if not data:
-					break
+                sock.close()
+                return urllib.unquote(response)
 
-				response += data
+        def send(self, data):
+                "Send data over scgi to url and get response"
+                scgiresp = self.__send(self.add_required_scgi_headers(data) )
+                return ''.join(scgiresp.split('\n')[4:])
 
-			sock.close()
-			return urllib.unquote(response)
+        @staticmethod
+        def encode_netstring(string):
+                "Encode string as netstring"
+                return '%d:%s,' % (len(string), string)
 
-		@staticmethod
-		def encodeNetstring(string):
-			"Encode string as netstring"
-			return '%d:%s,' % (len(string), string)
+        @staticmethod
+        def make_headers(headers):
+                "Make scgi header list"
+                return '\x00'.join(['%s\x00%s' % t for t in headers]) + '\x00'
 
-		@staticmethod
-		def makeHeaders(headers):
-			"Make scgi header list"
-			return '\x00'.join(['%s\x00%s' % t for t in headers]) + '\x00'
+        @staticmethod
+        def add_required_scgi_headers(data, headers = []):
+                "Wrap data in an scgi request,\nsee spec at: http://python.ca/scgi/protocol.txt"
+                headers = SCGIRequest.make_headers([('CONTENT_LENGTH', str(len(data) ) ), ('SCGI', '1'),] + headers)
+                enc_headers = SCGIRequest.encode_netstring(headers)
+                return enc_headers + data
 
-		@staticmethod
-		def addRequiredSCGIHeaders(data, headers = []):
-			"Wrap data in an scgi request, see spec at: http://python.ca/scgi/protocol.txt"
-			headers = SCGIRequest.makeHeaders([('CONTENT_LENGTH', str(len(data) ) ), ('SCGI', '1'),] + headers)
-			encHeaders = SCGIRequest.encodeNetstring(headers)
-			return encHeaders + data
+def xmlrpc(methodname, params):
+        xmlreq = xmlrpclib.dumps(params, methodname)
+        xmlresp = SCGIRequest(scgi).send(xmlreq)
+        return xmlrpclib.loads(xmlresp)[0][0]
