@@ -57,7 +57,7 @@ class SCGIRequest:
 
 		@staticmethod
 		def addRequiredSCGIHeaders(data, headers = []):
-			"Wrap data in an scgi request,\nsee spec at: http://python.ca/scgi/protocol.txt"
+			"Wrap data in an scgi request, see spec at: http://python.ca/scgi/protocol.txt"
 			headers = SCGIRequest.makeHeaders([('CONTENT_LENGTH', str(len(data) ) ), ('SCGI', '1'),] + headers)
 			encHeaders = SCGIRequest.encodeNetstring(headers)
 			return encHeaders + data

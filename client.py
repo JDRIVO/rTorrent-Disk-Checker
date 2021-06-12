@@ -4,7 +4,7 @@ import socket
 torrentName = sys.argv[1]
 torrentHash = sys.argv[2]
 torrentPath = sys.argv[3]
-torrentSize = int(sys.argv[4]) / 1073741824.0
+torrentSize = sys.argv[4]
 
 try:
 	import config as cfg

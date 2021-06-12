@@ -22,7 +22,7 @@ class Checker(SCGIRequest):
 
 	def	check(self, torrentInfo):
 		torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
-		torrentSize = float(torrentSize)
+		torrentSize = int(torrentSize) / 1073741824.0
 
 		try:
 			importlib.reload(cfg)

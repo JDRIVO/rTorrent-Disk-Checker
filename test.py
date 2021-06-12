@@ -152,8 +152,8 @@ while freedSpace < requiredSpace:
 
 	pendingDeletions[mountPoint] += tSizeBytes
 	completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
-	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeConverted, count, tName, count, tLabel, count, tTracker) )
 	count += 1
+	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeConverted, count, tName, count, tLabel, count, tTracker) )
 	freedSpace += tSizeGigabytes
 
 finish = datetime.now() - start
