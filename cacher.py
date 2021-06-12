@@ -1,70 +1,64 @@
-# -*- coding: utf-8 -*-
+import os
+import time
+import importlib
+import logging
+from remote_caller import SCGIRequest
 
-import sys, os, time, shutil, pprint
-from remotecaller import xmlrpc
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical(f"cacher.py: Config Error: Setting cache_interval to default value of 300: {e}")
 
-script_path = os.path.dirname(sys.argv[0])
-queue = script_path + '/cachequeue.txt'
-torrent_cache = script_path + '/torrents.py'
-cache_copy = script_path + '/torrentscopy.py'
-mp_cache = script_path + '/mountpoints.py'
+class Cache(SCGIRequest):
 
-def enter_queue(identity):
+	def __init__(self):
+		super().__init__()
+		self.pendingDeletions, self.torrentsDownloading, self.mountPoints = {}, {}, {}
+		self.pending = []
+		self.torrents = self.lastNotification = None
+		self.lock = False
 
-        with open(queue, 'a+') as txt:
-                txt.write(identity + '\n')
+	def getTorrents(self):
 
-        time.sleep(0.001)
+		while True:
 
-        while True:
+			while self.lock or self.pending:
+				time.sleep(60)
 
-                try:
-                        with open(queue, 'r') as txt:
-                                queued = txt.read().strip().splitlines()
-                except:
-                        with open(queue, 'a+') as txt:
-                                txt.write(identity + '\n')
+			try:
+				torrents = self.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
+			except:
+				time.sleep(60)
+				continue
 
-                try:
-                        if queued[0] == identity:
-                                break
+			torrents.sort()
+			[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
+			self.torrents = torrents
 
-                        if identity not in queued:
+			if self.torrentsDownloading:
+				downloading = [tHash[0] for tHash in self.send('d.multicall2', ('', 'leeching', 'd.hash=') )]
 
-                                with open(queue, 'a') as txt:
-                                        txt.write(identity + '\n')
-                except:
-                        pass
+				for torrentHash in list(self.torrentsDownloading):
 
-                time.sleep(0.01)
+					if torrentHash not in downloading:
+						del self.torrentsDownloading[torrentHash]
 
-def leave_queue(identity):
-        txt = open(queue, mode='r+')
-        queued = txt.read().strip().splitlines()
-        txt.seek(0)
-        [txt.write(queuer + '\n') for queuer in queued if queuer != identity]
-        txt.truncate()
+			try:
+				importlib.reload(cfg)
+				interval = cfg.cache_interval
+			except Exception as e:
+				logging.critical(f"cacher.py: Config Error: Setting cache_interval to default value of 300: {e}")
+				interval = 300
 
-def build_cache(identity):
-        enter_queue(identity)
-        completed = xmlrpc('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory='))
-        completed.sort()
-        [list.append(list[7].rsplit('/', 1)[0]) if list[5] in list[7] else list.append(list[7]) for list in completed]
-        cache = open(cache_copy, mode='w+')
-        cache.write('completed = ' + pprint.pformat(completed))
-        shutil.move(cache_copy, torrent_cache)
-        leave_queue(identity)
+			time.sleep(interval)
 
-        if not os.path.isfile(mp_cache):
-                mount_points = {}
+	def getMountPoints(self):
 
-                for list in completed:
-                        parent_directory = list[8]
-                        mount_point = [path for path in [parent_directory.rsplit('/', num)[0] for num in range(parent_directory.count('/'))] if os.path.ismount(path)]
-                        mount_point = mount_point[0] if mount_point else '/'
-                        mount_points[parent_directory] = mount_point
+		while not self.torrents:
+			time.sleep(1)
 
-                open(mp_cache, mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
-
-if __name__ == "__main__":
-        build_cache('schedule' + str(int(time.time())))
+		for item in self.torrents:
+			parentDirectory = item[8]
+			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else '/'
+			self.mountPoints[parentDirectory] = mountPoint

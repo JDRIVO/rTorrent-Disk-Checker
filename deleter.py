@@ -1,98 +1,60 @@
-# -*- coding: utf-8 -*-
+import os
+import logging
+from remote_caller import SCGIRequest
 
-import sys, os, cacher, time
-from torrents import completed
-from remotecaller import xmlrpc
+class Deleter(SCGIRequest):
 
-queue = sys.argv[1]
-torrent_hash = sys.argv[2]
-torrent_path = sys.argv[3]
-subtractions = sys.argv[4]
+	def __init__(self, cache, deleterQueue):
+		super().__init__()
+		self.cache = cache
+		self.deleterQueue = deleterQueue
 
-files = xmlrpc('f.multicall', (torrent_hash, '', 'f.size_bytes=', 'f.frozen_path='))
-t_hash = (torrent_hash,)
-xmlrpc('d.tracker_announce', t_hash)
-xmlrpc('d.erase', t_hash)
+	def process(self, torrentInfo):
+		torrentHash, torrentSize, torrentPath, mountPoint = torrentInfo
+		self.cache.pending.append(torrentHash)
 
-with open(queue, 'a+') as txt:
-        txt.write(torrent_hash + '\n')
+		try:
+			files = self.send('f.multicall', (torrentHash, '', 'f.size_bytes=', 'f.frozen_path=') )
+			tHash = (torrentHash,)
+			self.send('d.tracker_announce', tHash)
+			self.send('d.erase', tHash)
+			self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
+		except Exception as e:
+			logging.error(f"deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent: {e}")
+			self.cache.pendingDeletions[mountPoint] -= torrentSize
+			self.cache.pending.remove(torrentHash)
 
-time.sleep(0.001)
+	def delete(self, torrentInfo):
+		torrentHash, torrentPath, mountPoint, files = torrentInfo
 
-while True:
+		if len(files) <= 1:
+			self.cache.pendingDeletions[mountPoint] -= files[0][0]
 
-        try:
-                with open(queue, 'r') as txt:
-                        queued = txt.read().strip().splitlines()
-        except:
-                with open(queue, 'a+') as txt:
-                        txt.write(torrent_hash + '\n')
+			try:
+				os.remove(files[0][1])
+			except Exception as e:
+				logging.error(f"deleter.py: File Deletion Error: Skipping file: {files[0][1]}: {e}")
 
-        try:
-                if queued[0] == torrent_hash:
-                        break
+		else:
 
-                if torrent_hash not in queued:
+			for file in files:
+				self.cache.pendingDeletions[mountPoint] -= file[0]
 
-                        with open(queue, 'a') as txt:
-                                txt.write(torrent_hash + '\n')
-        except:
-                pass
+				try:
+					os.remove(file[1])
+				except Exception as e:
+					logging.error(f"deleter.py: File Deletion Error: Skipping file: {file[1]}: {e}")
 
-        time.sleep(0.01)
+			try:
+				os.rmdir(torrentPath)
+			except Exception as e:
+				logging.error(f"deleter.py: Folder Deletion Error: Skipping folder: {torrentPath}: {e}")
 
-try:
-        freed_bytes = int(open(subtractions, mode='r').read())
-except:
-        open(subtractions, mode='w+').close()
-        freed_bytes = 0
+				for root, directories, files in os.walk(torrentPath, topdown=False):
 
-if len(files) <= 1:
+					try:
+						os.rmdir(root)
+					except Exception as e:
+						logging.error(f"deleter.py: Folder Deletion Error: Skipping folder: {root}: {e}")
 
-        try:
-                freed_bytes += files[0][0]
-
-                with open(subtractions, 'r+') as txt:
-                        txt.write(str(freed_bytes))
-                        txt.truncate()
-
-                os.remove(files[0][1])
-        except:
-                pass
-else:
-
-        for file in files:
-                freed_bytes += file[0]
-
-                with open(subtractions, 'r+') as txt:
-                        txt.write(str(freed_bytes))
-                        txt.truncate()
-
-                os.remove(file[1])
-
-        try:
-                os.rmdir(torrent_path)
-        except:
-
-                for root, directories, files in os.walk(torrent_path, topdown=False):
-
-                        try:
-                                os.rmdir(root)
-                        except:
-                                pass
-
-txt = open(queue, mode='r+')
-queued = txt.read().strip().splitlines()
-txt.seek(0)
-[txt.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
-txt.truncate()
-time.sleep(1)
-
-try:
-        queued = open(queue).read()
-
-        if not queued:
-                os.remove(queue)
-                cacher.build_cache(torrent_hash)
-except:
-        pass
+		self.cache.pending.remove(torrentHash)

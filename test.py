@@ -1,198 +1,173 @@
-# -*- coding: utf-8 -*-
-
+import sys
+import os
 from datetime import datetime
+from emailer import email
+from remote_caller import SCGIRequest
+
+rtxmlrpc = SCGIRequest()
+
+completedTorrents = rtxmlrpc.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
+completedTorrents.sort()
+[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in completedTorrents]
+
+mountPoints = {}
+
+for item in completedTorrents:
+	parentDirectory = item[8]
+	mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+	mountPoint = mountPoint[0] if mountPoint else '/'
+	mountPoints[parentDirectory] = mountPoint
+
+torrentPath = sys.argv[2]
+
+if torrentPath == '0':
+	torrentPath = '/'
 
 start = datetime.now()
-
-import sys, os, smtplib, config as cfg
-from remotecaller import xmlrpc
+torrentSize = int(sys.argv[1])
 
 try:
-        from torrents import completed
-        from mountpoints import mount_points
-except:
-        print('Building cache. Please wait.')
-        import cacher
-
-        try:
-                cacher.build_cache('test')
-        except:
-                print('Failed\nRun the script with its full path like:\npython /path/to/test.py 69')
-                sys.exit()
-
-        print('Cache built. Please run the code again.')
-        sys.exit()
-
-def send_email():
-        server = False
-
-        try:
-                try:
-                        try:
-                                print('\nAttempting to email using TLS\n')
-                                server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                                server.starttls()
-                                server.login(cfg.account, cfg.password)
-                        except Exception as e:
-                                print('Failed\n\nTLS Related Error:\n')
-                                print(e)
-                                print('\nAttempting to email using SSL\n')
-
-                                if server:
-                                        server.quit()
-
-                                server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
-                                server.login(cfg.account, cfg.password)
-                except Exception as e:
-                        print('Failed\n\nSSL Related Error:\n')
-                        print(e)
-                        print('\nAttempting to email without TLS/SSL\n')
-
-                        if server:
-                                server.quit()
-
-                        server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-                        server.login(cfg.account, cfg.password)
-
-                message = 'Subject: {}\n\n{}'.format(cfg.subject, cfg.body)
-                server.sendmail(cfg.account, cfg.receiver, message)
-                server.quit()
-                print('Succeeded')
-        except Exception as e:
-                print('Failed\n\nNon TLS/SSL Related Error:\n')
-                print(e)
-
-if sys.argv[1] == 'email':
-        send_email()
-        sys.exit()
-
-try:
-        torrent_size = float(sys.argv[1])
-        script_path = os.path.dirname(sys.argv[0])
-        queue = script_path + '/queue.txt'
-        remover = script_path + '/remover.py'
-        remover_queue = script_path + '/' + 'hash'
-        emailer = script_path + '/emailer.py'
-        last_torrent = script_path + '/hash.txt'
-        downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes='))
-        downloading = 0
-        disk = os.statvfs('/')
-        available_space = (disk.f_bsize * disk.f_bavail - downloading) / 1073741824.0
-        required_space = torrent_size - (available_space - cfg.minimum_space)
-        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-        current_date = datetime.now()
-        include = override = True
-        exclude = no = False
-        freed_space = count = 0
-        fallback_torrents, deleted = [], []
-
-        while freed_space < required_space:
-
-                if not completed and not fallback_torrents:
-                        break
-
-                if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size, t_name, t_hash, t_path, parent_directory = completed[0]
-
-                        if override:
-                                override = False
-                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
-
-                        if cfg.exclude_unlabelled and not t_label:
-                                del completed[0]
-                                continue
-
-                        if cfg.labels:
-
-                                if t_label in cfg.labels:
-                                        label_rule = cfg.labels[t_label]
-                                        rule = label_rule[0]
-
-                                        if rule is exclude:
-                                                del completed[0]
-                                                continue
-
-                                        if rule is not include:
-                                                override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
-
-                                elif cfg.labels_only:
-                                        del completed[0]
-                                        continue
-
-                        if cfg.trackers and not override:
-                                tracker_rule = [rule for rule in cfg.trackers for url in t_tracker if rule in url[0]]
-
-                                if tracker_rule:
-                                        tracker_rule = cfg.trackers[tracker_rule[0]]
-                                        rule = tracker_rule[0]
-
-                                        if rule is exclude:
-                                                del completed[0]
-                                                continue
-
-                                        if rule is not include:
-                                                override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
-
-                                elif cfg.trackers_only:
-                                        del completed[0]
-                                        continue
-
-                        t_age = (current_date - datetime.utcfromtimestamp(t_age)).days
-                        t_ratio /= 1000.0
-                        t_size /= 1073741824.0
-
-                        if t_age < min_age or t_ratio < min_ratio or t_size < min_size:
-
-                                if fb_age is not no and t_age >= fb_age and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
-
-                                elif fb_ratio is not no and t_ratio >= fb_ratio and t_size >= min_size:
-                                        fallback_torrents.append([parent_directory, t_age, t_label, t_tracker, t_size, t_name])
-
-                                del completed[0]
-                                continue
-
-                        del completed[0]
-                else:
-                        parent_directory, t_age, t_label, t_tracker, t_size, t_name = fallback_torrents[0]
-                        del fallback_torrents[0]
-
-                count += 1
-                freed_space += t_size
-                deleted.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, t_age, count, t_name, count, t_label, count, t_tracker))
+	import config as cfg
 except Exception as e:
-        print(e)
+	print(e)
 
-time = datetime.now() - start
+completedTorrentsCopy = completedTorrents[:]
+torrentsDownloading = []
+pendingDeletions = {}
 
-try:
-        xmlrpc('d.multicall2', ('', 'leeching', 'd.down.total='))
-except:
-        print('SCGI address not configured properly. Please adjust it in your config.py file before continuing.')
-        sys.exit()
+if torrentPath in mountPoints:
+	mountPoint = mountPoints[torrentPath]
+else:
+	mountPoint = [path for path in [torrentPath.rsplit('/', num)[0] for num in range(torrentPath.count('/') )] if os.path.ismount(path)]
+	mountPoint = mountPoint[0] if mountPoint else '/'
+	mountPoints[torrentPath] = mountPoint
 
-calc = available_space + freed_space - torrent_size
+if torrentsDownloading:
+
+	try:
+		downloading = rtxmlrpc.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+		downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
+	except Exception as e:
+		print(e)
+
+else:
+	downloading = 0
+
+if mountPoint in pendingDeletions:
+	deletions = pendingDeletions[mountPoint]
+else:
+	deletions = pendingDeletions[mountPoint] = 0
+
+disk = os.statvfs(mountPoint)
+availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
+minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
+requiredSpace = torrentSize - (availableSpace - minimumSpace)
+requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+
+include = override = True
+exclude = False
+freedSpace = count = 0
+fallbackTorrents, deletedTorrents = [], []
+currentDate = datetime.now()
+
+while freedSpace < requiredSpace:
+
+	if not completedTorrentsCopy and not fallbackTorrents:
+		break
+
+	if completedTorrentsCopy:
+		tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy[0]
+
+		if override:
+			override = False
+			minSize, minAge, minRatio, fbAge, fbRatio = requirements
+
+		if cfg.exclude_unlabelled and not tLabel:
+			del completedTorrentsCopy[0]
+			continue
+
+		if cfg.labels:
+
+			if tLabel in cfg.labels:
+				labelRule = cfg.labels[tLabel]
+				rule = labelRule[0]
+
+				if rule is exclude:
+					del completedTorrentsCopy[0]
+					continue
+
+				if rule is not include:
+					override = True
+					minSize, minAge, minRatio, fbAge, fbRatio = labelRule
+
+			elif cfg.labels_only:
+				del completedTorrentsCopy[0]
+				continue
+
+		if cfg.trackers and not override:
+			trackerRule = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+
+			if trackerRule:
+				trackerRule = cfg.trackers[trackerRule[0]]
+				rule = trackerRule[0]
+
+				if rule is exclude:
+					del completedTorrentsCopy[0]
+					continue
+
+				if rule is not include:
+					override = True
+					minSize, minAge, minRatio, fbAge, fbRatio = trackerRule
+
+				elif cfg.trackers_only:
+					del completedTorrentsCopy[0]
+					continue
+
+		tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
+		tRatioConverted = tRatio / 1000.0
+		tSizeGigabytes = tSizeBytes / 1073741824.0
+
+		if tAgeConverted < minAge or tRatioConverted < minRatio or tSizeGigabytes < minSize:
+
+			if fbAge is not False and tAgeConverted >= fbAge and tSizeGigabytes >= minSize:
+				fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+			elif fbRatio is not False and tRatioConverted >= fbRatio and tSizeGigabytes >= minSize:
+				fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+
+			del completedTorrentsCopy[0]
+			continue
+
+		del completedTorrentsCopy[0]
+
+	else:
+		tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
+
+	if mountPoints[parentDirectory] != mountPoint:
+		continue
+
+	try:
+		rtxmlrpc.send('d.state', (tHash,) )
+	except:
+		continue
+
+	pendingDeletions[mountPoint] += tSizeBytes
+	completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
+	count += 1
+	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeConverted, count, tName, count, tLabel, count, tTracker) )
+	freedSpace += tSizeGigabytes
+
+finish = datetime.now() - start
+availableSpaceAfter = availableSpace + freedSpace - torrentSize
 
 with open('testresult.txt', 'w+') as textfile:
-        textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (time, count, freed_space))
-        textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (available_space, calc, torrent_size))
-        textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
+	textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (finish, count, freedSpace) )
+	textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (availableSpace, availableSpaceAfter, torrentSize) )
+	textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
-        for result in deleted:
-
-                if sys.version_info[0] == 3:
-                        textfile.write(result + '\n')
-                else:
-                        textfile.write(result.encode('utf-8') + '\n')
-
-print('\nTA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-
-for result in deleted:
-        print(result)
+	for torrent in deletedTorrents:
+		print(torrent)
+		textfile.write(torrent + '\n')
 
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (time, count, freed_space))
-print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (available_space, calc, torrent_size))
-print("Note: This script inspects the '/' mount point")
+print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace) )
+print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (availableSpace, availableSpaceAfter, torrentSize) )

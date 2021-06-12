@@ -1,265 +1,184 @@
-# -*- coding: utf-8 -*-
+import os
+import importlib
+import logging
+from datetime import datetime
+from threading import Thread
+from remote_caller import SCGIRequest
+from emailer import email
+from deleter import Deleter
 
-import sys, os, time, pprint, config as cfg
-from subprocess import Popen
-from datetime import datetime, timedelta
-from remotecaller import xmlrpc
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical(f"checker.py: Config Error: Couldn't import config file: {e}")
 
-script_path = os.path.dirname(sys.argv[0])
-torrent_magnet = int(sys.argv[1])
-torrent_name = sys.argv[2]
-torrent_label = sys.argv[3]
-torrent_hash = sys.argv[4]
-torrent_path = sys.argv[5]
-torrent_size = int(sys.argv[6]) / 1073741824.0
+class Checker(SCGIRequest):
 
-def imdb_search():
+	def __init__(self, cache, checkerQueue, deleterQueue):
+		super().__init__()
+		self.cache = cache
+		self.checkerQueue = checkerQueue
+		self.deleter = Deleter(cache, deleterQueue)
 
-        try:
-                from threading import Thread
-                from guessit import guessit
-                from imdbpie import Imdb
+	def	check(self, torrentInfo):
+		torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentSize = int(torrentSize) / 1073741824.0
 
-                def imdb_ratings():
-                        ratings.update(imdb.get_title_ratings(movie_imdb))
+		try:
+			importlib.reload(cfg)
+		except Exception as e:
+			self.cache.lock = False
+			self.checkerQueue.release = True
+			logging.critical(f"checker.py: Config Error: Couldn't import config file: {torrentName}: {e}")
+			return
 
-                def movie_country():
-                        country.extend(imdb.get_title_versions(movie_imdb)['origins'])
+		completedTorrents = self.cache.torrents
+		completedTorrentsCopy = completedTorrents[:]
+		torrentsDownloading = self.cache.torrentsDownloading
+		pendingDeletions = self.cache.pendingDeletions
+		mountPoints = self.cache.mountPoints
+		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
 
-                imdb = Imdb()
-                torrent_info = guessit(torrent_name)
-                movie_title = torrent_info['title'] + ' ' + str(torrent_info['year'])
-                movie_imdb = imdb.search_for_title(movie_title)[0]['imdb_id']
+		if parentDirectory in mountPoints:
+			mountPoint = mountPoints[parentDirectory]
+		else:
+			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else '/'
+			mountPoints[parentDirectory] = mountPoint
 
-                ratings = {}
-                country = []
-                t1 = Thread(target=movie_country)
-                t2 = Thread(target=imdb_ratings)
-                t1.start()
-                t2.start()
-                t1.join()
-                t2.join()
-        except:
-                return
+		if torrentsDownloading:
 
-        rating = ratings['rating']
-        votes = ratings['ratingCount']
+			try:
+				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
+			except Exception as e:
+				self.cache.lock = False
+				self.checkerQueue.release = True
+				logging.critical(f"checker.py: XMLRPC Error: Couldn't retrieve torrents: {torrentName}: {e}")
+				return
 
-        if rating < minimum_rating or votes < minimum_votes:
-                xmlrpc('d.erase', (torrent_hash,))
-                sys.exit()
+		else:
+			downloading = 0
 
-        if skip_foreign and 'US' not in country:
-                xmlrpc('d.erase', (torrent_hash,))
-                sys.exit()
+		if mountPoint in pendingDeletions:
+			deletions = pendingDeletions[mountPoint]
+		else:
+			deletions = pendingDeletions[mountPoint] = 0
 
-if torrent_magnet:
-        xmlrpc('d.start', (torrent_hash,))
-        sys.exit()
+		disk = os.statvfs(mountPoint)
+		availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
+		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
+		requiredSpace = torrentSize - (availableSpace - minimumSpace)
+		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+		torrentsDownloading[torrentHash] = mountPoint
 
-if torrent_label in cfg.imdb:
-        minimum_rating, minimum_votes, skip_foreign = cfg.imdb[torrent_label]
-        imdb_search()
+		include = override = True
+		exclude = False
+		freedSpace = 0
+		fallbackTorrents = []
+		currentDate = datetime.now()
 
-if cfg.enable_disk_check:
-        queue = script_path + '/queue.txt'
+		while freedSpace < requiredSpace:
 
-        with open(queue, 'a+') as txt:
-                txt.write(torrent_hash + '\n')
+			if not completedTorrentsCopy and not fallbackTorrents:
+				break
 
-        time.sleep(0.001)
+			if completedTorrentsCopy:
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy[0]
 
-        while True:
+				if override:
+					override = False
+					minSize, minAge, minRatio, fbAge, fbRatio = requirements
 
-                try:
-                        with open(queue, 'r') as txt:
-                                queued = txt.read().strip().splitlines()
-                except:
-                        with open(queue, 'a+') as txt:
-                                txt.write(torrent_hash + '\n')
+				if cfg.exclude_unlabelled and not tLabel:
+					del completedTorrentsCopy[0]
+					continue
 
-                try:
-                        if queued[0] == torrent_hash:
-                                break
+				if cfg.labels:
 
-                        if torrent_hash not in queued:
+					if tLabel in cfg.labels:
+						labelRule = cfg.labels[tLabel]
+						rule = labelRule[0]
 
-                                with open(queue, 'a') as txt:
-                                        txt.write(torrent_hash + '\n')
-                except:
-                        pass
+						if rule is exclude:
+							del completedTorrentsCopy[0]
+							continue
 
-                time.sleep(0.01)
+						if rule is not include:
+							override = True
+							minSize, minAge, minRatio, fbAge, fbRatio = labelRule
 
-        try:
-                from torrents import completed
-                from mountpoints import mount_points
-        except:
-                import cacher
-                cacher.build_cache('checker')
-                from torrents import completed
-                from mountpoints import mount_points
+					elif cfg.labels_only:
+						del completedTorrentsCopy[0]
+						continue
 
-        current_time = datetime.now()
-        remover = script_path + '/remover.py'
-        remover_queue = script_path + '/' + torrent_hash + '.txt'
-        subtractions = script_path + '/' + torrent_hash + 'sub.txt'
-        emailer = script_path + '/emailer.py'
-        mount_point = [path for path in [torrent_path.rsplit('/', num)[0] for num in range(torrent_path.count('/'))] if os.path.ismount(path)]
-        mount_point = mount_point[0] if mount_point else '/'
+				if cfg.trackers and not override:
+					trackerRule = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
 
-        try:
-                from torrent_history import torrents, recent_torrents
+					if trackerRule:
+						trackerRule = cfg.trackers[trackerRule[0]]
+						rule = trackerRule[0]
 
-                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash='))
-                downloading = sum(t_bytes for t_bytes, t_hash in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
-                torrents[torrent_hash] = mount_point
-                additions = []
-                recent_torrents = [x for x in recent_torrents if current_time - x[1] < timedelta(minutes=3)]
-                d_queue = [(t_hash, additions.append(t_bytes)) for m_point, d_time, t_hash, t_bytes in recent_torrents if m_point == mount_point]
-                d_queue = [x[0] for x in d_queue]
+						if rule is exclude:
+							del completedTorrentsCopy[0]
+							continue
 
-                try:
-                        unaccounted = sum(additions) - sum(int(open(script_path + '/' + t_hash + 'sub.txt').read()) for t_hash in d_queue)
-                except:
-                        unaccounted = 0
-        except:
-                torrents = {}
-                downloading = xmlrpc('d.multicall2', ('', 'leeching', 'd.directory=', 'd.hash=', 'd.left_bytes='))
+						if rule is not include:
+							override = True
+							minSize, minAge, minRatio, fbAge, fbRatio = trackerRule
 
-                for t_directory, t_hash, t_bytes in downloading:
-                        mp = [path for path in [t_directory.rsplit('/', num)[0] for num in range(t_directory.count('/'))] if os.path.ismount(path)]
-                        mp = mp[0] if mp else '/'
-                        torrents[t_hash] = mp
+						elif cfg.trackers_only:
+							del completedTorrentsCopy[0]
+							continue
 
-                downloading = sum(t_bytes for t_directory, t_hash, t_bytes in downloading if t_hash != torrent_hash and torrents[t_hash] == mount_point)
-                recent_torrents = []
-                unaccounted = 0
+				tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
+				tRatioConverted = tRatio / 1000.0
+				tSizeGigabytes = tSizeBytes / 1073741824.0
 
-        disk = os.statvfs(mount_point)
-        available_space = (disk.f_bsize * disk.f_bavail + unaccounted - downloading) / 1073741824.0
-        minimum_space = cfg.minimum_space_mp[mount_point] if mount_point in cfg.minimum_space_mp else cfg.minimum_space
-        required_space = torrent_size - (available_space - minimum_space)
-        requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-        include = override = True
-        exclude = mp_updated = no = False
-        freed_space = deleted = 0
-        fallback_torrents = []
+				if tAgeConverted < minAge or tRatioConverted < minRatio or tSizeGigabytes < minSize:
 
-        while freed_space < required_space:
+						if fbAge is not False and tAgeConverted >= fbAge and tSizeGigabytes >= minSize:
+							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+						elif fbRatio is not False and tRatioConverted >= fbRatio and tSizeGigabytes >= minSize:
+							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
 
-                if not completed and not fallback_torrents:
-                        break
+						del completedTorrentsCopy[0]
+						continue
 
-                if completed:
-                        t_age, t_label, t_tracker, t_ratio, t_size_b, t_name, t_hash, t_path, parent_directory = completed[0]
+				del completedTorrentsCopy[0]
 
-                        if override:
-                                override = False
-                                min_size, min_age, min_ratio, fb_age, fb_ratio = requirements
+			else:
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
 
-                        if cfg.exclude_unlabelled and not t_label:
-                                del completed[0]
-                                continue
+			if mountPoints[parentDirectory] != mountPoint:
+				continue
 
-                        if cfg.labels:
+			try:
+				self.send('d.open', (tHash,) )
+			except:
+				continue
 
-                                if t_label in cfg.labels:
-                                        label_rule = cfg.labels[t_label]
-                                        rule = label_rule[0]
+			pendingDeletions[mountPoint] += tSizeBytes
+			t = Thread(target=self.deleter.process, args=( (tHash, tSizeBytes, tPath, mountPoint),) )
+			t.start()
+			completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
+			freedSpace += tSizeGigabytes
 
-                                        if rule is exclude:
-                                                del completed[0]
-                                                continue
+		self.cache.lock = False
+		self.checkerQueue.release = True
 
-                                        if rule is not include:
-                                                override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = label_rule
+		if freedSpace >= requiredSpace:
 
-                                elif cfg.labels_only:
-                                        del completed[0]
-                                        continue
+			try:
+				self.send('d.start', (torrentHash,) )
+			except Exception as e:
+				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: {e}")
+				return
 
-                        if cfg.trackers and not override:
-                                tracker_rule = [tracker for tracker in cfg.trackers for url in t_tracker if tracker in url[0]]
+		if freedSpace < requiredSpace and cfg.enable_email:
 
-                                if tracker_rule:
-                                        tracker_rule = cfg.trackers[tracker_rule[0]]
-                                        rule = tracker_rule[0]
-
-                                        if rule is exclude:
-                                                del completed[0]
-                                                continue
-
-                                        if rule is not include:
-                                                override = True
-                                                min_size, min_age, min_ratio, fb_age, fb_ratio = tracker_rule
-
-                                elif cfg.trackers_only:
-                                        del completed[0]
-                                        continue
-
-                        t_age = (current_time - datetime.utcfromtimestamp(t_age)).days
-                        t_ratio /= 1000.0
-                        t_size_g = t_size_b / 1073741824.0
-
-                        if t_age < min_age or t_ratio < min_ratio or t_size_g < min_size:
-
-                                if fb_age is not no and t_age >= fb_age and t_size_g >= min_size:
-                                        fallback_torrents.append((parent_directory, t_hash, t_path, t_size_b, t_size_g))
-
-                                elif fb_ratio is not no and t_ratio >= fb_ratio and t_size_g >= min_size:
-                                        fallback_torrents.append((parent_directory, t_hash, t_path, t_size_b, t_size_g))
-
-                                del completed[0]
-                                continue
-
-                        del completed[0]
-                else:
-                        parent_directory, t_hash, t_path, t_size_b, t_size_g = fallback_torrents[0]
-                        del fallback_torrents[0]
-
-                if parent_directory not in mount_points:
-                        mp_updated = True
-                        t_mp = [path for path in [parent_directory.rsplit('/', num)[0] for num in range(parent_directory.count('/'))] if os.path.ismount(path)]
-                        t_mp = t_mp[0] if t_mp else '/'
-                        mount_points[parent_directory] = t_mp
-
-                if mount_points[parent_directory] != mount_point:
-                        continue
-
-                try:
-                        xmlrpc('d.open', (t_hash,))
-                except:
-                        continue
-
-                if not deleted:
-                        open(subtractions, mode='w+').write('0')
-
-                Popen([sys.executable, remover, remover_queue, t_hash, t_path, subtractions])
-                deleted += t_size_b
-                freed_space += t_size_g
-
-        if freed_space >= required_space:
-                xmlrpc('d.start', (torrent_hash,))
-
-        if mp_updated:
-                open(script_path + '/mountpoints.py', mode='w+').write('mount_points = ' + pprint.pformat(mount_points))
-
-        recent_torrents.insert(0, (mount_point, current_time, torrent_hash, deleted))
-        open(script_path + '/torrent_history.py', mode='w+').write('import datetime\n\ntorrents = ' + pprint.pformat(torrents)
-                                                                 + '\n\nrecent_torrents = ' + pprint.pformat(recent_torrents))
-
-        queue = open(queue, mode='r+')
-        queued = queue.read().strip().splitlines()
-        queue.seek(0)
-        [queue.write(torrent + '\n') for torrent in queued if torrent != torrent_hash]
-        queue.truncate()
-
-        if freed_space < required_space and cfg.enable_email:
-                Popen([sys.executable, emailer])
-
-        time.sleep(300)
-        os.remove(subtractions)
-else:
-        xmlrpc('d.start', (torrent_hash,))
+			try:
+				email(self.cache)
+			except Exception as e:
+				logging.error(f"checker.py: Email Error: Couldn't send email: {e}")
+				return
