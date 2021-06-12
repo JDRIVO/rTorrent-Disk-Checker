@@ -4,9 +4,17 @@ logging.basicConfig(filename='server.log', level=logging.DEBUG, format='%(asctim
 import socket
 import os
 import sys
+import subprocess
 from threading import Thread
 from cacher import Cache
 import queuer
+
+cmd = f"pgrep -a python | grep {sys.argv[0]}"
+process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+pid, err = process.communicate()
+
+if len(pid.splitlines() ) > 1:
+	sys.exit(0)
 
 try:
 	import config as cfg

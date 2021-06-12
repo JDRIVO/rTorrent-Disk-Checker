@@ -13,12 +13,10 @@ class Cache(SCGIRequest):
 
 	def __init__(self):
 		super().__init__()
-		self.pendingDeletions = {}
-		self.lastNotification = None
-		self.torrentsDownloading = {}
-		self.torrents = None
-		self.lock = False
+		self.pendingDeletions, self.torrentsDownloading, self.mountPoints = {}, {}, {}
 		self.pending = []
+		self.torrents = self.lastNotification = None
+		self.lock = False
 
 	def getTorrents(self):
 
@@ -55,7 +53,6 @@ class Cache(SCGIRequest):
 			time.sleep(interval)
 
 	def getMountPoints(self):
-		self.mountPoints = {}
 
 		while not self.torrents:
 			time.sleep(1)
