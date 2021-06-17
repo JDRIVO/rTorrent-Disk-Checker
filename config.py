@@ -12,9 +12,11 @@ socket_file  = 'unix_socket'
 # The wait time between cache creation iterations in seconds
 cache_interval = 300
 
-# Receive an email when disk is full?
+# Receive a notification when disk is full?
 enable_email = no
-
+enable_pushbullet = no
+enable_telegram = no
+enable_slack = no
 
 ###### DISK CHECK SECTION ######
 
@@ -86,20 +88,42 @@ labels_only = no
 exclude_unlabelled = no
 
 
-###### EMAIL SETTINGS - IGNORE IF DISABLED ######
+###### NOTIFICATION SETTINGS ######
 
-# python test.py email | will send a test email
-
-# Amount of minutes to wait before sending an email between torrent downloads
+# Amount of minutes to wait before sending a notification between torrent downloads
 interval = 60
+
+# Subject/Title if applicable.
+subject = 'Warning: Disk Full'
+message = 'Free disk space ASAP.'
+
+### EMAIL SETTINGS ###
 
 smtp_server = 'smtp.gmail.com'
 port = 587
+tls = yes
+ssl = no
 
 account = 'youremail@gmail.com'
 password = 'yourpassword'
 
 receiver = 'youremail@gmail.com'
 
-subject = 'Warning: Disk Full'
-body = 'Free disk space ASAP.'
+### PUSHBULLET SETTINGS ###
+
+pushbullet_token = ''
+
+# Limit message to specific devices? | Empty list = Send to all Devices
+specific_devices = []
+
+### TELEGRAM SETTINGS ###
+
+telegram_token = ''
+chat_id = ''
+
+### SLACK SETTINGS ###
+
+slack_token = ''
+
+# Limit message to specific channels? | Empty list = Send to all channels
+specific_channels = []

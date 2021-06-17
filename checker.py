@@ -4,7 +4,7 @@ import logging
 from datetime import datetime
 from threading import Thread
 from remote_caller import SCGIRequest
-from emailer import email
+from messenger import message
 from deleter import Deleter
 
 try:
@@ -39,30 +39,39 @@ class Checker(SCGIRequest):
 		mountPoints = self.cache.mountPoints
 		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
 
-		if parentDirectory in mountPoints:
+		try:
 			mountPoint = mountPoints[parentDirectory]
-		else:
+		except:
 			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			mountPoints[parentDirectory] = mountPoint
 
-		if torrentsDownloading:
+		try:
+			downloads = torrentsDownloading[mountPoint]
 
-			try:
-				downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-				downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
-			except Exception as e:
-				self.cache.lock = False
-				self.checkerQueue.release = True
-				logging.critical(f"checker.py: XMLRPC Error: Couldn't retrieve torrents: {torrentName}: {e}")
-				return
+			if downloads:
 
-		else:
+				try:
+					downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+					downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
+				except Exception as e:
+					self.cache.lock = False
+					self.checkerQueue.release = True
+					logging.critical(f"checker.py: XMLRPC Error: Couldn't retrieve torrents: {torrentName}: {e}")
+					return
+
+			else:
+				downloading = 0
+
+			downloads.append(torrentHash)
+
+		except:
+			torrentsDownloading[mountPoint] = [torrentHash]
 			downloading = 0
 
-		if mountPoint in pendingDeletions:
+		try:
 			deletions = pendingDeletions[mountPoint]
-		else:
+		except:
 			deletions = pendingDeletions[mountPoint] = 0
 
 		disk = os.statvfs(mountPoint)
@@ -70,7 +79,6 @@ class Checker(SCGIRequest):
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
-		torrentsDownloading[torrentHash] = mountPoint
 
 		include = override = True
 		exclude = False
@@ -175,10 +183,10 @@ class Checker(SCGIRequest):
 				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: {e}")
 				return
 
-		if freedSpace < requiredSpace and cfg.enable_email:
+		if freedSpace < requiredSpace and (cfg.enable_email or cfg.enable_pushbullet or cfg.enable_telegram or cfg.enable_slack):
 
 			try:
-				email(self.cache)
+				message()
 			except Exception as e:
-				logging.error(f"checker.py: Email Error: Couldn't send email: {e}")
+				logging.error(f"checker.py: Message Error: Couldn't send message: {e}")
 				return

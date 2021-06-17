@@ -1,7 +1,7 @@
 import sys
 import os
 from datetime import datetime
-from emailer import email
+from messenger import message
 from remote_caller import SCGIRequest
 
 rtxmlrpc = SCGIRequest()
@@ -32,8 +32,7 @@ except Exception as e:
 	print(e)
 
 completedTorrentsCopy = completedTorrents[:]
-torrentsDownloading = []
-pendingDeletions = {}
+torrentsDownloading, pendingDeletions = {}, {}
 
 if torrentPath in mountPoints:
 	mountPoint = mountPoints[torrentPath]
@@ -42,15 +41,24 @@ else:
 	mountPoint = mountPoint[0] if mountPoint else '/'
 	mountPoints[torrentPath] = mountPoint
 
-if torrentsDownloading:
+try:
+	downloads = torrentsDownloading[mountPoint]
 
-	try:
-		downloading = rtxmlrpc.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-		downloading = sum(tBytes for tBytes, tHash in downloading if tHash != torrentHash and torrentsDownloading[tHash] == mountPoint)
-	except Exception as e:
-		print(e)
+	if downloads:
 
-else:
+		try:
+			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+			downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
+		except Exception as e:
+			print(e)
+
+	else:
+		downloading = 0
+
+	downloads.append(None)
+
+except:
+	torrentsDownloading[mountPoint] = [None]
 	downloading = 0
 
 if mountPoint in pendingDeletions:

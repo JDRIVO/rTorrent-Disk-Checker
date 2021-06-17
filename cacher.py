@@ -15,7 +15,7 @@ class Cache(SCGIRequest):
 		super().__init__()
 		self.pendingDeletions, self.torrentsDownloading, self.mountPoints = {}, {}, {}
 		self.pending = []
-		self.torrents = self.lastNotification = None
+		self.torrents = None
 		self.lock = False
 
 	def getTorrents(self):
@@ -35,13 +35,8 @@ class Cache(SCGIRequest):
 			[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
 			self.torrents = torrents
 
-			if self.torrentsDownloading:
-				downloading = [tHash[0] for tHash in self.send('d.multicall2', ('', 'leeching', 'd.hash=') )]
-
-				for torrentHash in list(self.torrentsDownloading):
-
-					if torrentHash not in downloading:
-						del self.torrentsDownloading[torrentHash]
+			downloading = [tHash[0] for tHash in self.send('d.multicall2', ('', 'leeching', 'd.hash=') )]
+			[tHashes.remove(tHash) for mp, tHashes in self.torrentsDownloading.items() for tHash in tHashes[:] if tHash not in downloading]
 
 			try:
 				importlib.reload(cfg)
