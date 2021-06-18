@@ -139,7 +139,7 @@ class Slack(ServerCommunicator):
 				response = self.createRequest(self.MESSAGE_URL, self.headers, data)
 
 				if not response["ok"]:
-					print("Slack Error: Insufficient permissions - Please enable: {}".format(response["needed"]) )
+					print("Slack Error: Insufficient permissions - Please enable: " + response["needed"])
 					return
 
 def message():

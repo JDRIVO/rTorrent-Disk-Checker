@@ -14,7 +14,7 @@ def main(schedule=False):
 			rtxmlrpc.send("schedule2", ('', "low_diskspace", "0", interval, "close_low_diskspace={}G".format(amount) ) )
 
 		rtxmlrpc.send("system.file.allocate.set", ('', "0") )
-		Popen([sys.executable, "{}/server.py".format(path)])
+		Popen([sys.executable, path + "/server.py"])
 		rtxmlrpc.send("method.set_key", ('', "event.download.inserted_new", "checker", "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))") )
 
 		try:

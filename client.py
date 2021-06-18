@@ -11,7 +11,7 @@ try:
 	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	s.connect(cfg.socket_file)
 
-	message = "{}, {}, {}, {}".format(torrentName, torrentHash, torrentPath, torrentSize)
+	message = ", ".join( (torrentName, torrentHash, torrentPath, torrentSize) )
 	message = "{:<10}{}".format(len(message), message).encode("utf-8")
 	s.send(message)
 except Exception as e:

@@ -9,7 +9,7 @@ from threading import Thread
 from cacher import Cache
 import queuer
 
-cmd = "pgrep -a python | grep {}".format(sys.argv[0])
+cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 pid, err = process.communicate()
 
