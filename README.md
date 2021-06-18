@@ -29,4 +29,4 @@ The script accepts two arguments: 1. Torrent Size ( GB ) 2. Mount Point ( 0 will
 
 To send a test message (accepted arguments: email, pushbullet, telegram, slack):
 
-`python messenger.py`
+`python messenger.py email`
