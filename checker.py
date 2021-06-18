@@ -135,9 +135,9 @@ class Checker(SCGIRequest):
 							override = True
 							minSize, minAge, minRatio, fbAge, fbRatio = trackerRule
 
-						elif cfg.trackers_only:
-							del completedTorrentsCopy[0]
-							continue
+					elif cfg.trackers_only:
+						del completedTorrentsCopy[0]
+						continue
 
 				tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
 				tRatioConverted = tRatio / 1000.0
