@@ -1,5 +1,5 @@
 import logging
-logging.basicConfig(filename='server.log', level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+logging.basicConfig(filename="server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
 import socket
 import os
@@ -9,7 +9,7 @@ from threading import Thread
 from cacher import Cache
 import queuer
 
-cmd = f"pgrep -a python | grep {sys.argv[0]}"
+cmd = "pgrep -a python | grep {}".format(sys.argv[0])
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 pid, err = process.communicate()
 
@@ -19,7 +19,7 @@ if len(pid.splitlines() ) > 1:
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical(f"server.py: Config Error: Couldn't import socket_file: {e}")
+	logging.critical("server.py: Config Error: Couldn't import socket_file: " + str(e) )
 	sys.exit(1)
 
 cache = Cache()
@@ -64,8 +64,8 @@ try:
 			completeMessage += message
 
 			if len(completeMessage) - headerSize == messageLength:
-				checkerQueue.queueAdd(completeMessage[headerSize:].decode('utf-8').split(', ') )
+				checkerQueue.queueAdd(completeMessage[headerSize:].decode("utf-8").split(", ") )
 				break
 
 except Exception as e:
-	logging.critical(f"server.py: Server Error: Server closing: {e}")
+	logging.critical("server.py: Server Error: Server closing: " + str(e) )

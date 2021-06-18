@@ -1,13 +1,9 @@
+import socket
+import xmlrpc.client as xmlrpclib
+from urllib import parse as urllib
 from config import scgi
 
-try:
-		import xmlrpclib, socket
-		import urllib
-except:
-		import xmlrpc.client as xmlrpclib, socket
-		from urllib import parse as urllib
-
-class SCGIRequest:
+class SCGIRequest(object):
 
 		def __init__(self):
 			self.url = scgi
@@ -16,13 +12,13 @@ class SCGIRequest:
 			"Send data over scgi to url and get response"
 			data = xmlrpclib.dumps(params, methodname)
 			scgiresp = self.__send(self.addRequiredSCGIHeaders(data) )
-			xmlresp = ''.join(scgiresp.split('\n')[4:])
+			xmlresp = ''.join(scgiresp.split("\n")[4:])
 			return xmlrpclib.loads(xmlresp)[0][0]
 
 		def __send(self, scgireq):
 
 			try:
-				host, port = self.url.split(':')
+				host, port = self.url.split(":")
 				addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
 				sock = socket.socket(*addrinfo[0][:3])
 				sock.connect(addrinfo[0][4])
@@ -48,16 +44,16 @@ class SCGIRequest:
 		@staticmethod
 		def encodeNetstring(string):
 			"Encode string as netstring"
-			return '%d:%s,' % (len(string), string)
+			return "%d:%s," % (len(string), string)
 
 		@staticmethod
 		def makeHeaders(headers):
 			"Make scgi header list"
-			return '\x00'.join(['%s\x00%s' % t for t in headers]) + '\x00'
+			return "\x00".join(["%s\x00%s" % t for t in headers]) + "\x00"
 
 		@staticmethod
 		def addRequiredSCGIHeaders(data, headers = []):
 			"Wrap data in an scgi request, see spec at: http://python.ca/scgi/protocol.txt"
-			headers = SCGIRequest.makeHeaders([('CONTENT_LENGTH', str(len(data) ) ), ('SCGI', '1'),] + headers)
+			headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data) ) ), ("SCGI", "1"),] + headers)
 			encHeaders = SCGIRequest.encodeNetstring(headers)
 			return encHeaders + data

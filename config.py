@@ -113,7 +113,7 @@ receiver = 'youremail@gmail.com'
 
 pushbullet_token = ''
 
-# Limit message to specific devices? | Empty list = Send to all Devices
+# Limit message to specific devices? | Empty list = Send to all devices
 specific_devices = []
 
 ### TELEGRAM SETTINGS ###

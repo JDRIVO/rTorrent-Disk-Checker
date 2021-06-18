@@ -5,7 +5,7 @@ from remote_caller import SCGIRequest
 class Deleter(SCGIRequest):
 
 	def __init__(self, cache, deleterQueue):
-		super().__init__()
+		super(Deleter, self).__init__()
 		self.cache = cache
 		self.deleterQueue = deleterQueue
 
@@ -14,13 +14,13 @@ class Deleter(SCGIRequest):
 		self.cache.pending.append(torrentHash)
 
 		try:
-			files = self.send('f.multicall', (torrentHash, '', 'f.size_bytes=', 'f.frozen_path=') )
+			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path=") )
 			tHash = (torrentHash,)
-			self.send('d.tracker_announce', tHash)
-			self.send('d.erase', tHash)
+			self.send("d.tracker_announce", tHash)
+			self.send("d.erase", tHash)
 			self.deleterQueue.queueAdd( (torrentHash, torrentPath, mountPoint, files) )
 		except Exception as e:
-			logging.error(f"deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent: {e}")
+			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent: " + str(e) )
 			self.cache.pendingDeletions[mountPoint] -= torrentSize
 			self.cache.pending.remove(torrentHash)
 
@@ -33,7 +33,7 @@ class Deleter(SCGIRequest):
 			try:
 				os.remove(files[0][1])
 			except Exception as e:
-				logging.error(f"deleter.py: File Deletion Error: Skipping file: {files[0][1]}: {e}")
+				logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(files[0][1], e) )
 
 		else:
 
@@ -43,18 +43,18 @@ class Deleter(SCGIRequest):
 				try:
 					os.remove(file[1])
 				except Exception as e:
-					logging.error(f"deleter.py: File Deletion Error: Skipping file: {file[1]}: {e}")
+					logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(file[1], e) )
 
 			try:
 				os.rmdir(torrentPath)
 			except Exception as e:
-				logging.error(f"deleter.py: Folder Deletion Error: Skipping folder: {torrentPath}: {e}")
+				logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(torrentPath, e) )
 
 				for root, directories, files in os.walk(torrentPath, topdown=False):
 
 					try:
 						os.rmdir(root)
 					except Exception as e:
-						logging.error(f"deleter.py: Folder Deletion Error: Skipping folder: {root}: {e}")
+						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e) )
 
 		self.cache.pending.remove(torrentHash)

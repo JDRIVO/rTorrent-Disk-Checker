@@ -1,5 +1,4 @@
 import os
-import importlib
 import logging
 from datetime import datetime
 from threading import Thread
@@ -8,14 +7,19 @@ from messenger import message
 from deleter import Deleter
 
 try:
+	from importlib import reload
+except:
+	from imp import reload
+
+try:
 	import config as cfg
 except Exception as e:
-	logging.critical(f"checker.py: Config Error: Couldn't import config file: {e}")
+	logging.critical("checker.py: Config Error: Couldn't import config file: " + str(e) )
 
 class Checker(SCGIRequest):
 
 	def __init__(self, cache, checkerQueue, deleterQueue):
-		super().__init__()
+		super(Checker, self).__init__()
 		self.cache = cache
 		self.checkerQueue = checkerQueue
 		self.deleter = Deleter(cache, deleterQueue)
@@ -25,11 +29,11 @@ class Checker(SCGIRequest):
 		torrentSize = int(torrentSize) / 1073741824.0
 
 		try:
-			importlib.reload(cfg)
+			reload(cfg)
 		except Exception as e:
 			self.cache.lock = False
 			self.checkerQueue.release = True
-			logging.critical(f"checker.py: Config Error: Couldn't import config file: {torrentName}: {e}")
+			logging.critical("checker.py: Config Error: Couldn't import config file: {}: {}".format(torrentName, e) )
 			return
 
 		completedTorrents = self.cache.torrents
@@ -37,13 +41,13 @@ class Checker(SCGIRequest):
 		torrentsDownloading = self.cache.torrentsDownloading
 		pendingDeletions = self.cache.pendingDeletions
 		mountPoints = self.cache.mountPoints
-		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
+		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
 			mountPoint = mountPoints[parentDirectory]
 		except:
-			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else '/'
+			mountPoint = [path for path in [parentDirectory.rsplit("/", num)[0] for num in range(parentDirectory.count("/") )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else "/"
 			mountPoints[parentDirectory] = mountPoint
 
 		try:
@@ -52,12 +56,12 @@ class Checker(SCGIRequest):
 			if downloads:
 
 				try:
-					downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+					downloading = self.send("d.multicall2", ('', "leeching", "d.left_bytes=", "d.hash=") )
 					downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
 				except Exception as e:
 					self.cache.lock = False
 					self.checkerQueue.release = True
-					logging.critical(f"checker.py: XMLRPC Error: Couldn't retrieve torrents: {torrentName}: {e}")
+					logging.critical("checker.py: XMLRPC Error: Couldn't retrieve torrents: {}: {}".format(torrentName, e) )
 					return
 
 			else:
@@ -162,7 +166,7 @@ class Checker(SCGIRequest):
 				continue
 
 			try:
-				self.send('d.open', (tHash,) )
+				self.send("d.open", (tHash,) )
 			except:
 				continue
 
@@ -178,9 +182,9 @@ class Checker(SCGIRequest):
 		if freedSpace >= requiredSpace:
 
 			try:
-				self.send('d.start', (torrentHash,) )
+				self.send("d.start", (torrentHash,) )
 			except Exception as e:
-				logging.error(f"checker.py: XMLRPC Error: Couldn't start torrent: {torrentName}: {e}")
+				logging.error("checker.py: XMLRPC Error: Couldn't start torrent: {}: {}".format(torrentName, e) )
 				return
 
 		if freedSpace < requiredSpace and (cfg.enable_email or cfg.enable_pushbullet or cfg.enable_telegram or cfg.enable_slack):
@@ -188,5 +192,5 @@ class Checker(SCGIRequest):
 			try:
 				message()
 			except Exception as e:
-				logging.error(f"checker.py: Message Error: Couldn't send message: {e}")
+				logging.error("checker.py: Message Error: Couldn't send message: " + str(e) )
 				return

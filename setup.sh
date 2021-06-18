@@ -18,7 +18,7 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 2b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
 
-3. Run python setup.py. If it fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
+3. Run python3 setup.py. If it fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
 
 4. Optional: As an additional layer of protection you may add the close_low_diskspace command to rtorrent. This command will make rtorrent periodically
 check your disk space and stop all downloading torrents if your disk space falls below a threshold.
@@ -112,7 +112,7 @@ done
 # Delete existing entries
 sed -i '/method.set_key = event.download.inserted_new, checker/d' $rtorrent
 sed -i '/method.insert = dcheck, simple, d.stop=/d' $rtorrent
-sed -i "\|execute.throw.bg = python3, \"$PWD/server.py|d" $rtorrent
+sed -i "\|execute.throw.bg = python.*, \"$PWD/server.py|d" $rtorrent
 
 # Add to file
 sed -i '1imethod.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"' $rtorrent
