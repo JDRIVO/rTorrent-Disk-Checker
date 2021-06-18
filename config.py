@@ -93,7 +93,7 @@ exclude_unlabelled = no
 # Amount of minutes to wait before sending a notification between torrent downloads
 interval = 60
 
-# Subject/Title if applicable.
+# Subject/Title if applicable
 subject = 'Warning: Disk Full'
 message = 'Free disk space ASAP.'
 
