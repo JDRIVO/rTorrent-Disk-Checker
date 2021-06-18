@@ -27,6 +27,8 @@ The script accepts two arguments: 1. Torrent Size ( GB ) 2. Mount Point ( 0 will
 
 `python test.py 69 0`
 
-To send a test message (accepted arguments: `email`, `pushbullet`, `telegram`, `slack`):
+To send a test message:
 
 `python messenger.py email pushbullet`
+
+Accepted arguments: `email`, `pushbullet`, `telegram`, `slack`
