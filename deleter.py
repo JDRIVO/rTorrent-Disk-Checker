@@ -11,7 +11,6 @@ class Deleter(SCGIRequest):
 
 	def process(self, torrentInfo):
 		torrentHash, torrentSize, torrentPath, mountPoint = torrentInfo
-		self.cache.pending.append(torrentHash)
 
 		try:
 			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path=") )

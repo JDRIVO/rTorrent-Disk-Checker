@@ -18,7 +18,7 @@ class Cache(SCGIRequest):
 	def __init__(self):
 		super(Cache, self).__init__()
 		self.pendingDeletions, self.torrentsDownloading, self.mountPoints = {}, {}, {}
-		self.pending = []
+		self.deletions, self.pending = [], []
 		self.torrents = None
 		self.lock = False
 
@@ -26,7 +26,7 @@ class Cache(SCGIRequest):
 
 		while True:
 
-			while self.lock or self.pending:
+			while self.lock or self.deletions or self.pending:
 				time.sleep(60)
 
 			try:

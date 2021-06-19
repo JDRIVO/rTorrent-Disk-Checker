@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 from datetime import datetime
 from threading import Thread
 from remote_caller import SCGIRequest
@@ -23,6 +24,23 @@ class Checker(SCGIRequest):
 		self.cache = cache
 		self.checkerQueue = checkerQueue
 		self.deleter = Deleter(cache, deleterQueue)
+		self.torrentsDownloading = self.cache.torrentsDownloading
+		self.pendingDeletions = self.cache.pendingDeletions
+		self.mountPoints = self.cache.mountPoints
+		self.deletions = self.cache.deletions
+		self.pending = self.cache.pending
+		t = Thread(target=self.deletionHandler)
+		t.start()
+
+	def deletionHandler(self):
+
+		while True:
+
+			while self.deletions:
+				self.pending.append(self.deletions[0][0])
+				self.deleter.process(self.deletions.pop(0) )
+
+			time.sleep(1)
 
 	def	check(self, torrentInfo):
 		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
@@ -38,20 +56,17 @@ class Checker(SCGIRequest):
 
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
-		torrentsDownloading = self.cache.torrentsDownloading
-		pendingDeletions = self.cache.pendingDeletions
-		mountPoints = self.cache.mountPoints
 		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
-			mountPoint = mountPoints[parentDirectory]
+			mountPoint = self.mountPoints[parentDirectory]
 		except:
 			mountPoint = [path for path in [parentDirectory.rsplit("/", num)[0] for num in range(parentDirectory.count("/") )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else "/"
-			mountPoints[parentDirectory] = mountPoint
+			self.mountPoints[parentDirectory] = mountPoint
 
 		try:
-			downloads = torrentsDownloading[mountPoint]
+			downloads = self.torrentsDownloading[mountPoint]
 
 			if downloads:
 
@@ -70,13 +85,13 @@ class Checker(SCGIRequest):
 			downloads.append(torrentHash)
 
 		except:
-			torrentsDownloading[mountPoint] = [torrentHash]
+			self.torrentsDownloading[mountPoint] = [torrentHash]
 			downloading = 0
 
 		try:
-			deletions = pendingDeletions[mountPoint]
+			deletions = self.pendingDeletions[mountPoint]
 		except:
-			deletions = pendingDeletions[mountPoint] = 0
+			deletions = self.pendingDeletions[mountPoint] = 0
 
 		disk = os.statvfs(mountPoint)
 		availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
@@ -162,7 +177,7 @@ class Checker(SCGIRequest):
 			else:
 				tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
 
-			if mountPoints[parentDirectory] != mountPoint:
+			if self.mountPoints[parentDirectory] != mountPoint:
 				continue
 
 			try:
@@ -170,9 +185,8 @@ class Checker(SCGIRequest):
 			except:
 				continue
 
-			pendingDeletions[mountPoint] += tSizeBytes
-			t = Thread(target=self.deleter.process, args=( (tHash, tSizeBytes, tPath, mountPoint),) )
-			t.start()
+			self.pendingDeletions[mountPoint] += tSizeBytes
+			self.deletions.append( (tHash, tSizeBytes, tPath, mountPoint) )
 			completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
 			freedSpace += tSizeGigabytes
 
