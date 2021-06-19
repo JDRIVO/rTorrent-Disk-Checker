@@ -4,7 +4,7 @@
                  - a torrent is added by any program (autodl-irssi, RSS Downloader etc)
                  - a torrent is added remotely or directly 
 
-This program checks your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the program will delete torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py). The program will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	You can choose to receive an email, Pushbullet, Telegram or Slack notification if this occurs.
+This program checks your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the program will delete torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py). This program will scan through your torrents from oldest to newest, ensuring the oldest torrent that meets your criteria is deleted first. If your disk space is still too low, the torrent will be sent to rtorrent in a stopped state.	You can choose to receive an email, Pushbullet, Telegram or Slack notification if this occurs.
 
 ## Requirements
 * rTorrent 0.9.7+
