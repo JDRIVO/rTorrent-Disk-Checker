@@ -40,7 +40,6 @@ t = Thread(target=checkerQueue.processor)
 t.setDaemon(True)
 t.start()
 
-headerSize = 10
 socketFile = cfg.socket_file
 if os.path.exists(socketFile): os.remove(socketFile)
 
@@ -50,22 +49,9 @@ try:
 	s.listen(50)
 
 	while True:
-		completeMessage = b''
-		newMessage = True
 		clientsocket, address = s.accept()
-
-		while True:
-			message = clientsocket.recv(1024)
-
-			if newMessage:
-				messageLength = int(message[:headerSize])
-				newMessage = False
-
-			completeMessage += message
-
-			if len(completeMessage) - headerSize == messageLength:
-				checkerQueue.queueAdd(completeMessage[headerSize:].decode("utf-8").split(", ") )
-				break
+		message = clientsocket.recv(2048)
+		checkerQueue.queueAdd(message.decode("utf-8").split(",") )
 
 except Exception as e:
 	logging.critical("server.py: Server Error: Server closing: " + str(e) )
