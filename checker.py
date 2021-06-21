@@ -42,7 +42,7 @@ class Checker(SCGIRequest):
 
 			time.sleep(1)
 
-	def	check(self, torrentInfo):
+	def check(self, torrentInfo):
 		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
 		torrentSize = int(torrentSize) / 1073741824.0
 
