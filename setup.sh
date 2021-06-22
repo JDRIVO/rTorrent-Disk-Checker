@@ -18,9 +18,9 @@ grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
 2b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
 
-3. Run python3 setup.py. If it fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
+3. Run setup.py. If it fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
 
-4. Optional: As an additional layer of protection you may add the close_low_diskspace command to rtorrent. This command will make rtorrent periodically
+4. Optional: As an additional layer of protection you may add the close_low_diskspace command to your rtorrent.rc file. This command will make rtorrent periodically
 check your disk space and stop all downloading torrents if your disk space falls below a threshold.
 
 schedule2 = low_diskspace,0,55,close_low_diskspace=1G
