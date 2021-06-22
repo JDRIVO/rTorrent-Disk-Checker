@@ -4,11 +4,11 @@ Manual Setup Instructions:
 
 Ensure system.file.allocate.set = 0. This is the default setting in rtorrent so it's not necessary to include it in your rtorrent.rc file.
 
-1. Add the following code to your ~/.rtorrent.rc file !! making sure to update the paths to server.py & client.py !!
+1. Add the following code to your ~/.rtorrent.rc file !! making sure to update the paths to client.py & server.py !!
 
-execute.throw.bg = python3, "/path/to/server.py"
 method.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"
 method.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,/path/to/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="
+execute.throw.bg = python3, "/path/to/server.py"
 
 2. SCGI Addition
 
