@@ -57,7 +57,7 @@ class ServerCommunicator:
 				return json.loads(response.read() )
 
 		except Exception as e:
-			print(e)
+			print(type(self).__name__ + ':', e)
 
 	def createRequest(self, url, headers={}, data=None, origin_req_host=None, unverifiable=False):
 		if data: data = json.dumps(data).encode("utf8")

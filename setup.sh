@@ -35,7 +35,7 @@ low_diskspace=false
 rtorrent="$HOME/.rtorrent.rc"
 
 if [[ ! -f $rtorrent ]]; then
-	echo '.rtorrent.rc file not found in $HOME. Terminating script.'
+	echo ".rtorrent.rc file not found in $HOME. Terminating script."
 	exit
 fi
 

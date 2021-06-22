@@ -19,7 +19,7 @@ Run the setup script by entering the following command in your terminal (Refer t
 
 ## [Test Script](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/test.py)
 
-#### This script will show you what torrents the script will delete without actually deleting torrents.
+#### This script will show you what torrents this program will delete without actually deleting torrents.
 
 Results will output to your terminal and a text file named **testresult.txt**
 
