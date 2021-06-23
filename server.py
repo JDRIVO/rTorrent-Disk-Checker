@@ -51,7 +51,7 @@ try:
 	while True:
 		clientsocket, address = s.accept()
 		message = clientsocket.recv(2048)
-		checkerQueue.queueAdd(message.decode("utf-8").split(",") )
+		checkerQueue.queueAdd(message.decode("utf-8").split("|:|") )
 
 except Exception as e:
 	logging.critical("server.py: Server Error: Server closing: " + str(e) )

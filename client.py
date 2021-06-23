@@ -5,7 +5,7 @@ try:
 	import config as cfg
 	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 	s.connect(cfg.socket_file)
-	message = ",".join(sys.argv).encode("utf-8")
+	message = "|:|".join(sys.argv).encode("utf-8")
 	s.send(message)
 except Exception as e:
 	import logging
