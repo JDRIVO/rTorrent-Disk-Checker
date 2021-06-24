@@ -34,10 +34,8 @@ checkerQueue.createChecker(cache, deleterQueue)
 deleterQueue.createDeleter(cache)
 
 t = Thread(target=deleterQueue.processor)
-t.setDaemon(True)
 t.start()
 t = Thread(target=checkerQueue.processor)
-t.setDaemon(True)
 t.start()
 
 socketFile = cfg.socket_file
@@ -51,7 +49,7 @@ try:
 	while True:
 		clientsocket, address = s.accept()
 		message = clientsocket.recv(2048)
-		checkerQueue.queueAdd(message.decode("utf-8").split("|:|") )
+		checkerQueue.put(message.decode("utf-8").split("|:|") )
 
 except Exception as e:
 	logging.critical("server.py: Server Error: Server closing: " + str(e) )
