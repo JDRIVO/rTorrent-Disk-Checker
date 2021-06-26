@@ -22,13 +22,13 @@ class Checker(SCGIRequest):
 	def __init__(self, cache, checkerQueue, deleterQueue):
 		super(Checker, self).__init__()
 		self.cache = cache
-		self.checkerQueue = checkerQueue
-		self.deleter = Deleter(cache, deleterQueue)
-		self.torrentsDownloading = self.cache.torrentsDownloading
-		self.pendingDeletions = self.cache.pendingDeletions
-		self.mountPoints = self.cache.mountPoints
 		self.deletions = self.cache.deletions
 		self.pending = self.cache.pending
+		self.checkerQueue = checkerQueue
+		self.deleter = Deleter(self.cache, deleterQueue)
+		self.mountPoints = self.cache.mountPoints
+		self.torrentsDownloading = self.cache.torrentsDownloading
+		self.pendingDeletions = self.cache.pendingDeletions
 		t = Thread(target=self.deletionHandler)
 		t.start()
 

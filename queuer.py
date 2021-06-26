@@ -20,7 +20,7 @@ class CheckerQueue(Queue):
 				self.startChecker(item)
 				self.release = False
 
-			time.sleep(0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001)
+			time.sleep(0.000001)
 
 	def createChecker(self, cache, deleterQueue):
 		self.cache = cache

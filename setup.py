@@ -1,6 +1,5 @@
 import sys
 import os
-from subprocess import Popen
 from remote_caller import SCGIRequest
 
 def main(schedule=False):
@@ -14,7 +13,7 @@ def main(schedule=False):
 			rtxmlrpc.send("schedule2", ('', "low_diskspace", "0", interval, "close_low_diskspace={}G".format(amount) ) )
 
 		rtxmlrpc.send("system.file.allocate.set", ('', "0") )
-		Popen([sys.executable, path + "/server.py"])
+		rtxmlrpc.send("execute.throw.bg", ('', "python3", path + "/server.py") )
 		rtxmlrpc.send("method.set_key", ('', "event.download.inserted_new", "checker", "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))") )
 
 		try:

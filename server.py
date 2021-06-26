@@ -33,9 +33,9 @@ deleterQueue = queuer.DeleterQueue()
 checkerQueue.createChecker(cache, deleterQueue)
 deleterQueue.createDeleter(cache)
 
-t = Thread(target=deleterQueue.processor)
-t.start()
 t = Thread(target=checkerQueue.processor)
+t.start()
+t = Thread(target=deleterQueue.processor)
 t.start()
 
 socketFile = cfg.socket_file
