@@ -24,7 +24,7 @@ if torrentPath == '0':
 	torrentPath = '/'
 
 start = datetime.now()
-torrentSize = int(sys.argv[1])
+torrentSize = float(sys.argv[1])
 
 try:
 	import config as cfg
@@ -167,14 +167,14 @@ while freedSpace < requiredSpace:
 finish = datetime.now() - start
 availableSpaceAfter = availableSpace + freedSpace - torrentSize
 
-with open('testresult.txt', 'w+') as textfile:
-	textfile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (finish, count, freedSpace) )
-	textfile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (availableSpace, availableSpaceAfter, torrentSize) )
-	textfile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
+with open('testresult.txt', 'w+') as textFile:
+	textFile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (finish, count, freedSpace) )
+	textFile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (availableSpace, availableSpaceAfter, torrentSize) )
+	textFile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
 
 	for torrent in deletedTorrents:
 		print(torrent)
-		textfile.write(torrent + '\n')
+		textFile.write(torrent + '\n')
 
 print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
 print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace) )
