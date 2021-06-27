@@ -20,7 +20,7 @@ def main(schedule=False):
 			rtxmlrpc.send("method.insert", ('', "dcheck", "simple", "d.stop=", "execute.throw.bg=python3,{}/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes=".format(path) ) )
 		except:
 			# Setup has ran before / Method already inserted
-			print("Setup has already been run")
+			print("Disk checker is already running in the background.")
 			return
 
 		print("Setup.py completed successfully")
