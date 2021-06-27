@@ -27,7 +27,7 @@ minimum_space_mp = {
                    }
 
 
-### GENERAL RULES START ###
+### GENERAL RULES ###
 
 # All minimum requirements must be met by a torrent to be deleted
 
@@ -42,8 +42,8 @@ fallback_age = no
 # Only the ratio of a torrent must be higher or equal to this number for it to be deleted (torrent size requirement remains) - no to disable
 fallback_ratio = 1.1
 
-### GENERAL RULES END ###
 
+### TRACKER RULES ###
 
 # Tracker Rules will override general rules - Fill to enable
 
@@ -63,6 +63,8 @@ trackers = {
 # Only delete torrents from trackers with a tracker rule (yes/no)
 trackers_only = yes
 
+
+### LABEL RULES ###
 
 # Label Rules will override general/tracker rules - Fill to enable
 
