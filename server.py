@@ -1,7 +1,7 @@
 import os
-import logging
-import socket
 import sys
+import socket
+import logging
 import subprocess
 from threading import Thread
 from cacher import Cache
