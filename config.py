@@ -26,6 +26,7 @@ minimum_space_mp = {
 #                          '/torrents' : 100,
                    }
 
+
 ### GENERAL RULES START ###
 
 # All minimum requirements must be met by a torrent to be deleted
