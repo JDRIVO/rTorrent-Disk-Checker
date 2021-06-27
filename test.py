@@ -1,7 +1,6 @@
 import sys
 import os
 from datetime import datetime
-from messenger import message
 from remote_caller import SCGIRequest
 
 rtxmlrpc = SCGIRequest()
