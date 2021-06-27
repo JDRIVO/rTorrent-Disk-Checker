@@ -1,13 +1,19 @@
 import os
 import logging
-logging.basicConfig(filename=os.path.abspath(os.getcwd() ) + "/server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
-
 import socket
 import sys
 import subprocess
 from threading import Thread
 from cacher import Cache
 import queuer
+
+logging.basicConfig(filename=os.path.abspath(os.getcwd() ) + "/server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
+
+try:
+	import config as cfg
+except Exception as e:
+	logging.critical("server.py: Config Error: Couldn't import socket_file: " + str(e) )
+	sys.exit(1)
 
 cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -23,12 +29,6 @@ if '/' not in sys.argv[0]:
 	print("Server is now running in the background.")
 	rtxmlrpc.send("execute.throw.bg", ('', "python3", os.path.join(os.path.abspath(os.getcwd() ), sys.argv[0] ) ) )
 	sys.exit(0)
-
-try:
-	import config as cfg
-except Exception as e:
-	logging.critical("server.py: Config Error: Couldn't import socket_file: " + str(e) )
-	sys.exit(1)
 
 cache = Cache()
 t = Thread(target=cache.getTorrents)
