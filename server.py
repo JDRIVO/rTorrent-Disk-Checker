@@ -61,4 +61,5 @@ try:
 		checkerQueue.put(message.decode("utf-8").split("|:|") )
 
 except Exception as e:
+	print(e)
 	logging.critical("server.py: Server Error: Server closing: " + str(e) )
