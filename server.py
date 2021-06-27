@@ -12,6 +12,7 @@ logging.basicConfig(filename=os.path.abspath(os.getcwd() ) + "/server.log", leve
 try:
 	import config as cfg
 except Exception as e:
+	print(e)
 	logging.critical("server.py: Config Error: Couldn't import socket_file: " + str(e) )
 	sys.exit(1)
 
