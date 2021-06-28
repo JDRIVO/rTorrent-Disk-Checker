@@ -11,7 +11,7 @@ except:
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300: " + str(e) )
+	logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
 
 class Cache(SCGIRequest):
 
@@ -36,7 +36,7 @@ class Cache(SCGIRequest):
 				continue
 
 			torrents.sort()
-			[item.append(item[7].rsplit("/", 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
+			[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
 			self.torrents = torrents
 
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )]
@@ -46,7 +46,7 @@ class Cache(SCGIRequest):
 				reload(cfg)
 				interval = cfg.cache_interval
 			except Exception as e:
-				logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300: " + str(e) )
+				logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
 				interval = 300
 
 			time.sleep(interval)
@@ -58,6 +58,6 @@ class Cache(SCGIRequest):
 
 		for item in self.torrents:
 			parentDirectory = item[8]
-			mountPoint = [path for path in [parentDirectory.rsplit("/", num)[0] for num in range(parentDirectory.count("/") )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else "/"
+			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint

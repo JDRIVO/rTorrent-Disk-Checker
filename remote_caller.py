@@ -18,7 +18,7 @@ class SCGIRequest(object):
 		def __send(self, scgireq):
 
 			try:
-				host, port = self.url.split(":")
+				host, port = self.url.split(':')
 				addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
 				sock = socket.socket(*addrinfo[0][:3])
 				sock.connect(addrinfo[0][4])
@@ -52,8 +52,8 @@ class SCGIRequest(object):
 			return "\x00".join(["%s\x00%s" % t for t in headers]) + "\x00"
 
 		@staticmethod
-		def addRequiredSCGIHeaders(data, headers = []):
+		def addRequiredSCGIHeaders(data, headers=[]):
 			"Wrap data in an scgi request, see spec at: http://python.ca/scgi/protocol.txt"
-			headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data) ) ), ("SCGI", "1")] + headers)
+			headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data) ) ), ("SCGI", '1')] + headers)
 			encHeaders = SCGIRequest.encodeNetstring(headers)
 			return encHeaders + data

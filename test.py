@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 from datetime import datetime
 from remote_caller import SCGIRequest
 

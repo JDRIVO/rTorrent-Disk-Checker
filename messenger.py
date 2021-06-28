@@ -20,7 +20,7 @@ def email():
 			server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
 			server.login(cfg.account, cfg.password)
 		except Exception as e:
-			print("Email Error: " + str(e) )
+			print("Email Error:", e)
 			return
 
 	else:
@@ -34,7 +34,7 @@ def email():
 			server.login(cfg.account, cfg.password)
 
 		except Exception as e:
-			print("Email Error: " + str(e) )
+			print("Email Error:", e)
 			return
 
 	message = "Subject: {}\n\n{}".format(cfg.subject, cfg.message)
@@ -139,7 +139,7 @@ class Slack(ServerCommunicator):
 				response = self.createRequest(self.MESSAGE_URL, self.headers, data)
 
 				if not response["ok"]:
-					print("Slack Error: Insufficient permissions - Please enable: " + response["needed"])
+					print("Slack Error: Insufficient permissions - Please enable:", response["needed"])
 					return
 
 def message():

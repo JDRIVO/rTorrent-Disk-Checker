@@ -29,7 +29,7 @@ minimum_space_mp = {
 
 ### GENERAL RULES ###
 
-# All minimum requirements must be met by a torrent to be deleted
+# All minimum requirements must be met by a torrent for it to be deleted
 
 # Torrent Size in Gigabytes / Age in Days
 minimum_size = 5
@@ -60,7 +60,7 @@ trackers = {
 #                     'apollo.rip' : (2, 5, 1.4, no, 1.8),
            }
 
-# Only delete torrents from trackers with a tracker rule (yes/no)
+# Only delete torrents from trackers with a tracker rule? (yes/no)
 trackers_only = yes
 
 
@@ -78,10 +78,10 @@ labels = {
 #                     'HD' : (1, 5, 1.2, 15, 1.2),
          }
 
-# Only delete torrents with labels that have a label rule (yes/no)
+# Only delete torrents with labels that have a label rule? (yes/no)
 labels_only = no
 
-# Exclude torrents without labels (yes/no)
+# Exclude torrents without labels? (yes/no)
 exclude_unlabelled = no
 
 

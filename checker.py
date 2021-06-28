@@ -15,7 +15,7 @@ except:
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical("checker.py: Config Error: Couldn't import config file: " + str(e) )
+	logging.critical("checker.py: Config Error: Couldn't import config file:", e)
 
 class Checker(SCGIRequest):
 
@@ -56,13 +56,13 @@ class Checker(SCGIRequest):
 
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
-		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
+		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
 			mountPoint = self.mountPoints[parentDirectory]
 		except:
-			mountPoint = [path for path in [parentDirectory.rsplit("/", num)[0] for num in range(parentDirectory.count("/") )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else "/"
+			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint
 
 		try:
@@ -206,5 +206,5 @@ class Checker(SCGIRequest):
 			try:
 				message()
 			except Exception as e:
-				logging.error("checker.py: Message Error: Couldn't send message: " + str(e) )
+				logging.error("checker.py: Message Error: Couldn't send message:", e)
 				return

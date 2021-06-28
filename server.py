@@ -13,7 +13,7 @@ try:
 	import config as cfg
 except Exception as e:
 	print(e)
-	logging.critical("server.py: Config Error: Couldn't import socket_file: " + str(e) )
+	logging.critical("server.py: Config Error: Couldn't import socket_file:", e)
 	sys.exit(1)
 
 cmd = "pgrep -a python | grep " + sys.argv[0]
@@ -62,4 +62,4 @@ try:
 
 except Exception as e:
 	print(e)
-	logging.critical("server.py: Server Error: Server closing: " + str(e) )
+	logging.critical("server.py: Server Error: Server closing:", e)
