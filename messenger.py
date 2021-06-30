@@ -27,12 +27,8 @@ def email():
 
 		try:
 			server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-
-			if cfg.tls:
-				server.starttls()
-
+			if cfg.tls: server.starttls()
 			server.login(cfg.account, cfg.password)
-
 		except Exception as e:
 			print("Email Error:", e)
 			return
@@ -44,18 +40,13 @@ def email():
 class ServerCommunicator:
 
 	def addHeaders(self, request, headers):
-
-		for k, v in headers.items():
-			request.add_header(k, v)
+		for k, v in headers.items(): request.add_header(k, v)
 
 	def sendRequest(self, request):
 
 		try:
 			response = urlopen(request)
-
-			if response.getcode() >= 200 <= 299:
-				return json.loads(response.read() )
-
+			if response.getcode() >= 200 <= 299: return json.loads(response.read() )
 		except Exception as e:
 			print(type(self).__name__ + ':', e)
 
