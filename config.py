@@ -41,7 +41,7 @@ minimum_ratio = 1.2
 fallback_size = no
 
 # Only the age of a torrent must be greater or equal to this number for it to be deleted | no = disable
-# Torrent size requirement remains - set fallback_size to 0 to ignore this requirement 
+# Torrent size requirement remains - set fallback_size to 0 to ignore this requirement
 fallback_age = no
 
 # Only the ratio of a torrent must be greater or equal to this number for it to be deleted | no = disable
