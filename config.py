@@ -36,11 +36,17 @@ minimum_size = 5
 minimum_age = 7
 minimum_ratio = 1.2
 
-# Only the age of a torrent must be higher or equal to this number for it to be deleted (torrent size requirement remains) - no to disable
+# Overrides minimum_size | no = use minimum_size
+# If you only want to delete torrents that are equal to or greater than the fallback_size disregarding their age/ratio, set either fallback_age/ratio to 0
+fallback_size = no
+
+# Only the age of a torrent must be greater or equal to this number for it to be deleted | no = disable
+# Torrent size requirement remains - set fallback_size to 0 to ignore this requirement 
 fallback_age = no
 
-# Only the ratio of a torrent must be higher or equal to this number for it to be deleted (torrent size requirement remains) - no to disable
-fallback_ratio = 1.1
+# Only the ratio of a torrent must be greater or equal to this number for it to be deleted | no = disable
+# Torrent size requirement remains - set fallback_size to 0 to ignore this requirement
+fallback_ratio = no
 
 
 ### TRACKER RULES ###
@@ -49,19 +55,19 @@ fallback_ratio = 1.1
 
 # include = use general rules | exclude = exclude tracker
 
-# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Size 5. Fallback Age 6. Fallback Ratio
 
 trackers = {
 #                     'demonoid.pw' : [include],
 #                     'hdme.eu' : [exclude],
-#                     'redacted.ch' : (1, 7, 1.2, no, no),
-#                     'hd-torrents.org' : (3, 5, 1.3, 9, 1.3),
-#                     'privatehd.to' : (5, 6, 1.2, 12, no),
-#                     'apollo.rip' : (2, 5, 1.4, no, 1.8),
+#                     'redacted.ch' : (1, 7, 1.2, no, no, no),
+#                     'hd-torrents.org' : (3, 7, 1.3, 3, 7, 1.3),
+#                     'privatehd.to' : (30, 6, 1.2, 20, no, 1.1),
+#                     'apollo.rip' : (2, 6, 1.4, 5, 3, no),
            }
 
 # Only delete torrents from trackers with a tracker rule? (yes/no)
-trackers_only = yes
+trackers_only = no
 
 
 ### LABEL RULES ###
@@ -70,12 +76,12 @@ trackers_only = yes
 
 # include = use tracker rules (if defined) otherwise use general rules | exclude = exclude label
 
-# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Age 5. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Size 5. Fallback Age 6. Fallback Ratio
 
 labels = {
 #                     'Trash' : [include],
 #                     'TV' : [exclude],
-#                     'HD' : (1, 5, 1.2, 15, 1.2),
+#                     'HD' : (6, 5, 1.2, 3, 10, 1.2),
          }
 
 # Only delete torrents with labels that have a label rule? (yes/no)

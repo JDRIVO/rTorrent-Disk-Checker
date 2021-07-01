@@ -26,6 +26,7 @@ class Checker(SCGIRequest):
 		self.pending = self.cache.pending
 		self.checkerQueue = checkerQueue
 		self.deleter = Deleter(self.cache, deleterQueue)
+
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
@@ -97,7 +98,7 @@ class Checker(SCGIRequest):
 		availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
-		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_age, cfg.fallback_ratio
+		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
 		include = override = True
 		exclude = False
@@ -115,7 +116,7 @@ class Checker(SCGIRequest):
 
 				if override:
 					override = False
-					minSize, minAge, minRatio, fbAge, fbRatio = requirements
+					minSize, minAge, minRatio, fbSize, fbAge, fbRatio = requirements
 
 				if cfg.exclude_unlabelled and not tLabel:
 					del completedTorrentsCopy[0]
@@ -133,7 +134,7 @@ class Checker(SCGIRequest):
 
 						if rule is not include:
 							override = True
-							minSize, minAge, minRatio, fbAge, fbRatio = labelRule
+							minSize, minAge, minRatio, fbSize, fbAge, fbRatio = labelRule
 
 					elif cfg.labels_only:
 						del completedTorrentsCopy[0]
@@ -152,7 +153,7 @@ class Checker(SCGIRequest):
 
 						if rule is not include:
 							override = True
-							minSize, minAge, minRatio, fbAge, fbRatio = trackerRule
+							minSize, minAge, minRatio, fbSize, fbAge, fbRatio = trackerRule
 
 					elif cfg.trackers_only:
 						del completedTorrentsCopy[0]
@@ -164,10 +165,12 @@ class Checker(SCGIRequest):
 
 				if tAgeConverted < minAge or tRatioConverted < minRatio or tSizeGigabytes < minSize:
 
-						if fbAge is not False and tAgeConverted >= fbAge and tSizeGigabytes >= minSize:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-						elif fbRatio is not False and tRatioConverted >= fbRatio and tSizeGigabytes >= minSize:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+						if (fbSize is False and tSizeGigabytes >= minSize) or (fbSize is not False and tSizeGigabytes >= fbSize):
+
+							if fbAge is not False and tAgeConverted >= fbAge:
+								fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+							elif fbRatio is not False and tRatioConverted >= fbRatio:
+								fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
 
 						del completedTorrentsCopy[0]
 						continue
