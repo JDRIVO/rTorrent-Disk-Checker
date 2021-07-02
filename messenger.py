@@ -39,21 +39,17 @@ def email():
 
 class ServerCommunicator:
 
-	def addHeaders(self, request, headers):
-		for k, v in headers.items(): request.add_header(k, v)
-
 	def sendRequest(self, request):
 
 		try:
 			response = urlopen(request)
-			if response.getcode() >= 200 <= 299: return json.loads(response.read() )
+			if response.getcode() == 200: return json.loads(response.read() )
 		except Exception as e:
 			print(type(self).__name__ + ':', e)
 
 	def createRequest(self, url, headers={}, data=None, origin_req_host=None, unverifiable=False):
 		if data: data = json.dumps(data).encode("utf8")
 		request = Request(url, headers=headers, data=data, origin_req_host=origin_req_host, unverifiable=unverifiable)
-		self.addHeaders(request, headers)
 		return self.sendRequest(request)
 
 class Pushbullet(ServerCommunicator):
