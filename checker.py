@@ -112,14 +112,13 @@ class Checker(SCGIRequest):
 				break
 
 			if completedTorrentsCopy:
-				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy[0]
+				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy.pop(0)
 
 				if override:
 					override = False
 					minSize, minAge, minRatio, fbSize, fbAge, fbRatio = requirements
 
 				if cfg.exclude_unlabelled and not tLabel:
-					del completedTorrentsCopy[0]
 					continue
 
 				if cfg.labels:
@@ -129,7 +128,6 @@ class Checker(SCGIRequest):
 						rule = labelRule[0]
 
 						if rule is exclude:
-							del completedTorrentsCopy[0]
 							continue
 
 						if rule is not include:
@@ -137,7 +135,6 @@ class Checker(SCGIRequest):
 							minSize, minAge, minRatio, fbSize, fbAge, fbRatio = labelRule
 
 					elif cfg.labels_only:
-						del completedTorrentsCopy[0]
 						continue
 
 				if cfg.trackers and not override:
@@ -148,7 +145,6 @@ class Checker(SCGIRequest):
 						rule = trackerRule[0]
 
 						if rule is exclude:
-							del completedTorrentsCopy[0]
 							continue
 
 						if rule is not include:
@@ -156,26 +152,21 @@ class Checker(SCGIRequest):
 							minSize, minAge, minRatio, fbSize, fbAge, fbRatio = trackerRule
 
 					elif cfg.trackers_only:
-						del completedTorrentsCopy[0]
 						continue
 
+				tSizeGigabytes = tSizeBytes / 1073741824.0
 				tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
 				tRatioConverted = tRatio / 1000.0
-				tSizeGigabytes = tSizeBytes / 1073741824.0
 
-				if tAgeConverted < minAge or tRatioConverted < minRatio or tSizeGigabytes < minSize:
+				if tSizeGigabytes < minSize or tAgeConverted < minAge or tRatioConverted < minRatio:
 
-						if (fbSize is False and tSizeGigabytes >= minSize) or (fbSize is not False and tSizeGigabytes >= fbSize):
-
-							if fbAge is not False and tAgeConverted >= fbAge:
-								fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-							elif fbRatio is not False and tRatioConverted >= fbRatio:
-								fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-
-						del completedTorrentsCopy[0]
+					if fbSize is False or fbAge is False or fbRatio is False:
 						continue
-
-				del completedTorrentsCopy[0]
+					elif tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
+						continue
+					else:
+						fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+						continue
 
 			else:
 				tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
