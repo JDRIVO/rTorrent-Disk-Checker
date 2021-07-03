@@ -22,8 +22,8 @@ minimum_space = 5
 
 # Optional - Specify minimum space values for specific mount points
 minimum_space_mp = {
-#                          '/' : 5,
-#                          '/torrents' : 100,
+#                          '/': 5,
+#                          '/torrents': 100,
                    }
 
 
