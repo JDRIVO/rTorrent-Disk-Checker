@@ -47,7 +47,6 @@ class Deleter(SCGIRequest):
 			try:
 				os.rmdir(torrentPath)
 			except Exception as e:
-				logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(torrentPath, e) )
 
 				for root, directories, files in os.walk(torrentPath, topdown=False):
 
