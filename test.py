@@ -136,11 +136,11 @@ while freedSpace < requiredSpace:
 			elif tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
 				continue
 			else:
-				fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+				fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
 				continue
 
 	else:
-		tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
+		tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
 
 	if mountPoints[parentDirectory] != mountPoint:
 		continue
