@@ -37,17 +37,23 @@ minimum_age = 7
 minimum_ratio = 1.2
 
 # If all minimum requirements aren't met, the torrent will run through fallback conditions.
-# If all minimum fallback requirements are met, the torrent will be added to a fallback queue.
+# If all or any (dependent on fallback mode) minimum fallback requirements are met, the torrent will be added to a fallback queue.
 
 # Fallback torrents will only be deleted:
 #         -  once all torrents have been checked to verify minimum requirement satisfaction &
 #         -  insufficient disk space had been freed
 
-# To disable fallback set any requirement to no | To ignore a requirement set it to 0
+# Fallback Modes:
+# 0 = Disable fallback
+# 1 = Satisfy all conditions | To ignore a requirement set it to 0
+# 2 = Satisfy any condition  | To disable a requirement set it to no
 
-fallback_size = no
+fallback_mode = 0
+
+fallback_size = 5
 fallback_age = 5
 fallback_ratio = 1
+
 
 ### TRACKER RULES ###
 
@@ -55,15 +61,23 @@ fallback_ratio = 1
 
 # include = use general rules | exclude = exclude tracker
 
-# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Size 5. Fallback Age 6. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 trackers = {
 #                     'demonoid.pw': [include],
 #                     'hdme.eu': [exclude],
-#                     'redacted.ch': (1, 7, 1.2, no, 1, 1),
-#                     'hd-torrents.org': (3, 7, 1.3, 0, 0, 1.3),
-#                     'privatehd.to': (30, 6, 1.2, 20, 0, 1.1),
-#                     'apollo.rip': (2, 6, 1.4, 5, 3, 0),
+#                     'redacted.ch': (1, 7, 1.2,
+#                                     0,
+#                                     1, 1, 1),
+#                     'hd-torrents.org': (3, 7, 1.3,
+#                                         1,
+#                                         5, 0, 1.3),
+#                     'privatehd.to': (30, 6, 1.2,
+#                                       1,
+#                                      15, 5, 0),
+#                     'apollo.rip': (2, 6, 1.4,
+#                                    2,
+#                                    5, 3, no),
            }
 
 # Only delete torrents from trackers with a tracker rule? (yes/no)
@@ -76,12 +90,14 @@ trackers_only = no
 
 # include = use tracker rules (if defined) otherwise use general rules | exclude = exclude label
 
-# Value Order: 1. Minimum Torrent Size (GB) 2. Minimum Age 3. Minimum Ratio 4. Fallback Size 5. Fallback Age 6. Fallback Ratio
+# Value Order: 1. Minimum Torrent Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 labels = {
 #                     'Trash': [include],
 #                     'TV': [exclude],
-#                     'HD': (6, 5, 1.2, 3, 3, 1.2),
+#                     'HD': (6, 5, 1.2,
+#                            1,
+#                            3, 3, 1.2),
          }
 
 # Only delete torrents with labels that have a label rule? (yes/no)

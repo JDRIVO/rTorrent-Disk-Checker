@@ -69,7 +69,7 @@ disk = os.statvfs(mountPoint)
 availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
 minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 requiredSpace = torrentSize - (availableSpace - minimumSpace)
-requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
+requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
 include = override = True
 exclude = False
@@ -87,7 +87,7 @@ while freedSpace < requiredSpace:
 
 		if override:
 			override = False
-			minSize, minAge, minRatio, fbSize, fbAge, fbRatio = requirements
+			minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = requirements
 
 		if cfg.exclude_unlabelled and not tLabel:
 			continue
@@ -103,7 +103,7 @@ while freedSpace < requiredSpace:
 
 				if rule is not include:
 					override = True
-					minSize, minAge, minRatio, fbSize, fbAge, fbRatio = labelRule
+					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule
 
 			elif cfg.labels_only:
 				continue
@@ -120,7 +120,7 @@ while freedSpace < requiredSpace:
 
 				if rule is not include:
 					override = True
-					minSize, minAge, minRatio, fbSize, fbAge, fbRatio = trackerRule
+					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = trackerRule
 
 			elif cfg.trackers_only:
 				continue
@@ -131,13 +131,25 @@ while freedSpace < requiredSpace:
 
 		if tSizeGigabytes < minSize or tAgeConverted < minAge or tRatioConverted < minRatio:
 
-			if fbSize is False or fbAge is False or fbRatio is False:
+			if not fbMode:
 				continue
-			elif tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
-				continue
-			else:
-				fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-				continue
+			elif fbMode == 1:
+
+				if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
+					continue
+				else:
+					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+
+			elif fbMode == 2:
+
+				if fbSize is not False and tSizeGigabytes >= fbSize:
+					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+				elif fbAge is not False and tAgeConverted >= fbAge:
+					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+				elif fbRatio is not False and tRatioConverted >= fbRatio:
+					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+
+			continue
 
 	else:
 		tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
