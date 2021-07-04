@@ -160,9 +160,7 @@ class Checker(SCGIRequest):
 
 				if tSizeGigabytes < minSize or tAgeConverted < minAge or tRatioConverted < minRatio:
 
-					if not fbMode:
-						continue
-					elif fbMode == 1:
+					if fbMode == 1:
 
 						if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
 							continue
