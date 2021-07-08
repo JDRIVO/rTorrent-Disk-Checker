@@ -1,8 +1,8 @@
 import os
-import logging
 import time
-from datetime import datetime
+import logging
 from threading import Thread
+from datetime import datetime
 from remote_caller import SCGIRequest
 from messenger import message
 from deleter import Deleter
@@ -17,16 +17,14 @@ try:
 except Exception as e:
 	logging.critical("checker.py: Config Error: Couldn't import config file:", e)
 
+
 class Checker(SCGIRequest):
 
 	def __init__(self, cache, checkerQueue, deleterQueue):
 		super(Checker, self).__init__()
 		self.cache = cache
-		self.deletions = self.cache.deletions
-		self.pending = self.cache.pending
 		self.checkerQueue = checkerQueue
-		self.deleter = Deleter(self.cache, deleterQueue)
-
+		self.deleterQueue = deleterQueue
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
@@ -34,6 +32,9 @@ class Checker(SCGIRequest):
 		t.start()
 
 	def deletionHandler(self):
+		self.deletions = self.cache.deletions
+		self.pending = self.cache.pending
+		self.deleter = Deleter(self.cache, self.deleterQueue)
 
 		while True:
 
@@ -101,7 +102,7 @@ class Checker(SCGIRequest):
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
 		include = override = True
-		exclude = False
+		exclude = no = False
 		freedSpace = 0
 		fallbackTorrents = []
 		currentDate = datetime.now()
@@ -165,16 +166,33 @@ class Checker(SCGIRequest):
 						if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
 							continue
 						else:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+							fallbackTorrents.append(
+								(tAge,
+								tLabel,
+								tTracker,
+								tRatio,
+								tSizeBytes,
+								tSizeGigabytes,
+								tName, tHash,
+								tPath,
+								parentDirectory) )
 
 					elif fbMode == 2:
 
-						if fbSize is not False and tSizeGigabytes >= fbSize:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-						elif fbAge is not False and tAgeConverted >= fbAge:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-						elif fbRatio is not False and tRatioConverted >= fbRatio:
-							fallbackTorrents.append( (tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+						if (
+								fbSize is not no and tSizeGigabytes >= fbSize) or (
+								fbAge is not no and tAgeConverted >= fbAge) or (
+								fbRatio is not no and tRatioConverted >= fbRatio):
+							fallbackTorrents.append(
+								(tAge,
+								tLabel,
+								tTracker,
+								tRatio,
+								tSizeBytes,
+								tSizeGigabytes,
+								tName, tHash,
+								tPath,
+								parentDirectory) )
 
 					continue
 
@@ -185,13 +203,12 @@ class Checker(SCGIRequest):
 				continue
 
 			try:
-				self.send("d.open", (tHash,) )
+				completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
 			except:
 				continue
 
-			self.pendingDeletions[mountPoint] += tSizeBytes
 			self.deletions.append( (tHash, tSizeBytes, tPath, mountPoint) )
-			completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
+			self.pendingDeletions[mountPoint] += tSizeBytes
 			freedSpace += tSizeGigabytes
 
 		self.cache.lock = False

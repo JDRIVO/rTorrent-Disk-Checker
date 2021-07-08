@@ -6,6 +6,7 @@ Ensure system.file.allocate.set = 0. This is the default setting in rtorrent so 
 
 1. Add the following code to your ~/.rtorrent.rc file !! making sure to update the paths to client.py & server.py !!
 
+method.set_key = event.download.erased, checker_erase, "execute.throw.bg=python3,/path/to/client.py,delete,$d.hash="
 method.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"
 method.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,/path/to/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="
 execute.throw.bg = python3, "/path/to/server.py"
@@ -110,14 +111,16 @@ while true; do
 done
 
 # Delete existing entries
-sed -i '/method.set_key = event.download.inserted_new, checker/d' $rtorrent
-sed -i '/method.insert = dcheck, simple, d.stop=/d' $rtorrent
 sed -i "\|execute.throw.bg = python.*, \"$PWD/server.py|d" $rtorrent
+sed -i '/method.insert = dcheck, simple, d.stop=/d' $rtorrent
+sed -i '/method.set_key = event.download.inserted_new, checker/d' $rtorrent
+sed -i '/method.set_key = event.download.erased, checker_erase/d' $rtorrent
 
 # Add to file
-sed -i '1imethod.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"' $rtorrent
-sed -i '1imethod.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,'"$PWD"'/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="' $rtorrent
 sed -i "1iexecute.throw.bg = python3, \"$PWD/server.py\"" $rtorrent
+sed -i '1imethod.insert = dcheck, simple, d.stop=, "execute.throw.bg=python3,'"$PWD"'/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes="' $rtorrent
+sed -i '1imethod.set_key = event.download.inserted_new, checker, "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))"' $rtorrent
+sed -i '1imethod.set_key = event.download.erased, checker_erase, "execute.throw.bg=python3,'"$PWD"'/client.py,delete,$d.hash="' $rtorrent
 
 scgi=$(grep -oP "^[^#]*scgi.* = \K.*" $rtorrent)
 

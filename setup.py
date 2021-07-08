@@ -2,6 +2,7 @@ import os
 import sys
 from remote_caller import SCGIRequest
 
+
 def main(schedule=False):
 	path = os.path.abspath(os.getcwd() )
 	rtxmlrpc = SCGIRequest()
@@ -15,9 +16,16 @@ def main(schedule=False):
 		rtxmlrpc.send("system.file.allocate.set", ('', '0') )
 		rtxmlrpc.send("execute.throw.bg", ('', "python3", path + "/server.py") )
 		rtxmlrpc.send("method.set_key", ('', "event.download.inserted_new", "checker", "branch=((and,((not,((d.is_meta)))),((d.state)))),((dcheck))") )
+		rtxmlrpc.send("method.set_key", ('', "event.download.erased", "checker_erase", "execute.throw.bg=python3,{}/client.py,delete,$d.hash=".format(path) ) )
 
 		try:
-			rtxmlrpc.send("method.insert", ('', "dcheck", "simple", "d.stop=", "execute.throw.bg=python3,{}/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes=".format(path) ) )
+			rtxmlrpc.send(
+				"method.insert",
+				('',
+				"dcheck",
+				"simple",
+				"d.stop=",
+				"execute.throw.bg=python3,{}/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes=".format(path) ) )
 		except:
 			# Setup has ran before / Method already inserted
 			print("\nDisk checker is already running in the background.")

@@ -4,6 +4,7 @@ from threading import Thread
 from checker import Checker
 from deleter import Deleter
 
+
 class CheckerQueue(Queue):
 
 	def __init__(self):
@@ -29,6 +30,7 @@ class CheckerQueue(Queue):
 	def startChecker(self, item):
 		t = Thread(target=self.checker.check, args=(item,) )
 		t.start()
+
 
 class DeleterQueue(Queue):
 

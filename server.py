@@ -7,7 +7,7 @@ from threading import Thread
 from cacher import Cache
 import queuer
 
-logging.basicConfig(filename=os.path.abspath(os.getcwd() ) + "/server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
+logging.basicConfig(filename="checker_server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
 try:
 	import config as cfg
@@ -57,8 +57,12 @@ try:
 
 	while True:
 		clientsocket, address = s.accept()
-		message = clientsocket.recv(2048)
-		checkerQueue.put(message.decode("utf-8").split("|:|") )
+		message = clientsocket.recv(2048).decode("utf-8").split("|:|")
+
+		if "delete" in message:
+			cache.removeTorrent(message)
+		else:
+			checkerQueue.put(message)
 
 except Exception as e:
 	print(e)

@@ -5,7 +5,18 @@ from remote_caller import SCGIRequest
 
 rtxmlrpc = SCGIRequest()
 
-completedTorrents = rtxmlrpc.send('d.multicall2', ('', 'complete', 'd.timestamp.finished=', 'd.custom1=', 't.multicall=,t.url=', 'd.ratio=', 'd.size_bytes=', 'd.name=', 'd.hash=', 'd.directory=') )
+completedTorrents = rtxmlrpc.send(
+	'd.multicall2',
+	('',
+	'complete',
+	'd.timestamp.finished=',
+	'd.custom1=',
+	't.multicall=,t.url=',
+	'd.ratio=',
+	'd.size_bytes=',
+	'd.name=',
+	'd.hash=',
+	'd.directory=') )
 completedTorrents.sort()
 [item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in completedTorrents]
 
@@ -72,7 +83,7 @@ requiredSpace = torrentSize - (availableSpace - minimumSpace)
 requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
 include = override = True
-exclude = False
+exclude = no = False
 freedSpace = count = 0
 fallbackTorrents, deletedTorrents = [], []
 currentDate = datetime.now()
@@ -136,16 +147,37 @@ while freedSpace < requiredSpace:
 				if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
 					continue
 				else:
-					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+					fallbackTorrents.append(
+						(tAge,
+						tAgeConverted,
+						tLabel,
+						tTracker,
+						tRatio,
+						tSizeBytes,
+						tSizeGigabytes,
+						tName,
+						tHash,
+						tPath,
+						parentDirectory) )
 
 			elif fbMode == 2:
 
-				if fbSize is not False and tSizeGigabytes >= fbSize:
-					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-				elif fbAge is not False and tAgeConverted >= fbAge:
-					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
-				elif fbRatio is not False and tRatioConverted >= fbRatio:
-					fallbackTorrents.append( (tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory) )
+				if (
+						fbSize is not no and tSizeGigabytes >= fbSize) or (
+						fbAge is not no and tAgeConverted >= fbAge) or (
+						fbRatio is not no and tRatioConverted >= fbRatio):
+					fallbackTorrents.append(
+						(tAge,
+						tAgeConverted,
+						tLabel,
+						tTracker,
+						tRatio,
+						tSizeBytes,
+						tSizeGigabytes,
+						tName,
+						tHash,
+						tPath,
+						parentDirectory) )
 
 			continue
 
@@ -156,14 +188,13 @@ while freedSpace < requiredSpace:
 		continue
 
 	try:
-		rtxmlrpc.send('d.state', (tHash,) )
+		completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
 	except:
 		continue
 
-	pendingDeletions[mountPoint] += tSizeBytes
-	completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
 	count += 1
 	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeConverted, count, tName, count, tLabel, count, tTracker) )
+	pendingDeletions[mountPoint] += tSizeBytes
 	freedSpace += tSizeGigabytes
 
 finish = datetime.now() - start

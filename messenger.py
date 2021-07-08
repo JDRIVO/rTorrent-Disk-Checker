@@ -1,7 +1,7 @@
 import sys
 import json
-import datetime
 import smtplib
+import datetime
 import config as cfg
 from urllib.request import Request, urlopen
 
@@ -11,6 +11,7 @@ except:
 	from imp import reload
 
 LAST_NOTIFICATION = None
+
 
 def email():
 
@@ -37,6 +38,7 @@ def email():
 	server.sendmail(cfg.account, cfg.receiver, message)
 	server.quit()
 
+
 class ServerCommunicator:
 
 	def sendRequest(self, request):
@@ -51,6 +53,7 @@ class ServerCommunicator:
 		if data: data = json.dumps(data).encode("utf8")
 		request = Request(url, headers=headers, data=data, origin_req_host=origin_req_host, unverifiable=unverifiable)
 		return self.sendRequest(request)
+
 
 class Pushbullet(ServerCommunicator):
 	DEVICES_URL = "https://api.pushbullet.com/v2/devices"
@@ -80,6 +83,7 @@ class Pushbullet(ServerCommunicator):
 				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
 				self.createRequest(self.PUSH_URL, self.headers, data)
 
+
 class Telegram(ServerCommunicator):
 	BOT_URL = "https://api.telegram.org/bot"
 
@@ -93,6 +97,7 @@ class Telegram(ServerCommunicator):
 	def sendMessage(self):
 		data = {"chat_id": self.chatId, "text": self.message}
 		self.createRequest(self.url + "/sendMessage", self.headers, data)
+
 
 class Slack(ServerCommunicator):
 	CONVERSATIONS_URL = "https://slack.com/api/conversations.list"
@@ -128,6 +133,7 @@ class Slack(ServerCommunicator):
 				if not response["ok"]:
 					print("Slack Error: Insufficient permissions - Please enable:", response["needed"])
 					return
+
 
 def message():
 	reload(cfg)

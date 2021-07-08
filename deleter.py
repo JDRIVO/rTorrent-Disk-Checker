@@ -2,6 +2,7 @@ import os
 import logging
 from remote_caller import SCGIRequest
 
+
 class Deleter(SCGIRequest):
 
 	def __init__(self, cache, deleterQueue):

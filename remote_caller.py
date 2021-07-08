@@ -3,6 +3,7 @@ from xmlrpc import client as xmlrpclib
 from urllib import parse as urllib
 from config import scgi
 
+
 class SCGIRequest(object):
 
 		def __init__(self):

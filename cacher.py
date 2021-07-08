@@ -13,6 +13,7 @@ try:
 except Exception as e:
 	logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
 
+
 class Cache(SCGIRequest):
 
 	def __init__(self):
@@ -22,6 +23,14 @@ class Cache(SCGIRequest):
 		self.torrents = None
 		self.lock = False
 
+	def removeTorrent(self, torrentInfo):
+
+		try:
+			torrentHash = torrentInfo[2]
+			self.torrents.remove(self.torrentsDic[torrentHash])
+		except:
+			return
+
 	def getTorrents(self):
 
 		while True:
@@ -30,15 +39,26 @@ class Cache(SCGIRequest):
 				time.sleep(60)
 
 			try:
-				torrents = self.send("d.multicall2", ('', "complete", "d.timestamp.finished=", "d.custom1=", "t.multicall=,t.url=", "d.ratio=", "d.size_bytes=", "d.name=", "d.hash=", "d.directory=") )
+				torrents = self.send(
+					"d.multicall2",
+					('',
+					"complete",
+					"d.timestamp.finished=",
+					"d.custom1=",
+					"t.multicall=,t.url=",
+					"d.ratio=",
+					"d.size_bytes=",
+					"d.name=",
+					"d.hash=",
+					"d.directory=") )
 			except:
 				time.sleep(60)
 				continue
 
 			torrents.sort()
-			[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in torrents]
+			[item.append(item[7].rsplit('/', 1)[0] if item[5] in item[7] else item[7]) for item in torrents]
 			self.torrents = torrents
-
+			self.torrentsDic = {x[6]:x for x in self.torrents}
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
