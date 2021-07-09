@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+from threading import Thread
 from remote_caller import SCGIRequest
 
 try:
@@ -22,14 +23,23 @@ class Cache(SCGIRequest):
 		self.deletions, self.pending = [], []
 		self.torrents = None
 		self.lock = False
+		t = Thread(target=self.removeTorrent)
+		t.start()
 
-	def removeTorrent(self, torrentInfo):
+	def removeTorrent(self):
+		self.hashes = []
 
-		try:
-			torrentHash = torrentInfo[2]
-			self.torrents.remove(self.torrentsDic[torrentHash])
-		except:
-			return
+		while True:
+
+			while self.hashes:
+
+				try:
+					tHash = self.hashes.pop(0)[2]
+					self.torrents.remove(self.torrentsDic[tHash])
+				except:
+					continue
+
+			time.sleep(0.01)
 
 	def getTorrents(self):
 

@@ -60,7 +60,7 @@ try:
 		message = clientsocket.recv(2048).decode("utf-8").split("|:|")
 
 		if "delete" in message:
-			cache.removeTorrent(message)
+			cache.hashes.append(message)
 		else:
 			checkerQueue.put(message)
 
