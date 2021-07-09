@@ -162,6 +162,7 @@ def message():
 
 	LAST_NOTIFICATION = datetime.datetime.now()
 
+
 if __name__ == "__main__":
 	args = sys.argv
 

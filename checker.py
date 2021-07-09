@@ -173,7 +173,8 @@ class Checker(SCGIRequest):
 								tRatio,
 								tSizeBytes,
 								tSizeGigabytes,
-								tName, tHash,
+								tName,
+								tHash,
 								tPath,
 								parentDirectory) )
 
@@ -190,7 +191,8 @@ class Checker(SCGIRequest):
 								tRatio,
 								tSizeBytes,
 								tSizeGigabytes,
-								tName, tHash,
+								tName,
+								tHash,
 								tPath,
 								parentDirectory) )
 
