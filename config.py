@@ -61,7 +61,7 @@ fallback_ratio = 1
 
 # include = use general rules | exclude = exclude tracker
 
-# Value Order: 1. Minimum Torrent Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
+# Value Order: 1. Minimum Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 trackers = {
 #                     'demonoid.pw': [include],
@@ -90,7 +90,7 @@ trackers_only = no
 
 # include = use tracker rules (if defined) otherwise use general rules | exclude = exclude label
 
-# Value Order: 1. Minimum Torrent Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
+# Value Order: 1. Minimum Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 labels = {
 #                     'Trash': [include],
