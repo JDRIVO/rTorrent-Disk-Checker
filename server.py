@@ -4,8 +4,8 @@ import socket
 import logging
 import subprocess
 from threading import Thread
+from queuer import CheckerQueue
 from cacher import Cache
-import queuer
 
 logging.basicConfig(filename="checker_server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
@@ -32,20 +32,9 @@ if '/' not in sys.argv[0]:
 	sys.exit(0)
 
 cache = Cache()
-t = Thread(target=cache.getTorrents)
-t.start()
 cache.getMountPoints()
-
-checkerQueue = queuer.CheckerQueue()
-deleterQueue = queuer.DeleterQueue()
-
-checkerQueue.createChecker(cache, deleterQueue)
-deleterQueue.createDeleter(cache)
-
-t = Thread(target=checkerQueue.processor)
-t.start()
-t = Thread(target=deleterQueue.processor)
-t.start()
+checkerQueue = CheckerQueue()
+checkerQueue.createChecker(cache)
 
 socketFile = cfg.socket_file
 if os.path.exists(socketFile): os.remove(socketFile)

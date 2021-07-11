@@ -23,10 +23,12 @@ class Cache(SCGIRequest):
 		self.deletions, self.pending = [], []
 		self.torrents = None
 		self.lock = False
-		t = Thread(target=self.removeTorrent)
+		t = Thread(target=self.getTorrents)
+		t.start()
+		t = Thread(target=self.removeTorrents)
 		t.start()
 
-	def removeTorrent(self):
+	def removeTorrents(self):
 		self.hashes = []
 
 		while True:

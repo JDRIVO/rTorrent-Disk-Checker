@@ -20,33 +20,17 @@ except Exception as e:
 
 class Checker(SCGIRequest):
 
-	def __init__(self, cache, checkerQueue, deleterQueue):
+	def __init__(self, cache, checkerQueue):
 		super(Checker, self).__init__()
 		self.cache = cache
 		self.checkerQueue = checkerQueue
-		self.deleterQueue = deleterQueue
+		deleter = Deleter(self.cache)
+		self.delete = deleter.deletions
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
-		t = Thread(target=self.deletionHandler)
-		t.start()
-
-	def deletionHandler(self):
-		self.deletions = self.cache.deletions
-		self.pending = self.cache.pending
-		self.deleter = Deleter(self.cache, self.deleterQueue)
-
-		while True:
-
-			while self.deletions:
-				self.pending.append(self.deletions[0][0])
-				self.deleter.process(self.deletions.pop(0) )
-
-			time.sleep(1)
 
 	def check(self, torrentInfo):
-		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
-		torrentSize = int(torrentSize) / 1073741824.0
 
 		try:
 			reload(cfg)
@@ -56,6 +40,8 @@ class Checker(SCGIRequest):
 			logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e) )
 			return
 
+		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentSize = int(torrentSize) / 1073741824.0
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
 		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
@@ -209,7 +195,7 @@ class Checker(SCGIRequest):
 			except:
 				continue
 
-			self.deletions.append( (tHash, tSizeBytes, tPath, mountPoint) )
+			self.delete.append( (tHash, tSizeBytes, tPath, mountPoint) )
 			self.pendingDeletions[mountPoint] += tSizeBytes
 			freedSpace += tSizeGigabytes
 

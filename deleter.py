@@ -1,16 +1,31 @@
 import os
+import time
 import logging
+from threading import Thread
 from remote_caller import SCGIRequest
 
 
 class Deleter(SCGIRequest):
 
-	def __init__(self, cache, deleterQueue):
+	def __init__(self, cache):
 		super(Deleter, self).__init__()
 		self.cache = cache
-		self.deleterQueue = deleterQueue
+		self.deletions = self.cache.deletions
+		self.pending = self.cache.pending
+		t = Thread(target=self.processor)
+		t.start()
 
-	def process(self, torrentInfo):
+	def processor(self):
+
+		while True:
+
+			while self.deletions:
+				self.pending.append(self.deletions[0][0])
+				self.delete(self.deletions.pop(0) )
+
+			time.sleep(0.01)
+
+	def delete(self, torrentInfo):
 		torrentHash, torrentSize, torrentPath, mountPoint = torrentInfo
 
 		try:
@@ -18,14 +33,11 @@ class Deleter(SCGIRequest):
 			tHash = (torrentHash,)
 			self.send("d.tracker_announce", tHash)
 			self.send("d.erase", tHash)
-			self.deleterQueue.put( (torrentHash, torrentPath, mountPoint, files) )
 		except Exception as e:
 			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent:", e)
 			self.cache.pendingDeletions[mountPoint] -= torrentSize
 			self.cache.pending.remove(torrentHash)
-
-	def delete(self, torrentInfo):
-		torrentHash, torrentPath, mountPoint, files = torrentInfo
+			return
 
 		if len(files) <= 1:
 			self.cache.pendingDeletions[mountPoint] -= files[0][0]

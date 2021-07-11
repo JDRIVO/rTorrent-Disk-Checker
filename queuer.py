@@ -2,7 +2,6 @@ import time
 from queue import Queue
 from threading import Thread
 from checker import Checker
-from deleter import Deleter
 
 
 class CheckerQueue(Queue):
@@ -10,6 +9,8 @@ class CheckerQueue(Queue):
 	def __init__(self):
 		super(CheckerQueue, self).__init__()
 		self.release = True
+		t = Thread(target=self.processor)
+		t.start()
 
 	def processor(self):
 
@@ -23,28 +24,10 @@ class CheckerQueue(Queue):
 
 			time.sleep(0.000001)
 
-	def createChecker(self, cache, deleterQueue):
+	def createChecker(self, cache):
 		self.cache = cache
-		self.checker = Checker(cache, self, deleterQueue)
+		self.checker = Checker(cache, self)
 
 	def startChecker(self, item):
 		t = Thread(target=self.checker.check, args=(item,) )
 		t.start()
-
-
-class DeleterQueue(Queue):
-
-	def __init__(self):
-		super(DeleterQueue, self).__init__()
-
-	def processor(self):
-
-		while True:
-			item = self.get()
-			self.startDeleter(item)
-
-	def createDeleter(self, cache):
-		self.deleter = Deleter(cache, self)
-
-	def startDeleter(self, item):
-		self.deleter.delete(item)
