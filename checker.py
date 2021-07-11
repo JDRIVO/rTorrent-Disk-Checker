@@ -31,6 +31,8 @@ class Checker(SCGIRequest):
 		self.pendingDeletions = self.cache.pendingDeletions
 
 	def check(self, torrentInfo):
+		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
+		torrentSize = int(torrentSize) / 1073741824.0
 
 		try:
 			reload(cfg)
@@ -40,8 +42,6 @@ class Checker(SCGIRequest):
 			logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e) )
 			return
 
-		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
-		torrentSize = int(torrentSize) / 1073741824.0
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
 		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
