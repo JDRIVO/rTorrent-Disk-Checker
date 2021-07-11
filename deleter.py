@@ -12,6 +12,7 @@ class Deleter(SCGIRequest):
 		self.cache = cache
 		self.deletions = self.cache.deletions
 		self.pending = self.cache.pending
+		self.pendingDeletions = self.cache.pendingDeletions
 		t = Thread(target=self.processor)
 		t.start()
 
@@ -35,12 +36,12 @@ class Deleter(SCGIRequest):
 			self.send("d.erase", tHash)
 		except Exception as e:
 			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent:", e)
-			self.cache.pendingDeletions[mountPoint] -= torrentSize
-			self.cache.pending.remove(torrentHash)
+			self.pendingDeletions[mountPoint] -= torrentSize
+			self.pending.remove(torrentHash)
 			return
 
 		if len(files) <= 1:
-			self.cache.pendingDeletions[mountPoint] -= files[0][0]
+			self.pendingDeletions[mountPoint] -= files[0][0]
 
 			try:
 				os.remove(files[0][1])
@@ -50,7 +51,7 @@ class Deleter(SCGIRequest):
 		else:
 
 			for file in files:
-				self.cache.pendingDeletions[mountPoint] -= file[0]
+				self.pendingDeletions[mountPoint] -= file[0]
 
 				try:
 					os.remove(file[1])
@@ -68,4 +69,4 @@ class Deleter(SCGIRequest):
 					except Exception as e:
 						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e) )
 
-		self.cache.pending.remove(torrentHash)
+		self.pending.remove(torrentHash)
