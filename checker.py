@@ -49,7 +49,7 @@ class Checker(SCGIRequest):
 		try:
 			mountPoint = self.mountPoints[parentDirectory]
 		except:
-			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint
 
@@ -118,17 +118,30 @@ class Checker(SCGIRequest):
 							continue
 
 						if rule is not include:
+
+							if "exclude" in labelRule:
+									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+									if tracker:
+										continue
+
+							elif "include" in labelRule:
+									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+									if not tracker:
+										continue
+
 							override = True
-							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule
+							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
 
 					elif cfg.labels_only:
 						continue
 
 				if cfg.trackers and not override:
-					trackerRule = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+					tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
 
-					if trackerRule:
-						trackerRule = cfg.trackers[trackerRule[0]]
+					if tracker:
+						trackerRule = cfg.trackers[tracker[0]]
 						rule = trackerRule[0]
 
 						if rule is exclude:

@@ -70,7 +70,7 @@ class Cache(SCGIRequest):
 			torrents.sort()
 			[item.append(item[7].rsplit('/', 1)[0] if item[5] in item[7] else item[7]) for item in torrents]
 			self.torrents = torrents
-			self.torrentsDic = {x[6]:x for x in self.torrents}
+			self.torrentsDic = {t[6]:t for t in self.torrents}
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
@@ -90,6 +90,6 @@ class Cache(SCGIRequest):
 
 		for item in self.torrents:
 			parentDirectory = item[8]
-			mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint

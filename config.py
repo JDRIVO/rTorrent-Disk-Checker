@@ -95,9 +95,17 @@ trackers_only = no
 labels = {
 #                     'Trash': [include],
 #                     'TV': [exclude],
+#                     'Movie': (15, 7, 2,
+#                                0,
+#                                1, 1, 1),
 #                     'HD': (6, 5, 1.2,
 #                            1,
-#                            3, 3, 1.2),
+#                            3, 3, 1.2,
+#                            'exclude', ['blutopia.xyz', 'hd-torrents.org'] ),
+#                     '4K': (60, 7, 2,
+#                             2,
+#                            no, 5, 1.2,
+#                            'include', ['blutopia.xyz'] ),
          }
 
 # Only delete torrents with labels that have a label rule? (yes/no)

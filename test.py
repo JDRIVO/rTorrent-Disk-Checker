@@ -24,7 +24,7 @@ mountPoints = {}
 
 for item in completedTorrents:
 	parentDirectory = item[8]
-	mountPoint = [path for path in [parentDirectory.rsplit('/', num)[0] for num in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+	mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else '/'
 	mountPoints[parentDirectory] = mountPoint
 
@@ -47,7 +47,7 @@ torrentsDownloading, pendingDeletions = {}, {}
 if torrentPath in mountPoints:
 	mountPoint = mountPoints[torrentPath]
 else:
-	mountPoint = [path for path in [torrentPath.rsplit('/', num)[0] for num in range(torrentPath.count('/') )] if os.path.ismount(path)]
+	mountPoint = [path for path in [torrentPath.rsplit('/', n)[0] for n in range(torrentPath.count('/') )] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else '/'
 	mountPoints[torrentPath] = mountPoint
 
@@ -113,17 +113,30 @@ while freedSpace < requiredSpace:
 					continue
 
 				if rule is not include:
+
+					if "exclude" in labelRule:
+							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+							if tracker:
+								continue
+
+					elif "include" in labelRule:
+							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+							if not tracker:
+								continue
+
 					override = True
-					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule
+					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
 
 			elif cfg.labels_only:
 				continue
 
 		if cfg.trackers and not override:
-			trackerRule = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+			tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
 
-			if trackerRule:
-				trackerRule = cfg.trackers[trackerRule[0]]
+			if tracker:
+				trackerRule = cfg.trackers[tracker[0]]
 				rule = trackerRule[0]
 
 				if rule is exclude:
