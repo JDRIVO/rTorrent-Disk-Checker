@@ -117,16 +117,16 @@ class Checker(SCGIRequest):
 						if rule is not include:
 
 							if "exclude" in labelRule:
-									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+								tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
-									if tracker:
-										continue
+								if tracker:
+									continue
 
 							elif "include" in labelRule:
-									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+								tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
-									if not tracker:
-										continue
+								if not tracker:
+									continue
 
 							override = True
 							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
