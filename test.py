@@ -57,7 +57,7 @@ try:
 	if downloads:
 
 		try:
-			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
+			downloading = rtxmlrpc.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
 			downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
 		except Exception as e:
 			print(e)
@@ -88,10 +88,7 @@ freedSpace = count = 0
 fallbackTorrents, deletedTorrents = [], []
 currentDate = datetime.now()
 
-while freedSpace < requiredSpace:
-
-	if not completedTorrentsCopy and not fallbackTorrents:
-		break
+while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 	if completedTorrentsCopy:
 		tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy.pop(0)

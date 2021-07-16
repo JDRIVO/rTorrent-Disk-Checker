@@ -93,10 +93,7 @@ class Checker(SCGIRequest):
 		fallbackTorrents = []
 		currentDate = datetime.now()
 
-		while freedSpace < requiredSpace:
-
-			if not completedTorrentsCopy and not fallbackTorrents:
-				break
+		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 			if completedTorrentsCopy:
 				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy.pop(0)
