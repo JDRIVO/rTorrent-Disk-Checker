@@ -2,6 +2,7 @@ import os
 import time
 import logging
 from threading import Thread
+from datetime import datetime
 from remote_caller import SCGIRequest
 
 try:
@@ -56,21 +57,21 @@ class Cache(SCGIRequest):
 					('',
 					"complete",
 					"d.timestamp.finished=",
+					"d.ratio=",
+					"d.name=",
 					"d.custom1=",
 					"t.multicall=,t.url=",
-					"d.ratio=",
-					"d.size_bytes=",
-					"d.name=",
 					"d.hash=",
-					"d.directory=") )
+					"d.directory=",
+					"d.size_bytes=") )
 			except:
 				time.sleep(60)
 				continue
 
 			torrents.sort()
-			[item.append(item[7].rsplit('/', 1)[0] if item[5] in item[7] else item[7]) for item in torrents]
-			self.torrents = torrents
-			self.torrentsDic = {t[6]:t for t in self.torrents}
+			self.torrents = [tData[2:] + [tData[-1] / 1073741824.0, tData[1] / 1000.0, datetime.utcfromtimestamp(tData[0]),
+					tData[6].rsplit('/', 1)[0] if tData[2] in tData[6] else tData[6]] for tData in torrents]
+			self.torrentsDic = {tData[3]: tData for tData in self.torrents}
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
@@ -88,8 +89,8 @@ class Cache(SCGIRequest):
 		while not self.torrents:
 			time.sleep(1)
 
-		for item in self.torrents:
-			parentDirectory = item[8]
+		for torrentData in self.torrents:
+			parentDirectory = torrentData[-1]
 			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint

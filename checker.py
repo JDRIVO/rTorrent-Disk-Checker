@@ -30,8 +30,8 @@ class Checker(SCGIRequest):
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
 
-	def check(self, torrentInfo):
-		script, torrentName, torrentHash, torrentPath, torrentSize = torrentInfo
+	def check(self, torrentData):
+		_, torrentName, torrentHash, torrentPath, torrentSize = torrentData
 		torrentSize = int(torrentSize) / 1073741824.0
 
 		try:
@@ -92,12 +92,12 @@ class Checker(SCGIRequest):
 		freedSpace = 0
 		trackers = {}
 		fallbackTorrents = []
-		currentDate = datetime.now()
+		currentTime = datetime.now()
 
 		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 			if completedTorrentsCopy:
-				tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy.pop(0)
+				tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
 
 				if override:
 					override = False
@@ -173,57 +173,55 @@ class Checker(SCGIRequest):
 					elif cfg.trackers_only:
 						continue
 
-				tSizeGigabytes = tSizeBytes / 1073741824.0
-				tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
-				tRatioConverted = tRatio / 1000.0
+				tAgeDays = (currentTime - tAge).days
 
-				if tSizeGigabytes < minSize or tAgeConverted < minAge or tRatioConverted < minRatio:
+				if tSizeGigabytes < minSize or tAgeDays < minAge or tRatio < minRatio:
 
 					if fbMode == 1:
 
-						if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
+						if tSizeGigabytes < fbSize or tAgeDays < fbAge or tRatio < fbRatio:
 							continue
 						else:
 							fallbackTorrents.append(
-								(tAge,
+								(tName,
 								tLabel,
 								tTracker,
-								tRatio,
-								tSizeBytes,
-								tSizeGigabytes,
-								tName,
 								tHash,
 								tPath,
+								tSizeBytes,
+								tSizeGigabytes,
+								tRatio,
+								tAge,
 								parentDirectory) )
 
 					elif fbMode == 2:
 
 						if (
 								fbSize is not no and tSizeGigabytes >= fbSize) or (
-								fbAge is not no and tAgeConverted >= fbAge) or (
-								fbRatio is not no and tRatioConverted >= fbRatio):
+								fbAge is not no and tAgeDays >= fbAge) or (
+								fbRatio is not no and tRatio >= fbRatio):
 							fallbackTorrents.append(
-								(tAge,
+								(tName,
 								tLabel,
 								tTracker,
-								tRatio,
-								tSizeBytes,
-								tSizeGigabytes,
-								tName,
 								tHash,
 								tPath,
+								tSizeBytes,
+								tSizeGigabytes,
+								tRatio,
+								tAge,
 								parentDirectory) )
 
 					continue
 
 			else:
-				tAge, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
+				tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = fallbackTorrents.pop(0)
 
 			if self.mountPoints[parentDirectory] != mountPoint:
 				continue
 
 			try:
-				completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
+				completedTorrents.remove([tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
 			except:
 				continue
 

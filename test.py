@@ -10,20 +10,22 @@ completedTorrents = rtxmlrpc.send(
 	('',
 	'complete',
 	'd.timestamp.finished=',
+	'd.ratio=',
+	'd.name=',
 	'd.custom1=',
 	't.multicall=,t.url=',
-	'd.ratio=',
-	'd.size_bytes=',
-	'd.name=',
 	'd.hash=',
-	'd.directory=') )
+	'd.directory=',
+	'd.size_bytes=') )
+
 completedTorrents.sort()
-[item.append(item[7].rsplit('/', 1)[0]) if item[5] in item[7] else item.append(item[7]) for item in completedTorrents]
+completedTorrents = [tData[2:] + [tData[-1] / 1073741824.0, tData[1] / 1000.0, datetime.utcfromtimestamp(tData[0]),
+		tData[6].rsplit('/', 1)[0] if tData[2] in tData[6] else tData[6]] for tData in completedTorrents]
 
 mountPoints = {}
 
-for item in completedTorrents:
-	parentDirectory = item[8]
+for torrentData in completedTorrents:
+	parentDirectory = torrentData[-1]
 	mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else '/'
 	mountPoints[parentDirectory] = mountPoint
@@ -87,12 +89,12 @@ exclude = no = False
 freedSpace = count = 0
 trackers = {}
 fallbackTorrents, deletedTorrents = [], []
-currentDate = datetime.now()
+currentTime = datetime.now()
 
 while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 	if completedTorrentsCopy:
-		tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory = completedTorrentsCopy.pop(0)
+		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
 
 		if override:
 			override = False
@@ -168,64 +170,62 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 			elif cfg.trackers_only:
 				continue
 
-		tSizeGigabytes = tSizeBytes / 1073741824.0
-		tAgeConverted = (currentDate - datetime.utcfromtimestamp(tAge) ).days
-		tRatioConverted = tRatio / 1000.0
+		tAgeDays = (currentTime - tAge).days
 
-		if tSizeGigabytes < minSize or tAgeConverted < minAge or tRatioConverted < minRatio:
+		if tSizeGigabytes < minSize or tAgeDays < minAge or tRatio < minRatio:
 
 			if fbMode == 1:
 
-				if tSizeGigabytes < fbSize or tAgeConverted < fbAge or tRatioConverted < fbRatio:
+				if tSizeGigabytes < fbSize or tAgeDays < fbAge or tRatio < fbRatio:
 					continue
 				else:
 					fallbackTorrents.append(
-						(tAge,
-						tAgeConverted,
+						(tName,
 						tLabel,
 						tTracker,
-						tRatio,
-						tSizeBytes,
-						tSizeGigabytes,
-						tName,
 						tHash,
 						tPath,
+						tSizeBytes,
+						tSizeGigabytes,
+						tRatio,
+						tAge,
+						tAgeDays,
 						parentDirectory) )
 
 			elif fbMode == 2:
 
 				if (
 						fbSize is not no and tSizeGigabytes >= fbSize) or (
-						fbAge is not no and tAgeConverted >= fbAge) or (
-						fbRatio is not no and tRatioConverted >= fbRatio):
+						fbAge is not no and tAgeDays >= fbAge) or (
+						fbRatio is not no and tRatio >= fbRatio):
 					fallbackTorrents.append(
-						(tAge,
-						tAgeConverted,
+						(tName,
 						tLabel,
 						tTracker,
-						tRatio,
-						tSizeBytes,
-						tSizeGigabytes,
-						tName,
 						tHash,
 						tPath,
+						tSizeBytes,
+						tSizeGigabytes,
+						tRatio,
+						tAge,
+						tAgeDays,
 						parentDirectory) )
 
 			continue
 
 	else:
-		tAge, tAgeConverted, tLabel, tTracker, tRatio, tSizeBytes, tSizeGigabytes, tName, tHash, tPath, parentDirectory = fallbackTorrents.pop(0)
+		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, tAgeDays, parentDirectory = fallbackTorrents.pop(0)
 
 	if mountPoints[parentDirectory] != mountPoint:
 		continue
 
 	try:
-		completedTorrents.remove([tAge, tLabel, tTracker, tRatio, tSizeBytes, tName, tHash, tPath, parentDirectory])
+		completedTorrents.remove([tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
 	except:
 		continue
 
 	count += 1
-	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeConverted, count, tName, count, tLabel, count, tTracker) )
+	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeDays, count, tName, count, tLabel, count, tTracker) )
 	pendingDeletions[mountPoint] += tSizeBytes
 	freedSpace += tSizeGigabytes
 

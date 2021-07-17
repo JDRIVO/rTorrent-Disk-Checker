@@ -26,8 +26,8 @@ class Deleter(SCGIRequest):
 
 			time.sleep(0.01)
 
-	def delete(self, torrentInfo):
-		torrentHash, torrentSize, torrentPath, mountPoint = torrentInfo
+	def delete(self, torrentData):
+		torrentHash, torrentSize, torrentPath, mountPoint = torrentData
 
 		try:
 			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path=") )
