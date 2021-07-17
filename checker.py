@@ -90,6 +90,7 @@ class Checker(SCGIRequest):
 		include = override = True
 		exclude = no = False
 		freedSpace = 0
+		trackers = {}
 		fallbackTorrents = []
 		currentDate = datetime.now()
 
@@ -117,13 +118,27 @@ class Checker(SCGIRequest):
 						if rule is not include:
 
 							if "exclude" in labelRule:
-								tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+								try:
+									tracker = trackers[tLabel + tTracker[0][0]]
+								except:
+									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+									for url in tTracker:
+										trackers[tLabel + url[0]] = tracker
 
 								if tracker:
 									continue
 
 							elif "include" in labelRule:
-								tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+								try:
+									tracker = trackers[tLabel + tTracker[0][0]]
+								except:
+									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+									for url in tTracker:
+										trackers[tLabel + url[0]] = tracker
 
 								if not tracker:
 									continue
@@ -135,7 +150,14 @@ class Checker(SCGIRequest):
 						continue
 
 				if cfg.trackers and not override:
-					tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+
+					try:
+						tracker = trackers[tTracker[0][0]]
+					except:
+						tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+
+						for url in tTracker:
+							trackers[url[0]] = tracker
 
 					if tracker:
 						trackerRule = cfg.trackers[tracker[0]]

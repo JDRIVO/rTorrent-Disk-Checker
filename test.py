@@ -85,6 +85,7 @@ requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallbac
 include = override = True
 exclude = no = False
 freedSpace = count = 0
+trackers = {}
 fallbackTorrents, deletedTorrents = [], []
 currentDate = datetime.now()
 
@@ -112,13 +113,27 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 				if rule is not include:
 
 					if "exclude" in labelRule:
-						tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+						try:
+							tracker = trackers[tLabel + tTracker[0][0]]
+						except:
+							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+							for url in tTracker:
+								trackers[tLabel + url[0]] = tracker
 
 						if tracker:
 							continue
 
 					elif "include" in labelRule:
-						tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+						try:
+							tracker = trackers[tLabel + tTracker[0][0]]
+						except:
+							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
+
+							for url in tTracker:
+								trackers[tLabel + url[0]] = tracker
 
 						if not tracker:
 							continue
@@ -130,7 +145,14 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 				continue
 
 		if cfg.trackers and not override:
-			tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+
+			try:
+				tracker = trackers[tTracker[0][0]]
+			except:
+				tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+
+				for url in tTracker:
+					trackers[url[0]] = tracker
 
 			if tracker:
 				trackerRule = cfg.trackers[tracker[0]]
