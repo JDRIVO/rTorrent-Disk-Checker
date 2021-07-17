@@ -117,7 +117,7 @@ exclude_unlabelled = no
 
 ###### NOTIFICATION SETTINGS ######
 
-# Receive a notification when disk is full?
+# Receive a notification when disk is full? (yes/no)
 enable_email = no
 enable_pushbullet = no
 enable_telegram = no
