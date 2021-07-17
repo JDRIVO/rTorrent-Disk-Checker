@@ -97,7 +97,7 @@ class Checker(SCGIRequest):
 		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 			if completedTorrentsCopy:
-				tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
+				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
 
 				if override:
 					override = False
@@ -183,8 +183,7 @@ class Checker(SCGIRequest):
 							continue
 						else:
 							fallbackTorrents.append(
-								(tName,
-								tLabel,
+								(tLabel,
 								tTracker,
 								tHash,
 								tPath,
@@ -201,8 +200,7 @@ class Checker(SCGIRequest):
 								fbAge is not no and tAgeDays >= fbAge) or (
 								fbRatio is not no and tRatio >= fbRatio):
 							fallbackTorrents.append(
-								(tName,
-								tLabel,
+								(tLabel,
 								tTracker,
 								tHash,
 								tPath,
@@ -215,13 +213,13 @@ class Checker(SCGIRequest):
 					continue
 
 			else:
-				tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = fallbackTorrents.pop(0)
+				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = fallbackTorrents.pop(0)
 
 			if self.mountPoints[parentDirectory] != mountPoint:
 				continue
 
 			try:
-				completedTorrents.remove([tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
+				completedTorrents.remove([tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
 			except:
 				continue
 

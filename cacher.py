@@ -69,9 +69,9 @@ class Cache(SCGIRequest):
 				continue
 
 			torrents.sort()
-			self.torrents = [tData[2:] + [tData[-1] / 1073741824.0, tData[1] / 1000.0, datetime.utcfromtimestamp(tData[0]),
+			self.torrents = [tData[3:] + [tData[-1] / 1073741824.0, tData[1] / 1000.0, datetime.utcfromtimestamp(tData[0]),
 					tData[6].rsplit('/', 1)[0] if tData[2] in tData[6] else tData[6]] for tData in torrents]
-			self.torrentsDic = {tData[3]: tData for tData in self.torrents}
+			self.torrentsDic = {tData[2]: tData for tData in self.torrents}
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
