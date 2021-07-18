@@ -172,11 +172,11 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 		tAgeDays = (currentTime - tAge).days
 
-		if tSizeGigabytes < minSize or tAgeDays < minAge or tRatio < minRatio:
+		if tSizeGigabytes < minSize or tRatio < minRatio or tAgeDays < minAge:
 
 			if fbMode == 1:
 
-				if tSizeGigabytes < fbSize or tAgeDays < fbAge or tRatio < fbRatio:
+				if tSizeGigabytes < fbSize or tRatio < fbRatio or tAgeDays < fbAge:
 					continue
 				else:
 					fallbackTorrents.append(
@@ -196,8 +196,8 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 				if (
 						fbSize is not no and tSizeGigabytes >= fbSize) or (
-						fbAge is not no and tAgeDays >= fbAge) or (
-						fbRatio is not no and tRatio >= fbRatio):
+						fbRatio is not no and tRatio >= fbRatio) or (
+						fbAge is not no and tAgeDays >= fbAge):
 					fallbackTorrents.append(
 						(tName,
 						tLabel,
