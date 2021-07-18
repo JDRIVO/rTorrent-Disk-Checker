@@ -29,18 +29,26 @@ class Checker(SCGIRequest):
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
+		self.lastModified = os.path.getmtime("config.py")
+		self.trackers = {}
 
 	def check(self, torrentData):
-		_, torrentName, torrentHash, torrentPath, torrentSize = torrentData
+		torrentName, torrentHash, torrentPath, torrentSize = torrentData[1:]
 		torrentSize = int(torrentSize) / 1073741824.0
+		lastModified = os.path.getmtime("config.py")
 
-		try:
-			reload(cfg)
-		except Exception as e:
-			self.cache.lock = False
-			self.checkerQueue.release = True
-			logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e) )
-			return
+		if lastModified > self.lastModified:
+
+			try:
+				reload(cfg)
+			except Exception as e:
+				self.cache.lock = False
+				self.checkerQueue.release = True
+				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e) )
+				return
+
+			self.lastModified = lastModified
+			self.trackers = {}
 
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
@@ -90,7 +98,6 @@ class Checker(SCGIRequest):
 		include = override = True
 		exclude = no = False
 		freedSpace = 0
-		trackers = {}
 		fallbackTorrents = []
 		currentTime = datetime.now()
 
@@ -120,12 +127,12 @@ class Checker(SCGIRequest):
 							if "exclude" in labelRule:
 
 								try:
-									tracker = trackers[tLabel + tTracker[0][0]]
+									tracker = self.trackers[tLabel + tTracker[0][0]]
 								except:
 									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 									for url in tTracker:
-										trackers[tLabel + url[0]] = tracker
+										self.trackers[tLabel + url[0]] = tracker
 
 								if tracker:
 									continue
@@ -133,12 +140,12 @@ class Checker(SCGIRequest):
 							elif "include" in labelRule:
 
 								try:
-									tracker = trackers[tLabel + tTracker[0][0]]
+									tracker = self.trackers[tLabel + tTracker[0][0]]
 								except:
 									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 									for url in tTracker:
-										trackers[tLabel + url[0]] = tracker
+										self.trackers[tLabel + url[0]] = tracker
 
 								if not tracker:
 									continue
@@ -152,12 +159,12 @@ class Checker(SCGIRequest):
 				if cfg.trackers and not override:
 
 					try:
-						tracker = trackers[tTracker[0][0]]
+						tracker = self.trackers[tTracker[0][0]]
 					except:
 						tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
 
 						for url in tTracker:
-							trackers[url[0]] = tracker
+							self.trackers[url[0]] = tracker
 
 					if tracker:
 						trackerRule = cfg.trackers[tracker[0]]
