@@ -29,7 +29,7 @@ class Checker(SCGIRequest):
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
-		self.lastModified = os.path.getmtime("config.py")
+		self.lastModified = 0
 		self.trackers = {}
 
 	def check(self, torrentData):
