@@ -26,6 +26,7 @@ class Checker(SCGIRequest):
 		self.checkerQueue = checkerQueue
 		deleter = Deleter(self.cache)
 		self.delete = deleter.deletions
+
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
@@ -104,7 +105,8 @@ class Checker(SCGIRequest):
 		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 			if completedTorrentsCopy:
-				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
+				torrent = completedTorrentsCopy.pop(0)
+				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 				if override:
 					override = False
@@ -189,16 +191,7 @@ class Checker(SCGIRequest):
 						if tSizeGigabytes < fbSize or tRatio < fbRatio or tAgeDays < fbAge:
 							continue
 						else:
-							fallbackTorrents.append(
-								(tLabel,
-								tTracker,
-								tHash,
-								tPath,
-								tSizeBytes,
-								tSizeGigabytes,
-								tRatio,
-								tAge,
-								parentDirectory) )
+							fallbackTorrents.append(torrent)
 
 					elif fbMode == 2:
 
@@ -206,27 +199,19 @@ class Checker(SCGIRequest):
 								fbSize is not no and tSizeGigabytes >= fbSize) or (
 								fbRatio is not no and tRatio >= fbRatio) or (
 								fbAge is not no and tAgeDays >= fbAge):
-							fallbackTorrents.append(
-								(tLabel,
-								tTracker,
-								tHash,
-								tPath,
-								tSizeBytes,
-								tSizeGigabytes,
-								tRatio,
-								tAge,
-								parentDirectory) )
+							fallbackTorrents.append(torrent)
 
 					continue
 
 			else:
-				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = fallbackTorrents.pop(0)
+				torrent = fallbackTorrents.pop(0)
+				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 			if self.mountPoints[parentDirectory] != mountPoint:
 				continue
 
 			try:
-				completedTorrents.remove([tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
+				completedTorrents.remove(torrent)
 			except:
 				continue
 
