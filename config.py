@@ -1,5 +1,7 @@
 include = yes = True
 exclude =  no = False
+whitelist = 'whitelist'
+blacklist = 'blacklist'
 
 ############ USER DEFINED VARIABLES START ############
 
@@ -64,20 +66,21 @@ fallback_ratio = 1
 # Value Order: 1. Minimum Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 trackers = {
-#                     'demonoid.pw': [include],
-#                     'hdme.eu': [exclude],
-#                     'redacted.ch': (1, 7, 1.2,
+#                     include: ['demonoid.pw'],
+#                     exclude: ['hdme.eu', 'blutopia.xyz'],
+
+#                     'redacted.ch': [1, 7, 1.2,
 #                                     0,
-#                                     1, 1, 1),
-#                     'hd-torrents.org': (3, 7, 1.3,
+#                                     1, 1, 1],
+#                     'hd-torrents.org': [3, 7, 1.3,
 #                                         1,
-#                                         5, 0, 1.3),
-#                     'privatehd.to': (30, 6, 1.2,
+#                                         5, 0, 1.3],
+#                     'privatehd.to': [30, 6, 1.2,
 #                                       1,
-#                                      15, 5, 0),
-#                     'apollo.rip': (2, 6, 1.4,
+#                                      15, 5, 0],
+#                     'apollo.rip': [2, 6, 1.4,
 #                                    2,
-#                                    5, 3, no),
+#                                    5, 3, no],
            }
 
 # Only delete torrents from trackers with a tracker rule? (yes/no)
@@ -90,22 +93,27 @@ trackers_only = no
 
 # include = use tracker rules (if defined) otherwise use general rules | exclude = exclude label
 
+# whitelist = allowed trackers | blacklist = disallowed trackers
+
 # Value Order: 1. Minimum Size 2. Minimum Age 3. Minimum Ratio 4. Fallback Mode 5. Fallback Size 6. Fallback Age 7. Fallback Ratio
 
 labels = {
-#                     'Trash': [include],
-#                     'TV': [exclude],
-#                     'Movie': (15, 7, 2,
+#                     include: ['Trash', 'MOV', 'MP4'],
+#                     exclude: ['TV', 'Classics'],
+
+#                     'Games': [include, whitelist, ['tpb.org'] ],
+#                     'Music': [include, blacklist, ['redacted.ch', 'orpheus.network'] ],
+#                     'Movie': [15, 7, 2,
 #                                0,
-#                                1, 1, 1),
-#                     'HD': (6, 5, 1.2,
+#                                1, 1, 1],
+#                     'HD': [6, 5, 1.2,
 #                            1,
 #                            3, 3, 1.2,
-#                            'exclude', ['blutopia.xyz', 'hd-torrents.org'] ),
-#                     '4K': (60, 7, 2,
+#                            whitelist, ['blutopia.xyz', 'hd-torrents.org'] ],
+#                     '4K': [60, 7, 2,
 #                             2,
 #                            no, 5, 1.2,
-#                            'include', ['blutopia.xyz'] ),
+#                            blacklist, ['blutopia.xyz'] ],
          }
 
 # Only delete torrents with labels that have a label rule? (yes/no)

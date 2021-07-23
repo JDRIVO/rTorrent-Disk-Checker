@@ -30,8 +30,30 @@ class Checker(SCGIRequest):
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
+		self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
 		self.lastModified = 0
-		self.trackers = {}
+
+		self.include = True
+		self.exclude = self.no = False
+		self.whitelist = "whitelist"
+		self.blacklist = "blacklist"
+
+	def addRules(self, mode, dic):
+
+		if self.include in mode:
+
+			for title in mode[self.include]:
+				dic[title] = self.include
+
+		if self.exclude in mode:
+
+			for title in mode[self.exclude]:
+				dic[title] = self.exclude
+
+		for title, rules in mode.items():
+
+			if title not in (self.include, self.exclude):
+				dic[title] = rules
 
 	def check(self, torrentData):
 		torrentName, torrentHash, torrentPath, torrentSize = torrentData[1:]
@@ -49,7 +71,9 @@ class Checker(SCGIRequest):
 				return
 
 			self.lastModified = lastModified
-			self.trackers = {}
+			self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
+			self.addRules(cfg.labels, self.labelRules)
+			self.addRules(cfg.trackers, self.trackerRules)
 
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = completedTorrents[:]
@@ -96,9 +120,8 @@ class Checker(SCGIRequest):
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
 		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
-		include = override = True
-		exclude = no = False
 		freedSpace = 0
+		override = True
 		fallbackTorrents = []
 		currentTime = datetime.now()
 
@@ -115,18 +138,17 @@ class Checker(SCGIRequest):
 				if cfg.exclude_unlabelled and not tLabel:
 					continue
 
-				if cfg.labels:
+				if self.labelRules:
 
-					if tLabel in cfg.labels:
-						labelRule = cfg.labels[tLabel]
-						rule = labelRule[0]
+					if tLabel in self.labelRules:
+						labelRule = self.labelRules[tLabel]
 
-						if rule is exclude:
+						if labelRule is self.exclude:
 							continue
 
-						if rule is not include:
+						if labelRule is not self.include:
 
-							if "exclude" in labelRule:
+							if self.blacklist in labelRule:
 
 								try:
 									tracker = self.trackers[tLabel + tTracker[0][0]]
@@ -139,7 +161,7 @@ class Checker(SCGIRequest):
 								if tracker:
 									continue
 
-							elif "include" in labelRule:
+							elif self.whitelist in labelRule:
 
 								try:
 									tracker = self.trackers[tLabel + tTracker[0][0]]
@@ -152,30 +174,30 @@ class Checker(SCGIRequest):
 								if not tracker:
 									continue
 
-							override = True
-							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
+							if labelRule[0] is not self.include:
+								override = True
+								minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
 
 					elif cfg.labels_only:
 						continue
 
-				if cfg.trackers and not override:
+				if self.trackerRules and not override:
 
 					try:
 						tracker = self.trackers[tTracker[0][0]]
 					except:
-						tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+						tracker = [tracker for tracker in self.trackerRules for url in tTracker if tracker in url[0]]
 
 						for url in tTracker:
 							self.trackers[url[0]] = tracker
 
 					if tracker:
-						trackerRule = cfg.trackers[tracker[0]]
-						rule = trackerRule[0]
+						trackerRule = self.trackerRules[tracker[0]]
 
-						if rule is exclude:
+						if trackerRule is self.exclude:
 							continue
 
-						if rule is not include:
+						if trackerRule is not self.include:
 							override = True
 							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = trackerRule
 
@@ -196,9 +218,9 @@ class Checker(SCGIRequest):
 					elif fbMode == 2:
 
 						if (
-								fbSize is not no and tSizeGigabytes >= fbSize) or (
-								fbRatio is not no and tRatio >= fbRatio) or (
-								fbAge is not no and tAgeDays >= fbAge):
+								fbSize is not self.no and tSizeGigabytes >= fbSize) or (
+								fbRatio is not self.no and tRatio >= fbRatio) or (
+								fbAge is not self.no and tAgeDays >= fbAge):
 							fallbackTorrents.append(torrent)
 
 					continue

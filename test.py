@@ -3,6 +3,11 @@ import sys
 from datetime import datetime
 from remote_caller import SCGIRequest
 
+try:
+	import config as cfg
+except Exception as e:
+	print(e)
+
 rtxmlrpc = SCGIRequest()
 
 completedTorrents = rtxmlrpc.send(
@@ -35,14 +40,34 @@ torrentPath = sys.argv[2]
 if torrentPath == '0':
 	torrentPath = '/'
 
+whitelist = 'whitelist'
+blacklist = 'blacklist'
+exclude = no = False
+include = override = True
+labelRules, trackerRules = {}, {}
+
+def addRules(mode, dic):
+
+	if include in mode:
+
+		for title in mode[include]:
+			dic[title] = include
+
+	if exclude in mode:
+
+		for title in mode[exclude]:
+			dic[title] = exclude
+
+	for title, rules in mode.items():
+
+		if title not in (include, exclude):
+			dic[title] = rules
+
+addRules(cfg.labels, labelRules)
+addRules(cfg.trackers, trackerRules)
+
 start = datetime.now()
 torrentSize = float(sys.argv[1])
-
-try:
-	import config as cfg
-except Exception as e:
-	print(e)
-
 completedTorrentsCopy = completedTorrents[:]
 torrentsDownloading, pendingDeletions = {}, {}
 
@@ -84,8 +109,6 @@ minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_spa
 requiredSpace = torrentSize - (availableSpace - minimumSpace)
 requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
-include = override = True
-exclude = no = False
 freedSpace = count = 0
 trackers = {}
 fallbackTorrents, deletedTorrents = [], []
@@ -94,7 +117,8 @@ currentTime = datetime.now()
 while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 	if completedTorrentsCopy:
-		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = completedTorrentsCopy.pop(0)
+		torrent = completedTorrentsCopy.pop(0)
+		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 		if override:
 			override = False
@@ -103,18 +127,17 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 		if cfg.exclude_unlabelled and not tLabel:
 			continue
 
-		if cfg.labels:
+		if labelRules:
 
-			if tLabel in cfg.labels:
-				labelRule = cfg.labels[tLabel]
-				rule = labelRule[0]
+			if tLabel in labelRules:
+				labelRule = labelRules[tLabel]
 
-				if rule is exclude:
+				if labelRule is exclude:
 					continue
 
-				if rule is not include:
+				if labelRule is not include:
 
-					if "exclude" in labelRule:
+					if blacklist in labelRule:
 
 						try:
 							tracker = trackers[tLabel + tTracker[0][0]]
@@ -127,7 +150,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 						if tracker:
 							continue
 
-					elif "include" in labelRule:
+					elif whitelist in labelRule:
 
 						try:
 							tracker = trackers[tLabel + tTracker[0][0]]
@@ -140,30 +163,30 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 						if not tracker:
 							continue
 
-					override = True
-					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
+					if labelRule[0] is not include:
+						override = True
+						minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
 
 			elif cfg.labels_only:
 				continue
 
-		if cfg.trackers and not override:
+		if trackerRules and not override:
 
 			try:
 				tracker = trackers[tTracker[0][0]]
 			except:
-				tracker = [tracker for tracker in cfg.trackers for url in tTracker if tracker in url[0]]
+				tracker = [tracker for tracker in trackerRules for url in tTracker if tracker in url[0]]
 
 				for url in tTracker:
 					trackers[url[0]] = tracker
 
 			if tracker:
-				trackerRule = cfg.trackers[tracker[0]]
-				rule = trackerRule[0]
+				trackerRule = trackerRules[tracker[0]]
 
-				if rule is exclude:
+				if trackerRule is exclude:
 					continue
 
-				if rule is not include:
+				if trackerRule is not include:
 					override = True
 					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = trackerRule
 
@@ -179,18 +202,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 				if tSizeGigabytes < fbSize or tRatio < fbRatio or tAgeDays < fbAge:
 					continue
 				else:
-					fallbackTorrents.append(
-						(tName,
-						tLabel,
-						tTracker,
-						tHash,
-						tPath,
-						tSizeBytes,
-						tSizeGigabytes,
-						tRatio,
-						tAge,
-						tAgeDays,
-						parentDirectory) )
+					fallbackTorrents.append( (torrent, tAgeDays) )
 
 			elif fbMode == 2:
 
@@ -198,29 +210,21 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 						fbSize is not no and tSizeGigabytes >= fbSize) or (
 						fbRatio is not no and tRatio >= fbRatio) or (
 						fbAge is not no and tAgeDays >= fbAge):
-					fallbackTorrents.append(
-						(tName,
-						tLabel,
-						tTracker,
-						tHash,
-						tPath,
-						tSizeBytes,
-						tSizeGigabytes,
-						tRatio,
-						tAge,
-						tAgeDays,
-						parentDirectory) )
+					fallbackTorrents.append( (torrent, tAgeDays) )
 
 			continue
 
 	else:
-		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, tAgeDays, parentDirectory = fallbackTorrents.pop(0)
+		torrentInfo = fallbackTorrents.pop(0)
+		torrent = torrentInfo[0]
+		tAgeDays = torrentInfo[1]
+		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 	if mountPoints[parentDirectory] != mountPoint:
 		continue
 
 	try:
-		completedTorrents.remove([tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory])
+		completedTorrents.remove(torrent)
 	except:
 		continue
 
