@@ -19,8 +19,8 @@ class CheckerQueue(Queue):
 			if self.release:
 				item = self.get()
 				self.cache.lock = True
-				self.startChecker(item)
 				self.release = False
+				self.startChecker(item)
 
 			time.sleep(0.000001)
 
