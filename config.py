@@ -131,7 +131,7 @@ enable_pushbullet = no
 enable_telegram = no
 enable_slack = no
 
-# Amount of minutes to wait before sending a notification between torrent downloads
+# Amount of minutes to wait before sending another notification between torrent downloads
 interval = 60
 
 # Subject/Title if applicable
