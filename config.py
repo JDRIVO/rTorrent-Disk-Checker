@@ -9,7 +9,7 @@ blacklist = 'blacklist'
 scgi = '127.0.0.1:5000'
 
 # Unix domain socket - This program will automatically create this file
-socket_file  = 'unix_socket'
+socket_file = 'unix_socket'
 
 # The wait time between cache creation iterations in seconds
 cache_interval = 300
