@@ -11,7 +11,7 @@ scgi = '127.0.0.1:5000'
 # Unix domain socket - This program will automatically create this file
 socket_file = 'unix_socket'
 
-# The wait time between cache creation iterations in seconds
+# The amount of seconds to wait before updating the cache
 cache_interval = 300
 
 
