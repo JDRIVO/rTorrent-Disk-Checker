@@ -199,9 +199,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 			if fbMode == 1:
 
-				if tSizeGigabytes < fbSize or tRatio < fbRatio or tAgeDays < fbAge:
-					continue
-				else:
+				if tSizeGigabytes >= fbSize and tRatio >= fbRatio and tAgeDays >= fbAge:
 					fallbackTorrents.append( (torrent, tAgeDays) )
 
 			elif fbMode == 2:
