@@ -210,9 +210,7 @@ class Checker(SCGIRequest):
 
 					if fbMode == 1:
 
-						if tSizeGigabytes < fbSize or tRatio < fbRatio or tAgeDays < fbAge:
-							continue
-						else:
+						if tSizeGigabytes >= fbSize and tRatio >= fbRatio and tAgeDays >= fbAge:
 							fallbackTorrents.append(torrent)
 
 					elif fbMode == 2:
