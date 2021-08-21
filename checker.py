@@ -92,8 +92,8 @@ class Checker(SCGIRequest):
 			if downloads:
 
 				try:
-					downloading = self.send("d.multicall2", ('', "leeching", "d.left_bytes=", "d.hash=") )
-					downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
+					downloading = self.send("d.multicall2", ('', "leeching", "d.left_bytes=", "d.hash=", "d.state=") )
+					downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState == 1)
 				except Exception as e:
 					self.cache.lock = False
 					self.checkerQueue.release = True
