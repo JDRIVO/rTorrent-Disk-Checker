@@ -96,7 +96,12 @@ class Cache(SCGIRequest):
 			time.sleep(1)
 
 		for torrentData, incompleteTorrentData in itertools.zip_longest(self.torrents, incompleteTorrents):
-			parentDirectory = torrentData[-1]
+
+			if torrentData:
+				parentDirectory = torrentData[-1]
+			else:
+				parentDirectory = incompleteTorrentData[-1]
+
 			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
 			self.mountPoints[parentDirectory] = mountPoint
