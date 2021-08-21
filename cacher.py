@@ -87,6 +87,13 @@ class Cache(SCGIRequest):
 			time.sleep(interval)
 
 	def getMountPoints(self):
+	
+		def getMountPoint(parentDirectory):
+			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else '/'
+			self.mountPoints[parentDirectory] = mountPoint
+			return mountPoint
+
 		downloading = self.send("d.multicall2", ('', "leeching", "d.hash=", "d.name=", "d.directory=") )
 		stopped = self.send("d.multicall2", ('', "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory=") )
 		incompleteTorrents = [[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for tHash, tName, tPath in downloading] + \
@@ -98,15 +105,10 @@ class Cache(SCGIRequest):
 		for torrentData, incompleteTorrentData in itertools.zip_longest(self.torrents, incompleteTorrents):
 
 			if torrentData:
-				parentDirectory = torrentData[-1]
-			else:
-				parentDirectory = incompleteTorrentData[-1]
-
-			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else '/'
-			self.mountPoints[parentDirectory] = mountPoint
+				getMountPoint(torrentData[-1])
 
 			if incompleteTorrentData:
+				mountPoint = getMountPoint(incompleteTorrentData[-1])
 
 				try:
 					self.torrentsDownloading[mountPoint].append(incompleteTorrentData[0])
