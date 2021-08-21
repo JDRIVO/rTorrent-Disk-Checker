@@ -87,7 +87,7 @@ class Cache(SCGIRequest):
 			time.sleep(interval)
 
 	def getMountPoints(self):
-	
+
 		def getMountPoint(parentDirectory):
 			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else '/'
