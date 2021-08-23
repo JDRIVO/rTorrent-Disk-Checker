@@ -1,6 +1,7 @@
 import os
 import sys
 from datetime import datetime
+from collections import deque
 from remote_caller import SCGIRequest
 
 try:
@@ -68,12 +69,15 @@ addRules(cfg.trackers, trackerRules)
 
 start = datetime.now()
 torrentSize = float(sys.argv[1])
-completedTorrentsCopy = completedTorrents[:]
+completedTorrentsCopy = deque(completedTorrents)
 torrentsDownloading, pendingDeletions = {}, {}
+lastModified = os.path.getmtime('config.py')
 
-if torrentPath in mountPoints:
+if lastModified > 0: pass
+
+try:
 	mountPoint = mountPoints[torrentPath]
-else:
+except:
 	mountPoint = [path for path in [torrentPath.rsplit('/', n)[0] for n in range(torrentPath.count('/') )] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else '/'
 	mountPoints[torrentPath] = mountPoint
@@ -84,8 +88,8 @@ try:
 	if downloads:
 
 		try:
-			downloading = rtxmlrpc.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=') )
-			downloading = sum(tBytes for tBytes, tHash in downloading if tHash in downloads)
+			downloading = self.send('d.multicall2', ('', 'leeching', 'd.left_bytes=', 'd.hash=', 'd.state=') )
+			downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState)
 		except Exception as e:
 			print(e)
 
@@ -98,9 +102,9 @@ except:
 	torrentsDownloading[mountPoint] = [None]
 	downloading = 0
 
-if mountPoint in pendingDeletions:
+try:
 	deletions = pendingDeletions[mountPoint]
-else:
+except:
 	deletions = pendingDeletions[mountPoint] = 0
 
 disk = os.statvfs(mountPoint)
@@ -111,13 +115,14 @@ requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallbac
 
 freedSpace = count = 0
 trackers = {}
-fallbackTorrents, deletedTorrents = [], []
+deletedTorrents = []
+fallbackTorrents = deque()
 currentTime = datetime.now()
 
 while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 	if completedTorrentsCopy:
-		torrent = completedTorrentsCopy.pop(0)
+		torrent = completedTorrentsCopy.popleft()
 		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 		if override:
@@ -213,7 +218,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 			continue
 
 	else:
-		torrentInfo = fallbackTorrents.pop(0)
+		torrentInfo = fallbackTorrents.popleft()
 		torrent = torrentInfo[0]
 		tAgeDays = torrentInfo[1]
 		tName, tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
@@ -227,22 +232,27 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 		continue
 
 	count += 1
-	deletedTorrents.append('%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TT: %s\n' % (count, tAgeDays, count, tName, count, tLabel, count, tTracker) )
+	deletedTorrents.append( (count, tAgeDays, tName, tLabel, tTracker, tRatio, tSizeGigabytes) )
 	pendingDeletions[mountPoint] += tSizeBytes
 	freedSpace += tSizeGigabytes
 
 finish = datetime.now() - start
 availableSpaceAfter = availableSpace + freedSpace - torrentSize
+availableSpaceAfter = 0 if availableSpaceAfter < 0 else availableSpaceAfter
+
+info1 = 'TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TR = Torrent Ratio  TS = Torrent Size  TT = Torrent Tracker'
+info2 = 'Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace)
+info3 = '%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download' % (availableSpace, availableSpaceAfter, torrentSize)
 
 with open('testresult.txt', 'w+') as textFile:
-	textFile.write('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB\n' % (finish, count, freedSpace) )
-	textFile.write('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n\n' % (availableSpace, availableSpaceAfter, torrentSize) )
-	textFile.write('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n\n')
+	textFile.write(info2)
+	textFile.write(info3)
+	textFile.write('\n\n' + info1 + '\n\n')
 
-	for torrent in deletedTorrents:
-		print(torrent)
-		textFile.write(torrent + '\n')
+	for count, tAgeDays, tName, tLabel, tTracker, tRatio, tSize in deletedTorrents:
+		txt = '%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TR: %s\n%s. TS: %.2f GB\n%s. TT: %s\n' % \
+		(count, tAgeDays, count, tName, count, tLabel, count, tRatio, count, tSize, count, ', '.join(tracker[0] for tracker in tTracker) )
+		textFile.write(txt + '\n')
+		print(txt)
 
-print('TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TT = Torrent Tracker\n')
-print('Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace) )
-print('%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download\n' % (availableSpace, availableSpaceAfter, torrentSize) )
+print(info1 + '\n\n' + info2, info3 + '\n')

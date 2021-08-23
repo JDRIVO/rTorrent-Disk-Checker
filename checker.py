@@ -3,6 +3,7 @@ import time
 import logging
 from threading import Thread
 from datetime import datetime
+from collections import deque
 from remote_caller import SCGIRequest
 from messenger import message
 from deleter import Deleter
@@ -76,7 +77,7 @@ class Checker(SCGIRequest):
 			self.addRules(cfg.trackers, self.trackerRules)
 
 		completedTorrents = self.cache.torrents
-		completedTorrentsCopy = completedTorrents[:]
+		completedTorrentsCopy = deque(completedTorrents)
 		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
@@ -93,7 +94,7 @@ class Checker(SCGIRequest):
 
 				try:
 					downloading = self.send("d.multicall2", ('', "leeching", "d.left_bytes=", "d.hash=", "d.state=") )
-					downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState == 1)
+					downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState)
 				except Exception as e:
 					self.cache.lock = False
 					self.checkerQueue.release = True
@@ -122,13 +123,13 @@ class Checker(SCGIRequest):
 
 		freedSpace = 0
 		override = True
-		fallbackTorrents = []
+		fallbackTorrents = deque()
 		currentTime = datetime.now()
 
 		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
 			if completedTorrentsCopy:
-				torrent = completedTorrentsCopy.pop(0)
+				torrent = completedTorrentsCopy.popleft()
 				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 				if override:
@@ -224,7 +225,7 @@ class Checker(SCGIRequest):
 					continue
 
 			else:
-				torrent = fallbackTorrents.pop(0)
+				torrent = fallbackTorrents.popleft()
 				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
 
 			if self.mountPoints[parentDirectory] != mountPoint:

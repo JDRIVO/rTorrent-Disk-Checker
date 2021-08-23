@@ -1,7 +1,6 @@
 import os
 import time
 import logging
-import itertools
 from threading import Thread
 from datetime import datetime
 from remote_caller import SCGIRequest
@@ -74,7 +73,7 @@ class Cache(SCGIRequest):
 					tData[6].rsplit('/', 1)[0] if tData[2] in tData[6] else tData[6]] for tData in torrents]
 			self.torrentsDic = {tData[2]: tData for tData in self.torrents}
 			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )] + \
-			[tHash for tHash, complete in self.send("d.multicall2", ('', "stopped", "d.hash=", "d.complete=") ) if complete == 0]
+			[tHash for tHash, complete in self.send("d.multicall2", ('', "stopped", "d.hash=", "d.complete=") ) if not complete]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
 			try:
@@ -97,20 +96,26 @@ class Cache(SCGIRequest):
 		downloading = self.send("d.multicall2", ('', "leeching", "d.hash=", "d.name=", "d.directory=") )
 		stopped = self.send("d.multicall2", ('', "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory=") )
 		incompleteTorrents = [[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for tHash, tName, tPath in downloading] + \
-		[[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for complete, tHash, tName, tPath in stopped if complete == 0]
+		[[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for complete, tHash, tName, tPath in stopped if not complete]
 
 		while not self.torrents:
 			time.sleep(1)
 
-		for torrentData, incompleteTorrentData in itertools.zip_longest(self.torrents, incompleteTorrents):
+		for torrentData in self.torrents:
+			parentDirectory = torrentData[-1]
 
-			if torrentData:
-				getMountPoint(torrentData[-1])
+			if parentDirectory not in self.mountPoints:
+				getMountPoint(parentDirectory)
 
-			if incompleteTorrentData:
-				mountPoint = getMountPoint(incompleteTorrentData[-1])
+		for torrentData in incompleteTorrents:
+			parentDirectory = torrentData[-1]
 
-				try:
-					self.torrentsDownloading[mountPoint].append(incompleteTorrentData[0])
-				except:
-					self.torrentsDownloading[mountPoint] = [incompleteTorrentData[0]]
+			if parentDirectory not in self.mountPoints:
+				mountPoint = getMountPoint(parentDirectory)
+			else:
+				mountPoint = self.mountPoints[parentDirectory]
+
+			try:
+				self.torrentsDownloading[mountPoint].append(torrentData[0])
+			except:
+				self.torrentsDownloading[mountPoint] = [torrentData[0]]
