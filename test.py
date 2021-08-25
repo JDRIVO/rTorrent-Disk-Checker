@@ -257,4 +257,4 @@ with open('testresult.txt', 'w+') as textFile:
 		print(info)
 
 print('{}\n\n{}\n{}\n'.format(info1, info2, info3) )
-print('Your result has been saved to testresult.txt' + '\n')
+print('Your result has been saved to testresult.txt\n')
