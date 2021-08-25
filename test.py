@@ -241,18 +241,20 @@ availableSpaceAfter = availableSpace + freedSpace - torrentSize
 availableSpaceAfter = 0 if availableSpaceAfter < 0 else availableSpaceAfter
 
 info1 = 'TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TR = Torrent Ratio  TS = Torrent Size  TT = Torrent Tracker'
-info2 = 'Script Executed in %s Seconds\n%s Torrent(s) Deleted Totaling %.2f GB' % (finish, count, freedSpace)
-info3 = '%.2f GB Free Space Before Torrent Download\n%.2f GB Free Space After %.2f GB Torrent Download' % (availableSpace, availableSpaceAfter, torrentSize)
+info2 = 'Script Executed in {} Seconds\n{} Torrent(s) Deleted Totaling {:.2f} GB'.format(finish, count, freedSpace)
+info3 = '{:.2f} GB Free Space Before Torrent Download\n{:.2f} GB Free Space After {:.2f} GB Torrent Download'.format(
+	availableSpace, availableSpaceAfter, torrentSize)
 
 with open('testresult.txt', 'w+') as textFile:
-	textFile.write(info2)
-	textFile.write(info3)
-	textFile.write('\n\n' + info1 + '\n\n')
+	textFile.write(info2 + '\n')
+	textFile.write(info3 + '\n\n')
+	textFile.write(info1 + '\n\n')
 
 	for count, tAgeDays, tName, tLabel, tTracker, tRatio, tSize in deletedTorrents:
-		txt = '%s. TA: %s Days Old\n%s. TN: %s\n%s. TL: %s\n%s. TR: %s\n%s. TS: %.2f GB\n%s. TT: %s\n' % \
-		(count, tAgeDays, count, tName, count, tLabel, count, tRatio, count, tSize, count, ', '.join(tracker[0] for tracker in tTracker) )
-		textFile.write(txt + '\n')
-		print(txt)
+		info = '{}. TA: {} Days Old\n{}. TN: {}\n{}. TL: {}\n{}. TR: {}\n{}. TS: {:.2f} GB\n{}. TT: {}\n'.format(
+		count, tAgeDays, count, tName, count, tLabel, count, tRatio, count, tSize, count, ', '.join(tracker[0] for tracker in tTracker) )
+		textFile.write(info + '\n')
+		print(info)
 
-print(info1 + '\n\n' + info2, info3 + '\n')
+print('{}\n\n{}\n{}\n'.format(info1, info2, info3) )
+print('Your result has been saved to testresult.txt' + '\n')
