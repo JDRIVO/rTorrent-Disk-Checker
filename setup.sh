@@ -17,17 +17,20 @@ execute.throw.bg = python3, "/path/to/server.py"
 
 grep -oP "^[^#]*scgi.* = \K.*" ~/.rtorrent.rc
 
-2b. Update the scgi variable in line 7 of config.py with your own SCGI address/port or unix socket file path.
+2b. Update the scgi variable in line 9 of config.py with your own SCGI address/port or unix socket file path.
 
-3. Run setup.py. If it fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
-
-4. Optional: As an additional layer of protection you may add the close_low_diskspace command to your rtorrent.rc file. This command will make rtorrent periodically
+3. Optional: As an extra layer of protection you may add the close_low_diskspace command to your rtorrent.rc file. This command will make rtorrent periodically
 check your disk space and stop all downloading torrents if your disk space falls below a threshold.
 
 schedule2 = low_diskspace,0,55,close_low_diskspace=1G
 
 55 = the time in seconds the check is ran
 1G = the threshold in Gigabytes
+
+4. Run setup.py. If you opted to include close_low_diskspace, run setup.py with two arguments; interval and threshold. So for the above example,
+setup.py would be ran as: setup.py 55 1
+
+If setup.py fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
 
 COMMENT
 
@@ -128,7 +131,7 @@ if [[ -z $scgi ]]; then
 	printf '\n\033[0;36mUnable to locate a SCGI address or unix socket file path. Check your rtorrent.rc file and update the SCGI variable in config.py.\033[0m\n'
 	printf '\nRtorrent has to be restarted in order for the changes to take effect.'
 else
-	sed -i "7s~.*~scgi = '$scgi'~" config.py
+	sed -i "s/.*scgi.*=.*/scgi = '$scgi'/" config.py
 	printf '\nSCGI has been updated in your config.py file.\n'
 
 	if [ "$low_diskspace" = true ]; then
