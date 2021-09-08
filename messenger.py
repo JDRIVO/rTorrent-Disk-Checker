@@ -45,7 +45,7 @@ class ServerCommunicator:
 
 		try:
 			response = urlopen(request)
-			if response.getcode() == 200: return json.loads(response.read() )
+			if response.getcode() == 200: return json.loads(response.read())
 		except Exception as e:
 			print(type(self).__name__ + ':', e)
 

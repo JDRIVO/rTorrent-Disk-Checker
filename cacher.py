@@ -3,6 +3,7 @@ import time
 import logging
 from threading import Thread
 from datetime import datetime
+from utils import sortTorrents
 from remote_caller import SCGIRequest
 
 try:
@@ -52,28 +53,48 @@ class Cache(SCGIRequest):
 				time.sleep(60)
 
 			try:
-				torrents = self.send(
+				completedTorrents = self.send(
 					"d.multicall2",
-					('',
-					"complete",
-					"d.timestamp.finished=",
-					"d.ratio=",
-					"d.name=",
-					"d.custom1=",
-					"t.multicall=,t.url=",
-					"d.hash=",
-					"d.directory=",
-					"d.size_bytes=") )
+					(
+						"",
+						"complete",
+						"d.name=",
+						"d.hash=",
+						"d.custom1=",
+						"t.multicall=,t.url=",
+						"d.timestamp.finished=",
+						"t.multicall=,t.url=,t.scrape_complete=",
+						"d.ratio=",
+						"d.size_bytes=",
+						"d.directory=",
+					),
+				)
+				downloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
+				downloadingStopped = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
 			except:
 				time.sleep(60)
 				continue
 
-			torrents.sort()
-			self.torrents = [tData[3:] + [tData[-1] / 1073741824.0, tData[1] / 1000.0, datetime.utcfromtimestamp(tData[0]),
-					tData[6].rsplit('/', 1)[0] if tData[2] in tData[6] else tData[6]] for tData in torrents]
+			completedTorrents = [
+				(
+					(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
+					tName,
+					tHash,
+					tLabel,
+					tTracker,
+					datetime.utcfromtimestamp(tAge),
+					max(seeds[1] for seeds in tSeeders),
+					tRatio / 1000.0,
+					tSize,
+					tSize / 1073741824.0,
+					tPath,
+					tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
+				)
+				for tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize, tPath in completedTorrents
+			]
+			self.torrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
 			self.torrentsDic = {tData[2]: tData for tData in self.torrents}
-			downloading = [tHash[0] for tHash in self.send("d.multicall2", ('', "leeching", "d.hash=") )] + \
-			[tHash for tHash, complete in self.send("d.multicall2", ('', "stopped", "d.hash=", "d.complete=") ) if not complete]
+			downloading = [tHash[0] for tHash in downloading] + [tHash for tHash, complete in downloadingStopped if not complete]
 			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
 
 			try:
@@ -88,15 +109,28 @@ class Cache(SCGIRequest):
 	def getMountPoints(self):
 
 		def getMountPoint(parentDirectory):
-			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else '/'
+			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else "/"
 			self.mountPoints[parentDirectory] = mountPoint
 			return mountPoint
 
-		downloading = self.send("d.multicall2", ('', "leeching", "d.hash=", "d.name=", "d.directory=") )
-		stopped = self.send("d.multicall2", ('', "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory=") )
-		incompleteTorrents = [[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for tHash, tName, tPath in downloading] + \
-		[[tHash, tPath.rsplit('/', 1)[0] if tName in tPath else tPath] for complete, tHash, tName, tPath in stopped if not complete]
+		while True:
+
+			try:
+				downloading = self.send("d.multicall2", ("", "leeching", "d.hash=", "d.name=", "d.directory="))
+				downloadingStopped = self.send("d.multicall2", ("", "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory="))
+				break
+			except:
+				time.sleep(1)
+
+		incompleteTorrents = [
+			[tHash, tPath.rsplit("/", 1)[0] if tName in tPath else tPath]
+			for tHash, tName, tPath in downloading
+		] + [
+			[tHash, tPath.rsplit("/", 1)[0] if tName in tPath else tPath]
+			for complete, tHash, tName, tPath in downloadingStopped
+			if not complete
+		]
 
 		while not self.torrents:
 			time.sleep(1)

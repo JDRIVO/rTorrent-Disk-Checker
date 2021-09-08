@@ -5,6 +5,7 @@ from threading import Thread
 from datetime import datetime
 from collections import deque
 from remote_caller import SCGIRequest
+from utils import convertRules
 from messenger import message
 from deleter import Deleter
 
@@ -34,27 +35,10 @@ class Checker(SCGIRequest):
 		self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
 		self.lastModified = 0
 
-		self.include = True
-		self.exclude = self.no = False
+		self.include = "include"
+		self.exclude = "exclude"
 		self.whitelist = "whitelist"
 		self.blacklist = "blacklist"
-
-	def addRules(self, mode, dic):
-
-		if self.include in mode:
-
-			for title in mode[self.include]:
-				dic[title] = self.include
-
-		if self.exclude in mode:
-
-			for title in mode[self.exclude]:
-				dic[title] = self.exclude
-
-		for title, rules in mode.items():
-
-			if title not in (self.include, self.exclude):
-				dic[title] = rules
 
 	def check(self, torrentData):
 		torrentName, torrentHash, torrentPath, torrentSize = torrentData[1:]
@@ -68,23 +52,34 @@ class Checker(SCGIRequest):
 			except Exception as e:
 				self.cache.lock = False
 				self.checkerQueue.release = True
-				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e) )
+				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e))
 				return
 
-			self.lastModified = lastModified
 			self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
-			self.addRules(cfg.labels, self.labelRules)
-			self.addRules(cfg.trackers, self.trackerRules)
+			convertRules(cfg.labels, self.labelRules)
+			convertRules(cfg.trackers, self.trackerRules)
+			self.lastModified = lastModified
+			self.requirements = (
+				cfg.requirements["age"] if "age" in cfg.requirements else False,
+				cfg.requirements["ratio"] if "ratio" in cfg.requirements else False,
+				cfg.requirements["seeders"] if "seeders" in cfg.requirements else False,
+				cfg.requirements["size"] if "size" in cfg.requirements else False,
+				cfg.requirements["fb_mode"] if "fb_mode" in cfg.requirements else False,
+				cfg.requirements["fb_age"] if "fb_age" in cfg.requirements else False,
+				cfg.requirements["fb_ratio"] if "fb_ratio" in cfg.requirements else False,
+				cfg.requirements["fb_seeders"] if "fb_seeders" in cfg.requirements else False,
+				cfg.requirements["fb_size"] if "fb_size" in cfg.requirements else False,
+			)
 
 		completedTorrents = self.cache.torrents
 		completedTorrentsCopy = deque(completedTorrents)
-		parentDirectory = torrentPath.rsplit('/', 1)[0] if torrentName in torrentPath else torrentPath
+		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
 			mountPoint = self.mountPoints[parentDirectory]
 		except:
-			mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/') )] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else '/'
+			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else "/"
 			self.mountPoints[parentDirectory] = mountPoint
 
 		try:
@@ -93,12 +88,12 @@ class Checker(SCGIRequest):
 			if downloads:
 
 				try:
-					downloading = self.send("d.multicall2", ('', "leeching", "d.left_bytes=", "d.hash=", "d.state=") )
+					downloading = self.send("d.multicall2", ("", "leeching", "d.left_bytes=", "d.hash=", "d.state="))
 					downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState)
 				except Exception as e:
 					self.cache.lock = False
 					self.checkerQueue.release = True
-					logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents: {}".format(torrentName, e) )
+					logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents: {}".format(torrentName, e))
 					return
 
 			else:
@@ -119,7 +114,6 @@ class Checker(SCGIRequest):
 		availableSpace = (disk.f_bsize * disk.f_bavail + deletions - downloading) / 1073741824.0
 		minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_space_mp else cfg.minimum_space
 		requiredSpace = torrentSize - (availableSpace - minimumSpace)
-		requirements = cfg.minimum_size, cfg.minimum_age, cfg.minimum_ratio, cfg.fallback_mode, cfg.fallback_size, cfg.fallback_age, cfg.fallback_ratio
 
 		freedSpace = 0
 		override = True
@@ -130,11 +124,11 @@ class Checker(SCGIRequest):
 
 			if completedTorrentsCopy:
 				torrent = completedTorrentsCopy.popleft()
-				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
+				tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[2:]
 
 				if override:
 					override = False
-					minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = requirements
+					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = self.requirements
 
 				if cfg.exclude_unlabelled and not tLabel:
 					continue
@@ -175,9 +169,9 @@ class Checker(SCGIRequest):
 								if not tracker:
 									continue
 
-							if labelRule[0] is not self.include:
+							if self.include not in labelRule:
 								override = True
-								minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = labelRule[:7]
+								minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = labelRule[:9]
 
 					elif cfg.labels_only:
 						continue
@@ -200,33 +194,35 @@ class Checker(SCGIRequest):
 
 						if trackerRule is not self.include:
 							override = True
-							minSize, minAge, minRatio, fbMode, fbSize, fbAge, fbRatio = trackerRule
+							minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = trackerRule[:9]
 
 					elif cfg.trackers_only:
 						continue
 
 				tAgeDays = (currentTime - tAge).days
 
-				if tSizeGigabytes < minSize or tRatio < minRatio or tAgeDays < minAge:
+				if tAgeDays < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
 
 					if fbMode == 1:
 
-						if tSizeGigabytes >= fbSize and tRatio >= fbRatio and tAgeDays >= fbAge:
+						if tAgeDays >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
 							fallbackTorrents.append(torrent)
 
 					elif fbMode == 2:
 
 						if (
-								fbSize is not self.no and tSizeGigabytes >= fbSize) or (
-								fbRatio is not self.no and tRatio >= fbRatio) or (
-								fbAge is not self.no and tAgeDays >= fbAge):
+							(fbAge is not False and tAgeDays >= fbAge)
+							or (fbRatio is not False and tRatio >= fbRatio)
+							or (fbSeeders is not False and tSeeders >= fbSeeders)
+							or (fbSize is not False and tSizeGigabytes >= fbSize)
+						):
 							fallbackTorrents.append(torrent)
 
 					continue
 
 			else:
 				torrent = fallbackTorrents.popleft()
-				tLabel, tTracker, tHash, tPath, tSizeBytes, tSizeGigabytes, tRatio, tAge, parentDirectory = torrent
+				tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[2:]
 
 			if self.mountPoints[parentDirectory] != mountPoint:
 				continue
@@ -236,7 +232,7 @@ class Checker(SCGIRequest):
 			except:
 				continue
 
-			self.delete.append( (tHash, tSizeBytes, tPath, mountPoint) )
+			self.delete.append((tHash, tSizeBytes, tPath, mountPoint))
 			self.pendingDeletions[mountPoint] += tSizeBytes
 			freedSpace += tSizeGigabytes
 
@@ -246,9 +242,9 @@ class Checker(SCGIRequest):
 		if freedSpace >= requiredSpace:
 
 			try:
-				self.send("d.start", (torrentHash,) )
+				self.send("d.start", (torrentHash,))
 			except Exception as e:
-				logging.error("checker.py: {}: XMLRPC Error: Couldn't start torrent: {}".format(torrentName, e) )
+				logging.error("checker.py: {}: XMLRPC Error: Couldn't start torrent: {}".format(torrentName, e))
 
 		elif freedSpace < requiredSpace and (cfg.enable_email or cfg.enable_pushbullet or cfg.enable_telegram or cfg.enable_slack):
 

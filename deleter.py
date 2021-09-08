@@ -22,7 +22,7 @@ class Deleter(SCGIRequest):
 
 			while self.deletions:
 				self.pending.append(self.deletions[0][0])
-				self.delete(self.deletions.pop(0) )
+				self.delete(self.deletions.pop(0))
 
 			time.sleep(0.01)
 
@@ -30,7 +30,7 @@ class Deleter(SCGIRequest):
 		torrentHash, torrentSize, torrentPath, mountPoint = torrentData
 
 		try:
-			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path=") )
+			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path="))
 			tHash = (torrentHash,)
 			self.send("d.tracker_announce", tHash)
 			self.send("d.erase", tHash)
@@ -46,7 +46,7 @@ class Deleter(SCGIRequest):
 			try:
 				os.remove(files[0][1])
 			except Exception as e:
-				logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(files[0][1], e) )
+				logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(files[0][1], e))
 
 		else:
 
@@ -56,7 +56,7 @@ class Deleter(SCGIRequest):
 				try:
 					os.remove(file[1])
 				except Exception as e:
-					logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(file[1], e) )
+					logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(file[1], e))
 
 			try:
 				os.rmdir(torrentPath)
@@ -67,6 +67,6 @@ class Deleter(SCGIRequest):
 					try:
 						os.rmdir(root)
 					except Exception as e:
-						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e) )
+						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e))
 
 		self.pending.remove(torrentHash)

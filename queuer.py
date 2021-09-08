@@ -20,7 +20,7 @@ class CheckerQueue(Queue):
 				item = self.get()
 				self.cache.lock = True
 				self.release = False
-				t = Thread(target=self.checker.check, args=(item,) )
+				t = Thread(target=self.checker.check, args=(item,))
 				t.start()
 
 			time.sleep(0.000001)
