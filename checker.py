@@ -1,8 +1,6 @@
 import os
-import time
 import logging
 from threading import Thread
-from datetime import datetime
 from collections import deque
 from remote_caller import SCGIRequest
 from utils import convertRules
@@ -121,7 +119,6 @@ class Checker(SCGIRequest):
 		freedSpace = 0
 		override = True
 		fallbackTorrents = deque()
-		currentTime = datetime.now()
 
 		while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
