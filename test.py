@@ -218,7 +218,6 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 			elif cfg.trackers_only:
 				continue
 
-
 		if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
 
 			if fbMode == 1:
