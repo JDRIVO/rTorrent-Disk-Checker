@@ -56,10 +56,10 @@ def main(schedule=False):
 			)
 		except:
 			# Setup has ran before / Method already inserted
-			print("\nDisk checker is already running in the background. Please close it and run server.py")
+			print("\nDisk checker (server.py) is already running in the background. Please close it and run server.py")
 			return
 
-		print("\nSetup.py completed successfully. server.py is now running in the background.")
+		print("\nSetup.py completed successfully. Disk checker (server.py) is now running in the background.")
 
 	except Exception as e:
 		print("\nSetup.py failed:", e)
