@@ -24,20 +24,20 @@ minimum_space = 5
 
 # Optional - Specify minimum space values for specific mount points
 minimum_space_mp = {
-#                          '/': 5,
-#                          '/torrents': 100,
+#                        '/': 5,
+#                        '/torrents': 100,
                    }
 
 # Sort priority - If torrents are sorted first by age for instance and there are multiple torrents aged the same, the torrents of the same age will be
 # sorted by the next element in the list until there are no matching values or until the sort options have been exhausted
-sort_order = [age, ratio, size, seeders]
+sort_order = [age, ratio, seeders, size]
 
 # Group order provides finer control over which torrents are presented first to be deleted - Sort order is preserved
 # If a torrents label and tracker are both included in the label and tracker lists, the torrent will be grouped with labels
 group_order = [
-#                     [label, 'unwanted', 'tv', 'movies'],
-#                     [tracker, 'demonoid.pw'],
-#                     unmatched,
+#                   [label, 'unwanted', 'tv', 'movies'],
+#                   [tracker, 'demonoid.pw'],
+#                   unmatched,
               ]
 
 
@@ -58,9 +58,9 @@ group_order = [
 
 # To disable fallback either omit fb_mode or set fb_mode to 0
 
-# Empty requirements = ignore torrents attributes
+# No requirements = ignore torrents attributes
 # Age in days | Size in gigabytes
-requirements = {
+general_rules = {
 #                     age: 14,
 #                     ratio: 1.2,
 #                     seeders: 4,
@@ -70,7 +70,7 @@ requirements = {
 #                     fb_ratio: 1.2,
 #                     fb_seeders: 2,
 #                     fb_size: 4,
-               }
+                }
 
 
 ### TRACKER RULES ###
@@ -79,7 +79,7 @@ requirements = {
 
 # include = use general rules | exclude = exclude tracker
 
-trackers = {
+tracker_rules = {
 #                     include: ['demonoid.pw'],
 #                     exclude: ['hdme.eu', 'blutopia.xyz'],
 
@@ -106,7 +106,7 @@ trackers = {
 #                                           fb_age: 30,
 #                                        },
 #                     ('torrentleech.me', 'tpb.com'): {size: 10},
-           }
+                }
 
 # Only delete torrents from trackers with a tracker rule? (yes/no)
 trackers_only = no
@@ -120,7 +120,7 @@ trackers_only = no
 
 # whitelist = allowed trackers | blacklist = disallowed trackers
 
-labels = {
+label_rules = {
 #                     include: ['Trash', 'MOV', 'MP4'],
 #                     exclude: ['TV', 'Classics'],
 
@@ -151,7 +151,7 @@ labels = {
 #                              blacklist: ['blutopia.xyz'],
 #                           },
 #                     ('Sony', 'Nintendo'): {seeders: 2},
-         }
+              }
 
 # Only delete torrents with labels that have a label rule? (yes/no)
 labels_only = no
@@ -169,7 +169,7 @@ enable_telegram = no
 enable_slack = no
 
 # Amount of minutes to wait before sending another notification between torrent downloads
-interval = 60
+notification_interval = 60
 
 # Subject/Title if applicable
 subject = 'Warning: Disk Full'

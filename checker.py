@@ -56,23 +56,21 @@ class Checker(SCGIRequest):
 				return
 
 			self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
-			convertRules(cfg.labels, self.labelRules)
-			convertRules(cfg.trackers, self.trackerRules)
+			convertRules(cfg.label_rules, self.labelRules)
+			convertRules(cfg.tracker_rules, self.trackerRules)
 			self.lastModified = lastModified
 			self.requirements = (
-				cfg.requirements["age"] if "age" in cfg.requirements else False,
-				cfg.requirements["ratio"] if "ratio" in cfg.requirements else False,
-				cfg.requirements["seeders"] if "seeders" in cfg.requirements else False,
-				cfg.requirements["size"] if "size" in cfg.requirements else False,
-				cfg.requirements["fb_mode"] if "fb_mode" in cfg.requirements else False,
-				cfg.requirements["fb_age"] if "fb_age" in cfg.requirements else False,
-				cfg.requirements["fb_ratio"] if "fb_ratio" in cfg.requirements else False,
-				cfg.requirements["fb_seeders"] if "fb_seeders" in cfg.requirements else False,
-				cfg.requirements["fb_size"] if "fb_size" in cfg.requirements else False,
+				cfg.general_rules["age"] if "age" in cfg.general_rules else False,
+				cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
+				cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
+				cfg.general_rules["size"] if "size" in cfg.general_rules else False,
+				cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
+				cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
+				cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
+				cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
+				cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 			)
 
-		completedTorrents = self.cache.torrents
-		completedTorrentsCopy = deque(completedTorrents)
 		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 
 		try:
@@ -82,6 +80,9 @@ class Checker(SCGIRequest):
 			mountPoint = mountPoint[0] if mountPoint else "/"
 			self.mountPoints[parentDirectory] = mountPoint
 
+		completedTorrents = self.cache.torrents[mountPoint] if mountPoint in self.cache.torrents else []
+		completedTorrentsCopy = deque(completedTorrents)
+
 		try:
 			downloads = self.torrentsDownloading[mountPoint]
 
@@ -89,7 +90,7 @@ class Checker(SCGIRequest):
 
 				try:
 					downloading = self.send("d.multicall2", ("", "leeching", "d.left_bytes=", "d.hash=", "d.state="))
-					downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState)
+					downloading = sum([tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState])
 				except Exception as e:
 					self.cache.lock = False
 					self.checkerQueue.release = True
@@ -124,7 +125,7 @@ class Checker(SCGIRequest):
 
 			if completedTorrentsCopy:
 				torrent = completedTorrentsCopy.popleft()
-				tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[2:]
+				tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
 				if override:
 					override = False
@@ -199,19 +200,17 @@ class Checker(SCGIRequest):
 					elif cfg.trackers_only:
 						continue
 
-				tAgeDays = (currentTime - tAge).days
-
-				if tAgeDays < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
+				if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
 
 					if fbMode == 1:
 
-						if tAgeDays >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
+						if tAge >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
 							fallbackTorrents.append(torrent)
 
 					elif fbMode == 2:
 
 						if (
-							(fbAge is not False and tAgeDays >= fbAge)
+							(fbAge is not False and tAge >= fbAge)
 							or (fbRatio is not False and tRatio >= fbRatio)
 							or (fbSeeders is not False and tSeeders >= fbSeeders)
 							or (fbSize is not False and tSizeGigabytes >= fbSize)
@@ -222,17 +221,14 @@ class Checker(SCGIRequest):
 
 			else:
 				torrent = fallbackTorrents.popleft()
-				tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[2:]
-
-			if self.mountPoints[parentDirectory] != mountPoint:
-				continue
+				tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
 			try:
 				completedTorrents.remove(torrent)
 			except:
 				continue
 
-			self.delete.append((tHash, tSizeBytes, tPath, mountPoint))
+			self.delete.append((tHash, tSizeBytes, mountPoint))
 			self.pendingDeletions[mountPoint] += tSizeBytes
 			freedSpace += tSizeGigabytes
 

@@ -24,15 +24,14 @@ if len(pid.splitlines()) > 1:
 	print("Server is already running in the background. If you are updating, kill the server process and try again.")
 	sys.exit(0)
 
-if '/' not in sys.argv[0]:
+if "/" not in sys.argv[0]:
 	from remote_caller import SCGIRequest
 	rtxmlrpc = SCGIRequest()
 	print("Server is now running in the background.")
-	rtxmlrpc.send("execute.throw.bg", ('', "python3", os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])))
+	rtxmlrpc.send("execute.throw.bg", ("", "python3", os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])))
 	sys.exit(0)
 
 cache = Cache()
-cache.getMountPoints()
 checkerQueue = CheckerQueue()
 checkerQueue.createChecker(cache)
 

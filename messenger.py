@@ -47,7 +47,7 @@ class ServerCommunicator:
 			response = urlopen(request)
 			if response.getcode() == 200: return json.loads(response.read())
 		except Exception as e:
-			print(type(self).__name__ + ':', e)
+			print(type(self).__name__ + ":", e)
 
 	def createRequest(self, url, headers={}, data=None, origin_req_host=None, unverifiable=False):
 		if data: data = json.dumps(data).encode("utf8")
@@ -142,7 +142,7 @@ def message():
 	if LAST_NOTIFICATION:
 		period = datetime.datetime.now() - LAST_NOTIFICATION
 
-		if period < datetime.timedelta(minutes=cfg.interval):
+		if period < datetime.timedelta(minutes=cfg.notification_interval):
 			return
 
 	if cfg.enable_email:

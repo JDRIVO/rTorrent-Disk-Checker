@@ -11,50 +11,6 @@ except Exception as e:
 	print(e)
 	sys.exit(1)
 
-rtxmlrpc = SCGIRequest()
-
-completedTorrents = rtxmlrpc.send(
-	"d.multicall2",
-	(
-		"",
-		"complete",
-		"d.name=",
-		"d.hash=",
-		"d.custom1=",
-		"t.multicall=,t.url=",
-		"d.timestamp.finished=",
-		"t.multicall=,t.url=,t.scrape_complete=",
-		"d.ratio=",
-		"d.size_bytes=",
-		"d.directory=",
-	),
-)
-completedTorrents = [
-	(
-		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
-		tName,
-		tHash,
-		tLabel,
-		tTracker,
-		datetime.utcfromtimestamp(tAge),
-		max(seeds[1] for seeds in tSeeders),
-		tRatio / 1000.0,
-		tSize,
-		tSize / 1073741824.0,
-		tPath,
-		tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
-	)
-	for tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize, tPath in completedTorrents
-]
-completedTorrents = utils.sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
-mountPoints = {}
-
-for torrentData in completedTorrents:
-	parentDirectory = torrentData[-1]
-	mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/'))] if os.path.ismount(path)]
-	mountPoint = mountPoint[0] if mountPoint else "/"
-	mountPoints[parentDirectory] = mountPoint
-
 try:
 	torrentPath = sys.argv[2]
 except Exeption as e:
@@ -64,24 +20,73 @@ except Exeption as e:
 if torrentPath == "0":
 	torrentPath = "/"
 
+rtxmlrpc = SCGIRequest()
+
+completedTorrents = rtxmlrpc.send(
+	"d.multicall2",
+	(
+		"",
+		"complete",
+		"d.directory=",
+		"d.name=",
+		"d.hash=",
+		"d.custom1=",
+		"t.multicall=,t.url=",
+		"d.timestamp.finished=",
+		"t.multicall=,t.url=,t.scrape_complete=",
+		"d.ratio=",
+		"d.size_bytes=",
+	),
+)
+
+mountPoints = {}
+
+for torrentData in completedTorrents:
+	tPath, tName = torrentData[:2]
+	parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+	mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/'))] if os.path.ismount(path)]
+	mountPoint = mountPoint[0] if mountPoint else "/"
+	mountPoints[parentDirectory] = mountPoint
+
+mountPoint = [path for path in [torrentPath.rsplit('/', n)[0] for n in range(torrentPath.count('/'))] if os.path.ismount(path)]
+mountPoint = mountPoint[0] if mountPoint else "/"
+
+completedTorrents = [
+	(
+		tPath,
+		tName,
+		tHash,
+		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
+		tLabel,
+		tTracker,
+		max([seeds[1] for seeds in tSeeders]),
+		tRatio / 1000.0,
+		tSize,
+		tSize / 1073741824.0,
+	)
+	for tPath, tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize in completedTorrents
+	if mountPoints[tPath.rsplit("/", 1)[0] if tName in tPath else tPath] == mountPoint
+]
+completedTorrents = utils.sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
+
 whitelist, blacklist = "whitelist", "blacklist"
 include, exclude = "include", "exclude"
 labelRules, trackerRules = {}, {}
 override = True
 
 requirements = (
-	cfg.requirements["age"] if "age" in cfg.requirements else False,
-	cfg.requirements["ratio"] if "ratio" in cfg.requirements else False,
-	cfg.requirements["seeders"] if "seeders" in cfg.requirements else False,
-	cfg.requirements["size"] if "size" in cfg.requirements else False,
-	cfg.requirements["fb_mode"] if "fb_mode" in cfg.requirements else False,
-	cfg.requirements["fb_age"] if "fb_age" in cfg.requirements else False,
-	cfg.requirements["fb_ratio"] if "fb_ratio" in cfg.requirements else False,
-	cfg.requirements["fb_seeders"] if "fb_seeders" in cfg.requirements else False,
-	cfg.requirements["fb_size"] if "fb_size" in cfg.requirements else False,
+	cfg.general_rules["age"] if "age" in cfg.general_rules else False,
+	cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
+	cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
+	cfg.general_rules["size"] if "size" in cfg.general_rules else False,
+	cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
+	cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
+	cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
+	cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
+	cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 )
-utils.convertRules(cfg.labels, labelRules)
-utils.convertRules(cfg.trackers, trackerRules)
+utils.convertRules(cfg.label_rules, labelRules)
+utils.convertRules(cfg.tracker_rules, trackerRules)
 
 start = datetime.now()
 torrentSize = float(sys.argv[1])
@@ -105,7 +110,7 @@ try:
 
 		try:
 			downloading = self.send("d.multicall2", ("", "leeching", "d.left_bytes=", "d.hash=", "d.state="))
-			downloading = sum(tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState)
+			downloading = sum([tBytes for tBytes, tHash, tState in downloading if tHash in downloads and tState])
 		except Exception as e:
 			print(e)
 
@@ -138,7 +143,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	if completedTorrentsCopy:
 		torrent = completedTorrentsCopy.popleft()
-		tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[1:]
+		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
 		if override:
 			override = False
@@ -213,34 +218,30 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 			elif cfg.trackers_only:
 				continue
 
-		tAgeDays = (currentTime - tAge).days
 
-		if tAgeDays < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
+		if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
 
 			if fbMode == 1:
 
-				if tAgeDays >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
-					fallbackTorrents.append((torrent, tAgeDays))
+				if tAge >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
+					fallbackTorrents.append(torrent)
 
 			elif fbMode == 2:
 
 				if (
-					(fbAge is not False and tAgeDays >= fbAge)
+					(fbAge is not False and tAge >= fbAge)
 					or (fbRatio is not False and tRatio >= fbRatio)
 					or (fbSeeders is not False and tSeeders >= fbSeeders)
 					or (fbSize is not False and tSizeGigabytes >= fbSize)
 				):
-					fallbackTorrents.append((torrent, tAgeDays))
+					fallbackTorrents.append(torrent)
 
 			continue
 
 	else:
 		torrentInfo = fallbackTorrents.popleft()
-		torrent, tAgeDays = torrentInfo
-		tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSizeBytes, tSizeGigabytes, tPath, parentDirectory = torrent[1:]
-
-	if mountPoints[parentDirectory] != mountPoint:
-		continue
+		torrent = torrentInfo
+		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
 	try:
 		completedTorrents.remove(torrent)
@@ -248,7 +249,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 		continue
 
 	count += 1
-	deletedTorrents.append((count, tAgeDays, torrent))
+	deletedTorrents.append((count, torrent))
 	pendingDeletions[mountPoint] += tSizeBytes
 	freedSpace += tSizeGigabytes
 
@@ -267,23 +268,22 @@ with open("testresult.txt", "w+") as textFile:
 	textFile.write(info3 + "\n\n")
 	textFile.write(info1 + "\n\n")
 
-	for count, tAgeDays, torrentData in deletedTorrents:
+	for count, torrentData in deletedTorrents:
 		(
+			tPath,
 			tName,
 			tHash,
+			tAge,
 			tLabel,
 			tTracker,
-			tAge,
 			tSeeders,
 			tRatio,
 			tSizeBytes,
 			tSizeGigabytes,
-			tPath,
-			parentDirectory,
-		) = torrentData[1:]
+		) = torrentData
 		info = "{}. TA: {} Days Old\n{}. TN: {}\n{}. TL: {}\n{}. TR: {}\n{}. TS: {:.2f} GB\n{}. TSS: {}\n{}. TT: {}\n".format(
 			count,
-			tAgeDays,
+			tAge,
 			count,
 			tName,
 			count,

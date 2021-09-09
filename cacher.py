@@ -25,6 +25,7 @@ class Cache(SCGIRequest):
 		self.deletions, self.pending = [], []
 		self.torrents = None
 		self.lock = False
+		self.getMountPoints()
 		t = Thread(target=self.getTorrents)
 		t.start()
 		t = Thread(target=self.removeTorrents)
@@ -39,7 +40,7 @@ class Cache(SCGIRequest):
 
 				try:
 					tHash = self.hashes.pop(0)[2]
-					self.torrents.remove(self.torrentsDic[tHash])
+					self.torrents.remove(self.torrentHashes[tHash])
 				except:
 					continue
 
@@ -59,43 +60,55 @@ class Cache(SCGIRequest):
 						"",
 						"complete",
 						"d.name=",
+						"d.directory=",
 						"d.hash=",
+						"d.timestamp.finished=",
 						"d.custom1=",
 						"t.multicall=,t.url=",
-						"d.timestamp.finished=",
 						"t.multicall=,t.url=,t.scrape_complete=",
 						"d.ratio=",
 						"d.size_bytes=",
-						"d.directory=",
 					),
 				)
-				downloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
-				downloadingStopped = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
+				torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
+				stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
 			except:
 				time.sleep(60)
 				continue
 
 			completedTorrents = [
 				(
-					(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 					tName,
+					tPath,
 					tHash,
+					(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 					tLabel,
 					tTracker,
-					datetime.utcfromtimestamp(tAge),
-					max(seeds[1] for seeds in tSeeders),
+					max([seeds[1] for seeds in tSeeders]),
 					tRatio / 1000.0,
 					tSize,
 					tSize / 1073741824.0,
-					tPath,
-					tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
 				)
-				for tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize, tPath in completedTorrents
+				for tName, tPath, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSize in completedTorrents
 			]
-			self.torrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
-			self.torrentsDic = {tData[2]: tData for tData in self.torrents}
-			downloading = [tHash[0] for tHash in downloading] + [tHash for tHash, complete in downloadingStopped if not complete]
-			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in downloading]
+			sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
+			torrents, torrentHashes = {}, {}
+
+			for torrentData in sortedTorrents:
+				tName, tPath, tHash = torrentData[:3]
+				torrentHashes[tHash] = torrentData
+				parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+				mountPoint = self.mountPoints[parentDirectory]
+
+				if mountPoint in torrents:
+					torrents[mountPoint].append(torrentData[2:])
+				else:
+					torrents[mountPoint] = [torrentData[2:]]
+
+			self.torrents = torrents
+			self.torrentHashes = torrentHashes
+			torrentsDownloading = [tHash[0] for tHash in torrentsDownloading] + [tHash for tHash, complete in stoppedTorrents if not complete]
+			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in torrentsDownloading]
 
 			try:
 				reload(cfg)
@@ -117,26 +130,24 @@ class Cache(SCGIRequest):
 		while True:
 
 			try:
-				downloading = self.send("d.multicall2", ("", "leeching", "d.hash=", "d.name=", "d.directory="))
-				downloadingStopped = self.send("d.multicall2", ("", "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory="))
+				completedTorrents = self.send("d.multicall2", ("", "complete", "d.name=", "d.directory="))
+				torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash=", "d.name=", "d.directory="))
+				stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory="))
 				break
 			except:
 				time.sleep(1)
 
 		incompleteTorrents = [
 			[tHash, tPath.rsplit("/", 1)[0] if tName in tPath else tPath]
-			for tHash, tName, tPath in downloading
+			for tHash, tName, tPath in torrentsDownloading
 		] + [
 			[tHash, tPath.rsplit("/", 1)[0] if tName in tPath else tPath]
-			for complete, tHash, tName, tPath in downloadingStopped
+			for complete, tHash, tName, tPath in stoppedTorrents
 			if not complete
 		]
 
-		while not self.torrents:
-			time.sleep(1)
-
-		for torrentData in self.torrents:
-			parentDirectory = torrentData[-1]
+		for tName, tPath in completedTorrents:
+			parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
 
 			if parentDirectory not in self.mountPoints:
 				getMountPoint(parentDirectory)

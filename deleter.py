@@ -27,11 +27,12 @@ class Deleter(SCGIRequest):
 			time.sleep(0.01)
 
 	def delete(self, torrentData):
-		torrentHash, torrentSize, torrentPath, mountPoint = torrentData
+		torrentHash, torrentSize, mountPoint = torrentData
 
 		try:
-			files = self.send("f.multicall", (torrentHash, '', "f.size_bytes=", "f.frozen_path="))
+			files = self.send("f.multicall", (torrentHash, "", "f.size_bytes=", "f.frozen_path="))
 			tHash = (torrentHash,)
+			torrentPath = self.send("d.directory", tHash)
 			self.send("d.tracker_announce", tHash)
 			self.send("d.erase", tHash)
 		except Exception as e:
