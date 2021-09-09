@@ -79,8 +79,11 @@ class Checker(SCGIRequest):
 				cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 			)
 
-		completedTorrents = self.cache.torrents[mountPoint] if mountPoint in self.cache.torrents else []
-		completedTorrentsCopy = deque(completedTorrents)
+		try:
+			completedTorrents = self.cache.torrents[mountPoint]
+			completedTorrentsCopy = deque(completedTorrents)
+		except:
+			completedTorrentsCopy = None
 
 		try:
 			downloads = self.torrentsDownloading[mountPoint]
