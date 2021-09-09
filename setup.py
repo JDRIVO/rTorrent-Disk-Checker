@@ -59,7 +59,7 @@ def main(schedule=False):
 			print("\nDisk checker is already running in the background. Please close it and run server.py")
 			return
 
-		print("\nSetup.py completed successfully.")
+		print("\nSetup.py completed successfully. server.py is now running in the background.")
 
 	except Exception as e:
 		print("\nSetup.py failed:", e)
