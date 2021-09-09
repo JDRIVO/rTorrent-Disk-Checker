@@ -137,7 +137,6 @@ freedSpace = count = 0
 trackers = {}
 deletedTorrents = []
 fallbackTorrents = deque()
-currentTime = datetime.now()
 
 while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents):
 
