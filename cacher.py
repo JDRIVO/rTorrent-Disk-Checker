@@ -98,7 +98,7 @@ class Cache(SCGIRequest):
 				tName, tPath, tHash = torrentData[:3]
 				torrentHashes[tHash] = torrentData
 				parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
-				mountPoint = self.mountPoints[parentDirectory]
+				mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
 
 				if mountPoint in torrents:
 					torrents[mountPoint].append(torrentData[2:])
@@ -119,13 +119,13 @@ class Cache(SCGIRequest):
 
 			time.sleep(interval)
 
-	def getMountPoints(self):
+	def getMountPoint(self, parentDirectory):
+		mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
+		mountPoint = mountPoint[0] if mountPoint else "/"
+		self.mountPoints[parentDirectory] = mountPoint
+		return mountPoint
 
-		def getMountPoint(parentDirectory):
-			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else "/"
-			self.mountPoints[parentDirectory] = mountPoint
-			return mountPoint
+	def getMountPoints(self):
 
 		while True:
 
@@ -150,13 +150,13 @@ class Cache(SCGIRequest):
 			parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
 
 			if parentDirectory not in self.mountPoints:
-				getMountPoint(parentDirectory)
+				self.getMountPoint(parentDirectory)
 
 		for torrentData in incompleteTorrents:
 			parentDirectory = torrentData[-1]
 
 			if parentDirectory not in self.mountPoints:
-				mountPoint = getMountPoint(parentDirectory)
+				mountPoint = self.getMountPoint(parentDirectory)
 			else:
 				mountPoint = self.mountPoints[parentDirectory]
 

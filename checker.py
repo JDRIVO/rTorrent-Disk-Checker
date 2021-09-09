@@ -42,8 +42,16 @@ class Checker(SCGIRequest):
 
 	def check(self, torrentData):
 		torrentName, torrentHash, torrentPath, torrentSize = torrentData[1:]
+		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 		torrentSize = int(torrentSize) / 1073741824.0
 		lastModified = os.path.getmtime("config.py")
+
+		try:
+			mountPoint = self.mountPoints[parentDirectory]
+		except:
+			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
+			mountPoint = mountPoint[0] if mountPoint else "/"
+			self.mountPoints[parentDirectory] = mountPoint
 
 		if lastModified > self.lastModified:
 
@@ -70,15 +78,6 @@ class Checker(SCGIRequest):
 				cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
 				cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 			)
-
-		parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
-
-		try:
-			mountPoint = self.mountPoints[parentDirectory]
-		except:
-			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
-			mountPoint = mountPoint[0] if mountPoint else "/"
-			self.mountPoints[parentDirectory] = mountPoint
 
 		completedTorrents = self.cache.torrents[mountPoint] if mountPoint in self.cache.torrents else []
 		completedTorrentsCopy = deque(completedTorrents)
