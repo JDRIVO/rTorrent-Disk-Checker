@@ -1,6 +1,5 @@
 import os
 import logging
-from threading import Thread
 from collections import deque
 from remote_caller import SCGIRequest
 from utils import convertRules
