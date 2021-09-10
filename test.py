@@ -13,8 +13,8 @@ except Exception as e:
 
 try:
 	torrentPath = sys.argv[2]
-except Exeption as e:
-	print(e, "Second argument required being the mount point")
+except Exception as e:
+	print("Second argument (Mount Point) required.")
 	sys.exit(1)
 
 if torrentPath == "0":
