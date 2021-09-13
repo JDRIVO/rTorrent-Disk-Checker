@@ -141,8 +141,8 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 	unmatched = ordered["unmatched"]
 
 	for torrentData in torrents:
-		label = torrentData[3]
-		trackers = str(torrentData[4])
+		label = torrentData[4]
+		trackers = str(torrentData[5])
 
 		if label in labelsOrdered:
 			labelsOrdered[label].append(torrentData)
