@@ -1,7 +1,7 @@
 yes, no = True, False
 age, ratio, seeders, size = 'age', 'ratio', 'seeders', 'size'
 fb_mode, fb_age, fb_ratio, fb_seeders, fb_size = 'fb_mode', 'fb_age', 'fb_ratio', 'fb_seeders', 'fb_size'
-include, exclude, whitelist, blacklist, tracker, label, unmatched = 'include', 'exclude', 'whitelist', 'blacklist', 'tracker', 'label', 'unmatched'
+include, exclude, whitelist, blacklist, trackers, labels, unmatched = 'include', 'exclude', 'whitelist', 'blacklist', 'trackers', 'labels', 'unmatched'
 
 ############ USER DEFINED VARIABLES START ############
 
@@ -11,13 +11,24 @@ scgi = '127.0.0.1:5000'
 # Unix domain socket - This program will automatically create this file
 socket_file = 'unix_socket'
 
-# Amount of seconds to wait before updating the cache
+
+###### CACHE SETTINGS ######
+
+# Enable torrent cache? (yes/no)
+# If the cache is disabled, torrent data will be refreshed each time the disk check is run, thereby extending the execution time of the disk check
+enable_cache = yes
+
+# Amount of seconds to wait before updating the torrent cache
 cache_interval = 300
+
+# Update cache and check again if insufficient disk space is cleared? (yes/no)
+# In case updated torrent data meets your criteria, potentially allowing the program to clear enough disk space for the torrent to download
+repeat_check = no
 
 
 ###### DISK CHECKER SETTINGS ######
 
-# This program will auto detect mount points and only delete torrents inside the mount point that the torrent will be downloaded to
+# This program will auto-detect mount points and only delete torrents inside the mount point that the torrent will be downloaded to
 
 # The minimum amount of free space (in gigabytes) to maintain
 minimum_space = 5
@@ -32,11 +43,13 @@ minimum_space_mp = {
 # sorted by the next element in the list until there are no matching values or until the sort options have been exhausted
 sort_order = [age, ratio, seeders, size]
 
-# Group order provides finer control over which torrents are presented first to be deleted - Sort order is preserved
-# If a torrents label and tracker are both included in the label and tracker lists, the torrent will be grouped with labels
+# Group order provides finer control over which torrents are presented first to be deleted - Sort order is preserved within groups
+# If a torrents label and tracker are both included in the label and tracker lists, the torrent will be grouped with labels unless you have
+# specified specific trackers within a tuple "()" in the labels group, in which case only torrents from trackers matching the specified trackers
+# will be grouped with that label
 group_order = [
-#                   [label, 'unwanted', 'tv', 'movies'],
-#                   [tracker, 'demonoid.pw'],
+#                   [labels, ('unwanted', 'hd-torrents.org'), 'tv', 'movies'],
+#                   [trackers, 'demonoid.pw'],
 #                   unmatched,
               ]
 
@@ -72,6 +85,19 @@ general_rules = {
 #                     fb_size: 4,
                 }
 
+# Only delete torrents from trackers with a tracker rule? (yes/no)
+trackers_only = no
+
+# Only delete torrents with labels that have a label rule? (yes/no)
+labels_only = no
+
+# Only delete torrents with labels that have a label rule or are from trackers with a tracker rule? (yes/no)
+# Valid if you have both label and tracker rules
+labels_and_trackers_only = no
+
+# Exclude torrents without labels? (yes/no)
+exclude_unlabelled = no
+
 
 ### TRACKER RULES ###
 
@@ -96,7 +122,7 @@ tracker_rules = {
 #                                    },
 #                     'privatehd.to': {
 #                                        age: 14,
-#                                        ratio: 2,
+#                                        ratio: 1,
 #                                     },
 #                     'hd-torrents.org': {
 #                                           age: 7,
@@ -107,9 +133,6 @@ tracker_rules = {
 #                                        },
 #                     ('torrentleech.me', 'tpb.com'): {size: 10},
                 }
-
-# Only delete torrents from trackers with a tracker rule? (yes/no)
-trackers_only = no
 
 
 ### LABEL RULES ###
@@ -124,7 +147,7 @@ label_rules = {
 #                     include: ['Trash', 'MOV', 'MP4'],
 #                     exclude: ['TV', 'Classics'],
 
-#                     'Games': [include, whitelist, ['passthepopcorn'] ],
+#                     'Games': [include, whitelist, ['tpb.org'] ],
 #                     'Music': [include, blacklist, ['redacted.ch', 'orpheus.network'] ],
 #                     'Movie': {
 #                                 age: 21,
@@ -137,7 +160,7 @@ label_rules = {
 #                                 fb_seeders: 3,
 #                                 fb_size: 4,
 #                              },
-#                     'HD': {
+#                     'TV': {
 #                              age: 7,
 #                              ratio: 1,
 #                              whitelist: ['blutopia.xyz', 'hd-torrents.org'],
@@ -148,16 +171,11 @@ label_rules = {
 #                              size: 10,
 #                              fb_mode: 2,
 #                              fb_ratio: 2,
+#                              fb_seeders: 2,
 #                              blacklist: ['blutopia.xyz'],
 #                           },
 #                     ('Sony', 'Nintendo'): {seeders: 2},
               }
-
-# Only delete torrents with labels that have a label rule? (yes/no)
-labels_only = no
-
-# Exclude torrents without labels? (yes/no)
-exclude_unlabelled = no
 
 
 ###### NOTIFICATION SETTINGS ######

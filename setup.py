@@ -39,7 +39,7 @@ def main(schedule=False):
 				"",
 				"event.download.erased",
 				"checker_erase",
-				"execute.throw.bg=python3,{}/client.py,delete,$d.hash=".format(path),
+				"execute.throw.bg=python3,{}/client.py,delete,$d.hash=,$d.name=,$d.directory=".format(path),
 			),
 		)
 

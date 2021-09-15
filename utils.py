@@ -100,7 +100,7 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 			)
 		]
 
-	toIndex = {"age": 3, "ratio": 7, "seeders": 6, "size": 8}
+	toIndex = {"age": 3, "labels": 4, "trackers": 5, "ratio": 7, "seeders": 6, "size": 8}
 
 	while len(sortOrder) < 4:
 		sortOrder.append(sortOrder[-1])
@@ -116,37 +116,53 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 			),
 		)
 
-	labelOrder = trackerOrder = False
-	order = []
+	order, labelOrder, trackerOrder = [], [], []
+	labelsPairedWithTrackers = {}
 
 	for list_ in groupOrder:
 
-		if "label" in list_:
-			order.append("label")
-			labelOrder = list_[1:]
-		elif "tracker" in list_:
-			order.append("tracker")
+		if "labels" in list_:
+			order.append("labels")
+
+			for item in list_[1:]:
+
+				if isinstance(item, tuple) or isinstance(item, list):
+					labelsPairedWithTrackers[item[0]] = item[1:]
+					labelOrder.append(item[0])
+				else:
+					labelOrder.append(item)
+
+		elif "trackers" in list_:
+			order.append("trackers")
 			trackerOrder = list_[1:]
 		else:
 			order.append("unmatched")
 
 	ordered = {
-		"label": {label: [] for label in labelOrder} if labelOrder else [],
-		"tracker": {tracker: [] for tracker in trackerOrder} if trackerOrder else [],
+		"labels": {label: [] for label in labelOrder} if labelOrder else [],
+		"trackers": {tracker: [] for tracker in trackerOrder} if trackerOrder else [],
 		"unmatched": [],
 	}
 
-	labelsOrdered = ordered["label"]
-	trackersOrdered = ordered["tracker"]
+	labelsOrdered = ordered["labels"]
+	trackersOrdered = ordered["trackers"]
 	unmatched = ordered["unmatched"]
 
 	for torrentData in torrents:
-		label = torrentData[4]
-		trackers = str(torrentData[5])
+		label = torrentData[toIndex["labels"]]
+		trackers = str(torrentData[toIndex["trackers"]])
 
 		if label in labelsOrdered:
-			labelsOrdered[label].append(torrentData)
-			continue
+
+			if label in labelsPairedWithTrackers:
+
+				if [tracker for tracker in labelsPairedWithTrackers[label] if tracker in trackers]:
+					labelsOrdered[label].append(torrentData)
+					continue
+
+			else:
+				labelsOrdered[label].append(torrentData)
+				continue
 
 		if trackersOrdered:
 			tracker = [tracker for tracker in trackerOrder if tracker in trackers]
@@ -158,10 +174,10 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 		unmatched.append(torrentData)
 
 	if labelsOrdered:
-		sortList(labelOrder, "label")
+		sortList(labelOrder, "labels")
 
 	if trackersOrdered:
-		sortList(trackerOrder, "tracker")
+		sortList(trackerOrder, "trackers")
 
 	if unmatched:
 		unmatched.sort(

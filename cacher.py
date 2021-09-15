@@ -21,11 +21,11 @@ class Cache(SCGIRequest):
 
 	def __init__(self):
 		super(Cache, self).__init__()
-		self.pendingDeletions, self.torrentsDownloading, self.mountPoints = {}, {}, {}
+		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.deletions, self.pending = [], []
-		self.torrents = None
 		self.lock = False
 		self.getMountPoints()
+		self.refreshTorrents()
 		t = Thread(target=self.getTorrents)
 		t.start()
 		t = Thread(target=self.removeTorrents)
@@ -39,8 +39,10 @@ class Cache(SCGIRequest):
 			while self.hashes:
 
 				try:
-					tHash = self.hashes.pop(0)[2]
-					self.torrents.remove(self.torrentHashes[tHash])
+					tHash, tName, tPath = self.hashes.pop(0)[2:]
+					parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+					mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
+					self.torrents[mountPoint].remove(self.torrentHashes[tHash])
 				except:
 					continue
 
@@ -53,62 +55,8 @@ class Cache(SCGIRequest):
 			while self.lock or self.deletions or self.pending:
 				time.sleep(60)
 
-			try:
-				completedTorrents = self.send(
-					"d.multicall2",
-					(
-						"",
-						"complete",
-						"d.name=",
-						"d.directory=",
-						"d.hash=",
-						"d.timestamp.finished=",
-						"d.custom1=",
-						"t.multicall=,t.url=",
-						"t.multicall=,t.url=,t.scrape_complete=",
-						"d.ratio=",
-						"d.size_bytes=",
-					),
-				)
-				torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
-				stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
-			except:
-				time.sleep(60)
-				continue
-
-			completedTorrents = [
-				(
-					tName,
-					tPath,
-					tHash,
-					(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
-					tLabel,
-					tTracker,
-					max([seeds[1] for seeds in tSeeders]),
-					tRatio / 1000.0,
-					tSize,
-					tSize / 1073741824.0,
-				)
-				for tName, tPath, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSize in completedTorrents
-			]
-			sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
-			torrents, torrentHashes = {}, {}
-
-			for torrentData in sortedTorrents:
-				tName, tPath, tHash = torrentData[:3]
-				torrentHashes[tHash] = torrentData
-				parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
-				mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
-
-				if mountPoint in torrents:
-					torrents[mountPoint].append(torrentData[2:])
-				else:
-					torrents[mountPoint] = [torrentData[2:]]
-
-			self.torrents = torrents
-			self.torrentHashes = torrentHashes
-			torrentsDownloading = [tHash[0] for tHash in torrentsDownloading] + [tHash for tHash, complete in stoppedTorrents if not complete]
-			[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in torrentsDownloading]
+			if cfg.enable_cache:
+				self.refreshTorrents()
 
 			try:
 				reload(cfg)
@@ -118,6 +66,68 @@ class Cache(SCGIRequest):
 				interval = 300
 
 			time.sleep(interval)
+
+	def refreshTorrents(self):
+
+		while self.deletions or self.pending:
+			time.sleep(0.1)
+
+		try:
+			completedTorrents = self.send(
+				"d.multicall2",
+				(
+					"",
+					"complete",
+					"d.name=",
+					"d.directory=",
+					"d.hash=",
+					"d.timestamp.finished=",
+					"d.custom1=",
+					"t.multicall=,t.url=",
+					"t.multicall=,t.url=,t.scrape_complete=",
+					"d.ratio=",
+					"d.size_bytes=",
+				),
+			)
+			torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
+			stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
+		except:
+			return
+
+		completedTorrents = [
+			(
+				tName,
+				tPath,
+				tHash,
+				(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
+				tLabel,
+				tTracker,
+				max([seeds[1] for seeds in tSeeders]),
+				tRatio / 1000.0,
+				tSize,
+				tSize / 1073741824.0,
+			)
+			for tName, tPath, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSize in completedTorrents
+		]
+		sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
+		torrents, torrentHashes = {}, {}
+
+		for torrentData in sortedTorrents:
+			tName, tPath, tHash = torrentData[:3]
+			torrentData = torrentData[2:]
+			torrentHashes[tHash] = torrentData
+			parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+			mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
+
+			if mountPoint in torrents:
+				torrents[mountPoint].append(torrentData)
+			else:
+				torrents[mountPoint] = [torrentData]
+
+		self.torrents = torrents
+		self.torrentHashes = torrentHashes
+		torrentsDownloading = [tHash[0] for tHash in torrentsDownloading] + [tHash for tHash, complete in stoppedTorrents if not complete]
+		[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in torrentsDownloading]
 
 	def getMountPoint(self, parentDirectory):
 		mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]

@@ -134,6 +134,7 @@ minimumSpace = cfg.minimum_space_mp[mountPoint] if mountPoint in cfg.minimum_spa
 requiredSpace = torrentSize - (availableSpace - minimumSpace)
 
 freedSpace = count = 0
+labelMatch = False
 trackers = {}
 deletedTorrents = []
 fallbackTorrents = deque()
@@ -143,6 +144,9 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 	if completedTorrentsCopy:
 		torrent = completedTorrentsCopy.popleft()
 		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
+
+		if labelMatch:
+			labelMatch = False
 
 		if override:
 			override = False
@@ -158,6 +162,8 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 				if labelRule is exclude:
 					continue
+
+				labelMatch = True
 
 				if labelRule is not include:
 
@@ -214,7 +220,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 					override = True
 					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = trackerRule[:9]
 
-			elif cfg.trackers_only:
+			elif cfg.trackers_only or (cfg.labels_and_trackers_only and not labelMatch):
 				continue
 
 		if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
