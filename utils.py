@@ -191,9 +191,9 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 
 	orderedList = []
 
-	for element in order:
-		orderedList += ordered[element]
-		ordered[element].clear()
+	for group in order:
+		orderedList += ordered[group]
+		ordered[group].clear()
 
 	if unmatched:
 		orderedList += unmatched
