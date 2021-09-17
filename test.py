@@ -145,17 +145,15 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 		torrent = completedTorrentsCopy.popleft()
 		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
-		if labelMatch:
-			labelMatch = False
+		if cfg.exclude_unlabelled and not tLabel:
+			continue
 
 		if override:
 			override = False
 			minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = requirements
 
-		if cfg.exclude_unlabelled and not tLabel:
-			continue
-
 		if labelRules:
+			labelMatch = False
 
 			if tLabel in labelRules:
 				labelRule = labelRules[tLabel]

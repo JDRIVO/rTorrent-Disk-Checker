@@ -128,7 +128,7 @@ tracker_rules = {
 #                                           age: 7,
 #                                           ratio: 1.1,
 #                                           size: 5,
-#                                           fb_mode: 2,
+#                                           fb_mode: 1,
 #                                           fb_age: 30,
 #                                        },
 #                     ('torrentleech.me', 'tpb.com'): {size: 10},
@@ -145,7 +145,7 @@ tracker_rules = {
 
 label_rules = {
 #                     include: ['Trash', 'MOV', 'MP4'],
-#                     exclude: ['TV', 'Classics'],
+#                     exclude: ['HD', 'Classics'],
 
 #                     'Games': [include, whitelist, ['tpb.org'] ],
 #                     'Music': [include, blacklist, ['redacted.ch', 'orpheus.network'] ],

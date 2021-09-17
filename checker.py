@@ -131,17 +131,15 @@ class Checker(SCGIRequest):
 				torrent = completedTorrentsCopy.popleft()
 				tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
-				if labelMatch:
-					labelMatch = False
+				if cfg.exclude_unlabelled and not tLabel:
+					continue
 
 				if override:
 					override = False
 					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = self.requirements
 
-				if cfg.exclude_unlabelled and not tLabel:
-					continue
-
 				if self.labelRules:
+					labelMatch = False
 
 					if tLabel in self.labelRules:
 						labelRule = self.labelRules[tLabel]
@@ -254,6 +252,7 @@ class Checker(SCGIRequest):
 
 			if cfg.repeat_check and self.lastHash != torrentHash:
 				self.lastHash = torrentHash
+				self.torrentsDownloading[mountPoint].remove(torrentHash)
 				self.cache.refreshTorrents()
 				self.check(torrentData)
 
