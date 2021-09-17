@@ -139,15 +139,12 @@ class Checker(SCGIRequest):
 					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = self.requirements
 
 				if self.labelRules:
-					labelMatch = False
 
 					if tLabel in self.labelRules:
 						labelRule = self.labelRules[tLabel]
 
 						if labelRule is exclude:
 							continue
-
-						labelMatch = True
 
 						if labelRule is not include:
 
@@ -181,8 +178,12 @@ class Checker(SCGIRequest):
 								override = True
 								minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = labelRule[:9]
 
+						labelMatch = True
+
 					elif cfg.labels_only:
 						continue
+					else:
+						labelMatch = False
 
 				if self.trackerRules and not override:
 
