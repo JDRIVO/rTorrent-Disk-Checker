@@ -58,8 +58,8 @@ group_order = [
 
 # All minimum requirements must be met by a torrent for it to be deleted
 
-# If all minimum requirements aren't met, the torrent will run through fallback conditions.
-# If all or any (dependent on fallback mode) minimum fallback requirements are met, the torrent will be added to a fallback queue.
+# If all minimum requirements aren't met, the torrent will run through fallback conditions
+# If all or any (dependent on fallback mode) minimum fallback requirements are met, the torrent will be added to a fallback queue
 
 # Fallback torrents will only be deleted:
 #         -  once all torrents have been checked to verify minimum requirement satisfaction &
