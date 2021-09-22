@@ -35,9 +35,8 @@ class Checker(SCGIRequest):
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
-		self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
+		self.cfgLabelRules = self.cfgTrackerRules = self.lastHash = None
 		self.lastModified = 0
-		self.lastHash = None
 
 	def check(self, torrentData):
 		torrentName, torrentHash, torrentPath, torrentSize = torrentData[1:]
@@ -62,9 +61,16 @@ class Checker(SCGIRequest):
 				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e))
 				return
 
-			self.labelRules, self.trackerRules, self.trackers = {}, {}, {}
-			convertRules(cfg.label_rules, self.labelRules)
-			convertRules(cfg.tracker_rules, self.trackerRules)
+			if self.cfgLabelRules != cfg.label_rules:
+				self.cfgLabelRules = cfg.label_rules
+				self.labelRules = {}
+				convertRules(cfg.label_rules, self.labelRules)
+
+			if self.cfgTrackerRules != cfg.tracker_rules:
+				self.cfgTrackerRules = cfg.tracker_rules
+				self.trackerRules, self.trackers = {}, {}
+				convertRules(cfg.tracker_rules, self.trackerRules)
+
 			self.lastModified = lastModified
 			self.requirements = (
 				cfg.general_rules["age"] if "age" in cfg.general_rules else False,
