@@ -63,7 +63,7 @@ class Checker(SCGIRequest):
 
 			if self.cfgLabelRules != cfg.label_rules:
 				self.cfgLabelRules = cfg.label_rules
-				self.labelRules = {}
+				self.labelRules, self.trackers = {}, {}
 				convertRules(cfg.label_rules, self.labelRules)
 
 			if self.cfgTrackerRules != cfg.tracker_rules:
