@@ -37,11 +37,11 @@ class Cache(SCGIRequest):
 		while True:
 
 			while self.hashes:
+				tHash, tName, tPath = self.hashes.pop(0)[2:]
+				parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+				mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
 
 				try:
-					tHash, tName, tPath = self.hashes.pop(0)[2:]
-					parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
-					mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
 					self.torrents[mountPoint].remove(self.torrentHashes[tHash])
 				except:
 					continue
