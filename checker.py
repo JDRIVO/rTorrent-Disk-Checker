@@ -35,7 +35,7 @@ class Checker(SCGIRequest):
 		self.mountPoints = self.cache.mountPoints
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
-		self.cfgLabelRules = self.cfgTrackerRules = self.lastHash = None
+		self.cfgGeneralRules = self.cfgLabelRules = self.cfgTrackerRules = self.lastHash = None
 		self.lastModified = 0
 
 	def check(self, torrentData):
@@ -71,18 +71,21 @@ class Checker(SCGIRequest):
 				self.trackerRules, self.trackers = {}, {}
 				convertRules(cfg.tracker_rules, self.trackerRules)
 
+			if self.cfgGeneralRules != cfg.general_rules:
+				self.cfgGeneralRules = cfg.general_rules
+				self.requirements = (
+					cfg.general_rules["age"] if "age" in cfg.general_rules else False,
+					cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
+					cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
+					cfg.general_rules["size"] if "size" in cfg.general_rules else False,
+					cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
+					cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
+					cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
+					cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
+					cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
+				)
+
 			self.lastModified = lastModified
-			self.requirements = (
-				cfg.general_rules["age"] if "age" in cfg.general_rules else False,
-				cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
-				cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
-				cfg.general_rules["size"] if "size" in cfg.general_rules else False,
-				cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
-				cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
-				cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
-				cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
-				cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
-			)
 
 		if not cfg.enable_cache:
 			self.cache.refreshTorrents()
