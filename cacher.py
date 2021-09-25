@@ -46,9 +46,6 @@ class Cache(SCGIRequest):
 				except:
 					pass
 
-				t = Thread(target=self.removeTorrent, args=(torrentHash, mountPoint))
-				t.start()
-
 			time.sleep(0.01)
 
 	def removeTorrent(self, torrentHash, mountPoint):
@@ -70,7 +67,7 @@ class Cache(SCGIRequest):
 
 		while True:
 
-			while self.lock or self.deletions:
+			while self.lock or self.deletions or self.pending:
 				time.sleep(60)
 
 			if cfg.enable_cache:
@@ -87,7 +84,7 @@ class Cache(SCGIRequest):
 
 	def refreshTorrents(self):
 
-		while self.deletions:
+		while self.deletions or self.pending:
 			time.sleep(0.1)
 
 		self.refreshing = True

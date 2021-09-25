@@ -10,6 +10,7 @@ class Deleter(SCGIRequest):
 	def __init__(self, cache):
 		super(Deleter, self).__init__()
 		self.cache = cache
+		self.removeTorrent = self.cache.removeTorrent
 		self.deletions = self.cache.deletions
 		self.pending = self.cache.pending
 		self.pendingDeletions = self.cache.pendingDeletions
@@ -74,3 +75,6 @@ class Deleter(SCGIRequest):
 						os.rmdir(root)
 					except Exception as e:
 						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e))
+
+		t = Thread(target=self.removeTorrent, args=(torrentHash, mountPoint))
+		t.start()
