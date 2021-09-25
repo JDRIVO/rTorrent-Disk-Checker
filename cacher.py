@@ -23,7 +23,7 @@ class Cache(SCGIRequest):
 		super(Cache, self).__init__()
 		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.deletions, self.pending = [], []
-		self.lock = False
+		self.lock = self.refreshing = False
 		self.getMountPoints()
 		self.refreshTorrents()
 		t = Thread(target=self.getTorrents)
@@ -32,27 +32,45 @@ class Cache(SCGIRequest):
 		t.start()
 
 	def removeTorrents(self):
-		self.hashes = []
+		self.deletedTorrents = []
 
 		while True:
 
-			while self.hashes:
-				tHash, tName, tPath = self.hashes.pop(0)[2:]
-				parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+			while self.deletedTorrents:
+				torrentHash, torrentName, torrentPath = self.deletedTorrents.pop(0)[2:]
+				parentDirectory = torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath
 				mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
 
 				try:
-					self.torrents[mountPoint].remove(self.torrentHashes[tHash])
+					self.torrents[mountPoint].remove(self.torrentHashes[torrentHash])
 				except:
-					continue
+					pass
+
+				t = Thread(target=self.removeTorrent, args=(torrentHash, mountPoint))
+				t.start()
 
 			time.sleep(0.01)
+
+	def removeTorrent(self, torrentHash, mountPoint):
+
+		while self.refreshing:
+			time.sleep(0.01)
+
+		try:
+			self.torrents[mountPoint].remove(self.torrentHashes[torrentHash])
+		except:
+			pass
+
+		try:
+			self.pending.remove((torrentHash, mountPoint))
+		except:
+			pass
 
 	def getTorrents(self):
 
 		while True:
 
-			while self.lock or self.deletions or self.pending:
+			while self.lock or self.deletions:
 				time.sleep(60)
 
 			if cfg.enable_cache:
@@ -69,8 +87,10 @@ class Cache(SCGIRequest):
 
 	def refreshTorrents(self):
 
-		while self.deletions or self.pending:
+		while self.deletions:
 			time.sleep(0.1)
+
+		self.refreshing = True
 
 		try:
 			completedTorrents = self.send(
@@ -92,6 +112,7 @@ class Cache(SCGIRequest):
 			torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
 			stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
 		except:
+			self.refreshing = False
 			return
 
 		completedTorrents = [
@@ -124,8 +145,27 @@ class Cache(SCGIRequest):
 			else:
 				torrents[mountPoint] = [torrentData]
 
+		if self.deletions or self.pending or self.pendingDeletions:
+
+			while self.deletions:
+
+				try:
+					torrentHash, mountPoint, torrentSize = self.deletions[0]
+					torrents[mountPoint].remove(torrentHashes[torrentHash])
+				except:
+					pass
+
+			while self.pending:
+
+				try:
+					torrentHash, mountPoint = self.pending.pop(0)
+					torrents[mountPoint].remove(torrentHashes[torrentHash])
+				except:
+					pass
+
 		self.torrents = torrents
 		self.torrentHashes = torrentHashes
+		self.refreshing = False
 		torrentsDownloading = [tHash[0] for tHash in torrentsDownloading] + [tHash for tHash, complete in stoppedTorrents if not complete]
 		[tHashes.remove(tHash) for tHashes in self.torrentsDownloading.values() for tHash in tHashes[:] if tHash not in torrentsDownloading]
 

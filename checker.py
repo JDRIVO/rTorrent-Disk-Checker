@@ -245,7 +245,7 @@ class Checker(SCGIRequest):
 			except:
 				continue
 
-			self.delete.append((tHash, tSizeBytes, mountPoint))
+			self.delete.append((tHash, mountPoint, tSizeBytes))
 			self.pendingDeletions[mountPoint] += tSizeBytes
 			freedSpace += tSizeGigabytes
 
