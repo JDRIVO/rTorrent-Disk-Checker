@@ -9,8 +9,8 @@ logging.basicConfig(filename="checker_server.log", level=logging.DEBUG, format="
 try:
 	import config as cfg
 except Exception as e:
-	print(e)
-	logging.critical("server.py: Config Error: Couldn't import socket_file:", e)
+	print("Error: Couldn't import config file:", e)
+	logging.critical("server.py: Config Error: Couldn't import config file: " + str(e))
 	sys.exit(1)
 
 from threading import Thread
