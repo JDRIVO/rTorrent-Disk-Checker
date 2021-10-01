@@ -1,8 +1,8 @@
 import os
 import sys
+import utils
 from datetime import datetime
 from collections import deque
-import utils
 from remote_caller import SCGIRequest
 
 try:
