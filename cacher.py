@@ -78,15 +78,15 @@ class Cache(SCGIRequest):
 			while self.lock or self.deletions or self.pending:
 				time.sleep(60)
 
-			if cfg.enable_cache:
-				self.refreshTorrents()
-
 			try:
 				reload(cfg)
 				interval = cfg.cache_interval
 			except Exception as e:
 				logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
 				interval = 300
+
+			if cfg.enable_cache:
+				self.refreshTorrents()
 
 			time.sleep(interval)
 
