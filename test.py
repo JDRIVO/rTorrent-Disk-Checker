@@ -8,7 +8,7 @@ from remote_caller import SCGIRequest
 try:
 	import config as cfg
 except Exception as e:
-	print(e)
+	print("Error: Couldn't import config file:", e)
 	sys.exit(1)
 
 try:
