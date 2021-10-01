@@ -12,7 +12,6 @@ try:
 except:
 	from imp import reload
 
-
 include = "include"
 exclude = "exclude"
 whitelist = "whitelist"
