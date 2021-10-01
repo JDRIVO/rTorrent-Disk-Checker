@@ -14,7 +14,7 @@ except:
 try:
 	import config as cfg
 except Exception as e:
-	logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
+	logging.critical("cacher.py: Config Error: Couldn't import config file", e)
 
 
 class Cache(SCGIRequest):
@@ -78,19 +78,17 @@ class Cache(SCGIRequest):
 			while self.lock or self.deletions or self.pending:
 				time.sleep(60)
 
-			try:
-				reload(cfg)
-				interval = cfg.cache_interval
-			except Exception as e:
-				logging.critical("cacher.py: Config Error: Setting cache_interval to default value of 300:", e)
-				interval = 300
-
 			if cfg.enable_cache:
 				self.refreshTorrents()
 
-			time.sleep(interval)
+			time.sleep(cfg.cache_interval)
 
 	def refreshTorrents(self):
+
+		try:
+			reload(cfg)
+		except Exception as e:
+			logging.error("cacher.py: Config Error: Can't reload settings:", e)
 
 		while self.deletions or self.pending:
 			time.sleep(0.01)
