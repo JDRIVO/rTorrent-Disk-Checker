@@ -3,9 +3,6 @@ import sys
 import socket
 import logging
 import subprocess
-from threading import Thread
-from queuer import CheckerQueue
-from cacher import Cache
 
 logging.basicConfig(filename="checker_server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
@@ -15,6 +12,10 @@ except Exception as e:
 	print(e)
 	logging.critical("server.py: Config Error: Couldn't import socket_file:", e)
 	sys.exit(1)
+
+from threading import Thread
+from queuer import CheckerQueue
+from cacher import Cache
 
 cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

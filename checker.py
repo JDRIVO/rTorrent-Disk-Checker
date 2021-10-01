@@ -1,5 +1,6 @@
 import os
 import logging
+import config as cfg
 from collections import deque
 from remote_caller import SCGIRequest
 from utils import convertRules
@@ -10,11 +11,6 @@ try:
 	from importlib import reload
 except:
 	from imp import reload
-
-try:
-	import config as cfg
-except Exception as e:
-	logging.critical("checker.py: Config Error: Couldn't import config file:", e)
 
 
 include = "include"

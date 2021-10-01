@@ -1,6 +1,7 @@
 import os
 import time
 import logging
+import config as cfg
 from threading import Thread
 from datetime import datetime
 from utils import sortTorrents
@@ -10,11 +11,6 @@ try:
 	from importlib import reload
 except:
 	from imp import reload
-
-try:
-	import config as cfg
-except Exception as e:
-	logging.critical("cacher.py: Config Error: Couldn't import config file", e)
 
 
 class Cache(SCGIRequest):
