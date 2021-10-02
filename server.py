@@ -55,4 +55,4 @@ try:
 
 except Exception as e:
 	print(e)
-	logging.critical("server.py: Server Error: Server closing:", e)
+	logging.critical("server.py: Server Error: Server closing: " + str(e))

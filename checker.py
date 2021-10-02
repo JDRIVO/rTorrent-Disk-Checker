@@ -83,7 +83,12 @@ class Checker(SCGIRequest):
 			self.lastModified = lastModified
 
 		if not cfg.enable_cache:
-			self.cache.refreshTorrents()
+
+			if self.cache.refreshTorrents():
+				self.cache.lock = False
+				self.checkerQueue.release = True
+				logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents".format(torrentName))
+				return
 
 		try:
 			completedTorrents = self.cache.torrents[mountPoint]
@@ -269,4 +274,4 @@ class Checker(SCGIRequest):
 				try:
 					message()
 				except Exception as e:
-					logging.error("checker.py: Message Error: Couldn't send message:", e)
+					logging.error("checker.py: Message Error: Couldn't send message: " + str(e))

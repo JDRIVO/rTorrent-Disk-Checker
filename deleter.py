@@ -37,7 +37,7 @@ class Deleter(SCGIRequest):
 			self.send("d.tracker_announce", tHash)
 			self.send("d.erase", tHash)
 		except Exception as e:
-			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent:", e)
+			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent: " + str(e))
 			self.pendingDeletions[mountPoint] -= torrentSize
 
 			try:

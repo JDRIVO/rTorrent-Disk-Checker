@@ -84,7 +84,7 @@ class Cache(SCGIRequest):
 		try:
 			reload(cfg)
 		except Exception as e:
-			logging.error("cacher.py: Config Error: Can't reload settings:", e)
+			logging.error("cacher.py: Config Error: Couldn't reload settings: " + str(e))
 
 		while self.deletions or self.pending:
 			time.sleep(0.01)
@@ -112,7 +112,7 @@ class Cache(SCGIRequest):
 			stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
 		except:
 			self.refreshing = False
-			return
+			return True
 
 		completedTorrents = [
 			(
