@@ -14,7 +14,6 @@ except Exception as e:
 	logging.critical("server.py: Config Error: Couldn't import config file: " + str(e))
 	sys.exit(1)
 
-from threading import Thread
 from queuer import CheckerQueue
 from cacher import Cache
 
