@@ -28,7 +28,7 @@ if len(pids) > 1:
 	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if serverPath in str(pid) and int(pid.split()[0]) != myPid]
 
 if "/" not in sys.argv[0]:
-	print("Server is now running in the background.")
+	print("Disk checker (server.py) is now running in the background.")
 	subprocess.Popen([sys.executable, serverPath])
 	sys.exit(0)
 
