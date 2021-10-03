@@ -1,5 +1,6 @@
 import os
 import sys
+import signal
 import socket
 import logging
 import subprocess
@@ -19,11 +20,10 @@ from cacher import Cache
 
 cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-pid, err = process.communicate()
+pids = process.communicate()[0].splitlines()
 
-if len(pid.splitlines()) > 1:
-	print("Server is already running in the background. If you are updating, kill the server process and try again.")
-	sys.exit(0)
+if len(pids) > 1:
+	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if os.path.join(os.path.abspath(os.getcwd()), sys.argv[0]) in str(pid)]
 
 if "/" not in sys.argv[0]:
 	from remote_caller import SCGIRequest
