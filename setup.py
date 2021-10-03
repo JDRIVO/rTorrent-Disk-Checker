@@ -56,8 +56,7 @@ def main(schedule=False):
 			)
 		except:
 			# Setup has ran before / Method already inserted
-			print("\nDisk checker (server.py) is already running in the background. Please close it and run server.py")
-			return
+			pass
 
 		print("\nSetup.py completed successfully. Disk checker (server.py) is now running in the background.")
 
