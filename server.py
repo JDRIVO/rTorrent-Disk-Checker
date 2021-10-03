@@ -18,18 +18,19 @@ from threading import Thread
 from queuer import CheckerQueue
 from cacher import Cache
 
+serverPath = os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])
 cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 pids = process.communicate()[0].splitlines()
 
 if len(pids) > 1:
-	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if os.path.join(os.path.abspath(os.getcwd()), sys.argv[0]) in str(pid)]
+	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if serverPath in str(pid)]
 
 if "/" not in sys.argv[0]:
 	from remote_caller import SCGIRequest
 	rtxmlrpc = SCGIRequest()
 	print("Server is now running in the background.")
-	rtxmlrpc.send("execute.throw.bg", ("", "python3", os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])))
+	rtxmlrpc.send("execute.throw.bg", ("", "python3", serverPath))
 	sys.exit(0)
 
 cache = Cache()
