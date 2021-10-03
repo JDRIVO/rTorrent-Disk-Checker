@@ -28,7 +28,7 @@ if len(pids) > 1:
 
 if "/" not in sys.argv[0]:
 	print("Disk checker (server.py) is now running in the background.")
-	subprocess.Popen([sys.executable, serverPath])
+	subprocess.Popen([sys.executable, serverPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	sys.exit(0)
 
 cache = Cache()
