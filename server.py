@@ -22,9 +22,10 @@ serverPath = os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])
 cmd = "pgrep -a python | grep " + sys.argv[0]
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 pids = process.communicate()[0].splitlines()
+myPid = os.getpid()
 
 if len(pids) > 1:
-	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if serverPath in str(pid)]
+	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if serverPath in str(pid) and int(pid.split()[0]) != myPid]
 
 if "/" not in sys.argv[0]:
 	from remote_caller import SCGIRequest
