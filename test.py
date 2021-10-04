@@ -1,15 +1,16 @@
 import os
 import sys
 import utils
-from datetime import datetime
-from collections import deque
-from remote_caller import SCGIRequest
 
 try:
 	import config as cfg
 except Exception as e:
 	print("Error: Couldn't import config file:", e)
 	sys.exit(1)
+
+from datetime import datetime
+from collections import deque
+from remote_caller import SCGIRequest
 
 try:
 	torrentPath = sys.argv[2]
