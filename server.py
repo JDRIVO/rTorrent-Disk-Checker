@@ -32,8 +32,7 @@ if "/" not in sys.argv[0]:
 	sys.exit(0)
 
 cache = Cache()
-checkerQueue = CheckerQueue()
-checkerQueue.createChecker(cache)
+checkerQueue = CheckerQueue(cache)
 
 socketFile = cfg.socket_file
 if os.path.exists(socketFile): os.remove(socketFile)

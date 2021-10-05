@@ -52,7 +52,6 @@ class Checker(SCGIRequest):
 				reload(cfg)
 			except Exception as e:
 				self.cache.lock = False
-				self.checkerQueue.release = True
 				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e))
 				return
 
@@ -82,13 +81,10 @@ class Checker(SCGIRequest):
 
 			self.lastModified = lastModified
 
-		if not cfg.enable_cache:
-
-			if self.cache.refreshTorrents():
-				self.cache.lock = False
-				self.checkerQueue.release = True
-				logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents".format(torrentName))
-				return
+		if not cfg.enable_cache and self.cache.refreshTorrents():
+			self.cache.lock = False
+			logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents".format(torrentName))
+			return
 
 		try:
 			completedTorrents = self.cache.torrents[mountPoint]
@@ -106,7 +102,6 @@ class Checker(SCGIRequest):
 					torrentsDownloading = sum([tBytes for tBytes, tHash, tState in torrentsDownloading if tHash in downloading and tState])
 				except Exception as e:
 					self.cache.lock = False
-					self.checkerQueue.release = True
 					logging.critical("checker.py: {}: XMLRPC Error: Couldn't retrieve torrents: {}".format(torrentName, e))
 					return
 
@@ -251,7 +246,6 @@ class Checker(SCGIRequest):
 
 		if freedSpace >= requiredSpace:
 			self.cache.lock = False
-			self.checkerQueue.release = True
 
 			try:
 				self.send("d.start", (torrentHash,))
@@ -267,7 +261,6 @@ class Checker(SCGIRequest):
 				self.check(torrentData)
 
 			self.cache.lock = False
-			self.checkerQueue.release = True
 
 			if cfg.enable_email or cfg.enable_pushbullet or cfg.enable_telegram or cfg.enable_slack:
 

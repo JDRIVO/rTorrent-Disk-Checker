@@ -6,25 +6,21 @@ from checker import Checker
 
 class CheckerQueue(Queue):
 
-	def __init__(self):
+	def __init__(self, cache):
 		super(CheckerQueue, self).__init__()
-		self.release = True
+		self.cache = cache
+		self.checker = Checker(self.cache, self)
 		t = Thread(target=self.processor)
 		t.start()
 
 	def processor(self):
 
 		while True:
+			torrent = self.get()
 
-			if self.release:
-				item = self.get()
-				self.cache.lock = True
-				self.release = False
-				t = Thread(target=self.checker.check, args=(item,))
-				t.start()
+			while self.cache.lock:
+				time.sleep(0.000001)
 
-			time.sleep(0.000001)
-
-	def createChecker(self, cache):
-		self.cache = cache
-		self.checker = Checker(cache, self)
+			self.cache.lock = True
+			t = Thread(target=self.checker.check, args=(torrent,))
+			t.start()
