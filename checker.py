@@ -20,14 +20,13 @@ blacklist = "blacklist"
 
 class Checker(SCGIRequest):
 
-	def __init__(self, cache, checkerQueue):
+	def __init__(self, cache):
 		super(Checker, self).__init__()
 		self.cache = cache
-		self.checkerQueue = checkerQueue
 		deleter = Deleter(self.cache)
 		self.delete = deleter.deletions
-
 		self.mountPoints = self.cache.mountPoints
+
 		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
 		self.cfgGeneralRules = self.cfgLabelRules = self.cfgTrackerRules = self.lastHash = None

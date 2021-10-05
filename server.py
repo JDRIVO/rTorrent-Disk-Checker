@@ -15,6 +15,7 @@ except Exception as e:
 	sys.exit(1)
 
 from queuer import CheckerQueue
+from checker import Checker
 from cacher import Cache
 
 serverPath = os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])
@@ -32,7 +33,8 @@ if "/" not in sys.argv[0]:
 	sys.exit(0)
 
 cache = Cache()
-checkerQueue = CheckerQueue(cache)
+checker = Checker(cache)
+checkerQueue = CheckerQueue(cache, checker)
 
 socketFile = cfg.socket_file
 if os.path.exists(socketFile): os.remove(socketFile)

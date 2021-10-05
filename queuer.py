@@ -1,15 +1,14 @@
 import time
 from queue import Queue
 from threading import Thread
-from checker import Checker
 
 
 class CheckerQueue(Queue):
 
-	def __init__(self, cache):
+	def __init__(self, cache, checker):
 		super(CheckerQueue, self).__init__()
 		self.cache = cache
-		self.checker = Checker(self.cache, self)
+		self.checker = checker
 		t = Thread(target=self.processor)
 		t.start()
 
