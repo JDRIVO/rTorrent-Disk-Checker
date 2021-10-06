@@ -42,7 +42,7 @@ class SCGIRequest:
 
 	@staticmethod
 	def makeHeaders(headers):
-		return "\x00".join(["%s\x00%s" % t for t in headers]) + "\x00"
+		return "\x00".join(["%s\x00%s" % h for h in headers]) + "\x00"
 
 	@staticmethod
 	def addRequiredSCGIHeaders(data):
