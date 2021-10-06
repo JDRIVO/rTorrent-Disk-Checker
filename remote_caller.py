@@ -10,7 +10,6 @@ class SCGIRequest:
 		self.url = scgi
 
 	def send(self, methodName, params):
-		"Send data over scgi to url and get response"
 		data = xmlrpclib.dumps(params, methodName)
 		scgiResp = self.__send(self.addRequiredSCGIHeaders(data))
 		xmlResp = "".join(scgiResp.split("\n")[4:])
@@ -44,17 +43,14 @@ class SCGIRequest:
 
 	@staticmethod
 	def encodeNetstring(string):
-		"Encode string as netstring"
 		return "%d:%s," % (len(string), string)
 
 	@staticmethod
 	def makeHeaders(headers):
-		"Make scgi header list"
 		return "\x00".join(["%s\x00%s" % t for t in headers]) + "\x00"
 
 	@staticmethod
 	def addRequiredSCGIHeaders(data, headers=[]):
-		"Wrap data in an scgi request, see spec at: http://python.ca/scgi/protocol.txt"
 		headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data))), ("SCGI", "1")] + headers)
 		encHeaders = SCGIRequest.encodeNetstring(headers)
 		return encHeaders + data
