@@ -8,7 +8,7 @@ class SCGIRequest:
 
 	def send(self, methodName, params):
 		data = xmlrpclib.dumps(params, methodName)
-		scgiReq = self.addRequiredSCGIHeaders(data)
+		scgiReq = self.addRequiredSCGIHeaders(data).encode("utf-8")
 
 		try:
 			host, port = scgi.split(":")
@@ -19,7 +19,7 @@ class SCGIRequest:
 			sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 			sock.connect(scgi)
 
-		sock.send(scgiReq.encode())
+		sock.send(scgiReq)
 		sFile = sock.makefile()
 		resp = ""
 
@@ -32,7 +32,6 @@ class SCGIRequest:
 			resp += data
 
 		sock.close()
-
 		scgiResp = urllib.unquote(resp)
 		xmlResp = "".join(scgiResp.split("\n")[4:])
 		return xmlrpclib.loads(xmlResp)[0][0]
