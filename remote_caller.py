@@ -9,30 +9,30 @@ class SCGIRequest:
 	def __init__(self):
 		self.url = scgi
 
-	def send(self, methodname, params):
+	def send(self, methodName, params):
 		"Send data over scgi to url and get response"
-		data = xmlrpclib.dumps(params, methodname)
-		scgiresp = self.__send(self.addRequiredSCGIHeaders(data))
-		xmlresp = "".join(scgiresp.split("\n")[4:])
-		return xmlrpclib.loads(xmlresp)[0][0]
+		data = xmlrpclib.dumps(params, methodName)
+		scgiResp = self.__send(self.addRequiredSCGIHeaders(data))
+		xmlResp = "".join(scgiResp.split("\n")[4:])
+		return xmlrpclib.loads(xmlResp)[0][0]
 
-	def __send(self, scgireq):
+	def __send(self, scgiReq):
 
 		try:
 			host, port = self.url.split(":")
-			addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-			sock = socket.socket(*addrinfo[0][:3])
-			sock.connect(addrinfo[0][4])
+			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+			sock = socket.socket(*addrInfo[0][:3])
+			sock.connect(addrInfo[0][4])
 		except:
 			sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 			sock.connect(self.url)
 
-		sock.send(scgireq.encode())
-		sfile = sock.makefile()
+		sock.send(scgiReq.encode())
+		sFile = sock.makefile()
 		response = ""
 
 		while True:
-			data = sfile.read(1024)
+			data = sFile.read(1024)
 
 			if not data:
 				break
