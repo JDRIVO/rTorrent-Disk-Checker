@@ -8,11 +8,7 @@ class SCGIRequest:
 
 	def send(self, methodName, params):
 		data = xmlrpclib.dumps(params, methodName)
-		scgiResp = self.__send(self.addRequiredSCGIHeaders(data))
-		xmlResp = "".join(scgiResp.split("\n")[4:])
-		return xmlrpclib.loads(xmlResp)[0][0]
-
-	def __send(self, scgiReq):
+		scgiReq = self.addRequiredSCGIHeaders(data)
 
 		try:
 			host, port = scgi.split(":")
@@ -36,7 +32,10 @@ class SCGIRequest:
 			resp += data
 
 		sock.close()
-		return urllib.unquote(resp)
+
+		scgiResp = urllib.unquote(resp)
+		xmlResp = "".join(scgiResp.split("\n")[4:])
+		return xmlrpclib.loads(xmlResp)[0][0]
 
 	@staticmethod
 	def encodeNetstring(string):
