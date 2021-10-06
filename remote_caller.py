@@ -50,7 +50,7 @@ class SCGIRequest:
 		return "\x00".join(["%s\x00%s" % t for t in headers]) + "\x00"
 
 	@staticmethod
-	def addRequiredSCGIHeaders(data, headers=[]):
-		headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data))), ("SCGI", "1")] + headers)
+	def addRequiredSCGIHeaders(data):
+		headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data))), ("SCGI", "1")])
 		encHeaders = SCGIRequest.encodeNetstring(headers)
 		return encHeaders + data
