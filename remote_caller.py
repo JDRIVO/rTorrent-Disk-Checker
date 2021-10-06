@@ -6,9 +6,6 @@ from config import scgi
 
 class SCGIRequest:
 
-	def __init__(self):
-		self.url = scgi
-
 	def send(self, methodName, params):
 		data = xmlrpclib.dumps(params, methodName)
 		scgiResp = self.__send(self.addRequiredSCGIHeaders(data))
@@ -18,13 +15,13 @@ class SCGIRequest:
 	def __send(self, scgiReq):
 
 		try:
-			host, port = self.url.split(":")
+			host, port = scgi.split(":")
 			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
 			sock = socket.socket(*addrInfo[0][:3])
 			sock.connect(addrInfo[0][4])
 		except:
 			sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			sock.connect(self.url)
+			sock.connect(scgi)
 
 		sock.send(scgiReq.encode())
 		sFile = sock.makefile()
