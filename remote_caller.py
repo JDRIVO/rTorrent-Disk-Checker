@@ -21,11 +21,11 @@ class SCGIRequest:
 
 		sock.send(scgiReq)
 		sFile = sock.makefile()
-		recvData = resp = sFile.read(1024)
+		data = resp = sFile.read(1024)
 
-		while recvData:
-			recvData = sFile.read(1024)
-			resp += recvData
+		while data:
+			data = sFile.read(1024)
+			resp += data
 
 		sock.close()
 		scgiResp = urllib.unquote(resp)
