@@ -13,21 +13,21 @@ class SCGIRequest:
 		try:
 			host, port = scgi.split(":")
 			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-			sock = socket.socket(*addrInfo[0][:3])
-			sock.connect(addrInfo[0][4])
+			s = socket.socket(*addrInfo[0][:3])
+			s.connect(addrInfo[0][4])
 		except:
-			sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			sock.connect(scgi)
+			s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+			s.connect(scgi)
 
-		sock.send(scgiReq)
-		sFile = sock.makefile()
+		s.send(scgiReq)
+		sFile = s.makefile()
 		data = resp = sFile.read(1024)
 
 		while data:
 			data = sFile.read(1024)
 			resp += data
 
-		sock.close()
+		s.close()
 		scgiResp = urllib.unquote(resp)
 		xmlResp = "".join(scgiResp.split("\n")[4:])
 		return xmlrpclib.loads(xmlResp)[0][0]
