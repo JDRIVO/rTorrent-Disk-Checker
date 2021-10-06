@@ -29,7 +29,7 @@ class SCGIRequest:
 
 		sock.send(scgiReq.encode())
 		sFile = sock.makefile()
-		response = ""
+		resp = ""
 
 		while True:
 			data = sFile.read(1024)
@@ -37,10 +37,10 @@ class SCGIRequest:
 			if not data:
 				break
 
-			response += data
+			resp += data
 
 		sock.close()
-		return urllib.unquote(response)
+		return urllib.unquote(resp)
 
 	@staticmethod
 	def encodeNetstring(string):
