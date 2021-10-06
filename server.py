@@ -46,12 +46,12 @@ try:
 
 	while True:
 		clientSocket, address = s.accept()
-		message = clientSocket.recv(2048).decode("utf-8").split("|:|")
+		data = clientSocket.recv(2048).decode("utf-8").split("|:|")
 
-		if "delete" in message:
-			cache.deletedTorrents.append(message)
+		if "delete" in data:
+			cache.deletedTorrents.append(data)
 		else:
-			checkerQueue.put(message)
+			checkerQueue.put(data)
 
 except Exception as e:
 	print(e)
