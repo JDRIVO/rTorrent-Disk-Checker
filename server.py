@@ -45,8 +45,8 @@ try:
 	s.listen(50)
 
 	while True:
-		clientsocket, address = s.accept()
-		message = clientsocket.recv(2048).decode("utf-8").split("|:|")
+		clientSocket, address = s.accept()
+		message = clientSocket.recv(2048).decode("utf-8").split("|:|")
 
 		if "delete" in message:
 			cache.deletedTorrents.append(message)
