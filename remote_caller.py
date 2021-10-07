@@ -8,12 +8,12 @@ class SCGIRequest:
 
 	def __init__(self):
 
-		if ":" in scgi:
+		try:
 			host, port = scgi.split(":")
 			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
 			self.sInfo = addrInfo[0][:3]
 			self.scgi = addrInfo[0][4]
-		else:
+		except:
 			self.sInfo = socket.AF_UNIX, socket.SOCK_STREAM
 			self.scgi = scgi
 
