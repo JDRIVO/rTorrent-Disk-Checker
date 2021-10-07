@@ -8,7 +8,7 @@ class SCGIRequest:
 
 	def send(self, methodName, params):
 		xmlReq = xmlrpclib.dumps(params, methodName)
-		scgiReq = self.addRequiredSCGIHeaders(xmlReq).encode("utf-8")
+		scgiReq = self.addSCGIHeaders(xmlReq).encode("utf-8")
 
 		try:
 			host, port = scgi.split(":")
@@ -41,7 +41,7 @@ class SCGIRequest:
 		return "\x00".join(["%s\x00%s" % h for h in headers]) + "\x00"
 
 	@staticmethod
-	def addRequiredSCGIHeaders(data):
+	def addSCGIHeaders(data):
 		headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data))), ("SCGI", "1")])
 		encHeaders = SCGIRequest.encodeNetstring(headers)
 		return encHeaders + data
