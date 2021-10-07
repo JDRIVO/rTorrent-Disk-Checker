@@ -7,8 +7,8 @@ from config import scgi
 class SCGIRequest:
 
 	def send(self, methodName, params):
-		data = xmlrpclib.dumps(params, methodName)
-		scgiReq = self.addRequiredSCGIHeaders(data).encode("utf-8")
+		xmlReq = xmlrpclib.dumps(params, methodName)
+		scgiReq = self.addRequiredSCGIHeaders(xmlReq).encode("utf-8")
 
 		try:
 			host, port = scgi.split(":")
