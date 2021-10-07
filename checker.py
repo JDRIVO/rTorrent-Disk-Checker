@@ -256,7 +256,9 @@ class Checker(SCGIRequest):
 			if cfg.repeat_check and self.lastHash != torrentHash:
 				self.lastHash = torrentHash
 				self.torrentsDownloading[mountPoint].remove(torrentHash)
+				self.cache.repeat = True
 				self.cache.refreshTorrents()
+				self.cache.repeat = False
 				self.check(torrentData)
 
 			self.cache.lock = False

@@ -19,7 +19,7 @@ class Cache(SCGIRequest):
 		super(Cache, self).__init__()
 		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.deletions, self.pending = [], []
-		self.lock = self.refreshing = False
+		self.lock = self.refreshing = self.repeat = False
 		self.getMountPoints()
 		self.refreshTorrents()
 		t = Thread(target=self.getTorrents)
@@ -144,7 +144,7 @@ class Cache(SCGIRequest):
 			else:
 				torrents[mountPoint] = [torrentData]
 
-		while (self.lock and cfg.enable_cache) or self.deletions or self.pending:
+		while (self.lock and cfg.enable_cache and not self.repeat) or self.deletions or self.pending:
 
 			while self.deletions:
 
