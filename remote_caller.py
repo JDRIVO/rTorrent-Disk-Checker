@@ -6,20 +6,25 @@ from config import scgi
 
 class SCGIRequest:
 
+	def __init__(self):
+
+		if ":" in scgi:
+			host, port = scgi.split(":")
+			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+			self.sInfo = addrInfo[0][:3]
+			self.scgi = addrInfo[0][4]
+		else:
+			self.sInfo = socket.AF_UNIX, socket.SOCK_STREAM
+			self.scgi = scgi
+
 	def send(self, methodName, params):
 		xmlReq = xmlrpclib.dumps(params, methodName)
 		scgiReq = self.addSCGIHeaders(xmlReq).encode("utf-8")
 
-		try:
-			host, port = scgi.split(":")
-			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
-			s = socket.socket(*addrInfo[0][:3])
-			s.connect(addrInfo[0][4])
-		except:
-			s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-			s.connect(scgi)
-
+		s = socket.socket(*self.sInfo)
+		s.connect(self.scgi)
 		s.send(scgiReq)
+
 		sFile = s.makefile()
 		data = resp = sFile.read(1024)
 
@@ -28,6 +33,7 @@ class SCGIRequest:
 			resp += data
 
 		s.close()
+
 		scgiResp = urllib.unquote(resp)
 		xmlResp = "".join(scgiResp.split("\n")[4:])
 		return xmlrpclib.loads(xmlResp)[0][0]
