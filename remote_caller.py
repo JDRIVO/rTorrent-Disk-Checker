@@ -39,15 +39,7 @@ class SCGIRequest:
 		return xmlrpclib.loads(xmlResp)[0][0]
 
 	@staticmethod
-	def encodeNetstring(string):
-		return "%d:%s," % (len(string), string)
-
-	@staticmethod
-	def makeHeaders(headers):
-		return "\x00".join(["%s\x00%s" % h for h in headers]) + "\x00"
-
-	@staticmethod
 	def addSCGIHeaders(data):
-		headers = SCGIRequest.makeHeaders([("CONTENT_LENGTH", str(len(data))), ("SCGI", "1")])
-		encHeaders = SCGIRequest.encodeNetstring(headers)
+		headers = "CONTENT_LENGTH\x00{}\x00SCGI1\x00".format(len(data))
+		encHeaders = "{}:{},".format(len(headers), headers)
 		return encHeaders + data
