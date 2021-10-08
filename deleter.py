@@ -12,6 +12,7 @@ class Deleter(SCGIRequest):
 		self.cache = cache
 		self.pending = self.cache.pending
 		self.deletions = self.cache.deletions
+
 		self.updatePending = self.cache.updatePending
 		self.pendingDeletions = self.cache.pendingDeletions
 		t = Thread(target=self.processor)

@@ -20,12 +20,25 @@ class Cache(SCGIRequest):
 		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.deletions, self.pending = [], []
 		self.lock = self.refreshing = self.repeat = False
+		self.lastModified = 0
+
 		self.getMountPoints()
 		self.refreshTorrents()
 		t = Thread(target=self.getTorrents)
 		t.start()
 		t = Thread(target=self.removeTorrents)
 		t.start()
+
+	def reloadConfig(self):
+		lastModified = os.path.getmtime("config.py")
+
+		if lastModified > self.lastModified:
+			self.lastModified = lastModified
+
+			try:
+				reload(cfg)
+			except Exception as e:
+				logging.error("cacher.py: Config Error: Couldn't reload config: " + str(e))
 
 	def removeTorrents(self):
 		self.deletedTorrents = []
@@ -71,20 +84,19 @@ class Cache(SCGIRequest):
 
 		while True:
 
-			while self.lock or self.deletions or self.pending:
-				time.sleep(60)
+			while cfg.enable_cache:
 
-			if cfg.enable_cache:
+				while self.lock or self.deletions or self.pending:
+					time.sleep(60)
+
 				self.refreshTorrents()
+				time.sleep(cfg.cache_interval)
 
-			time.sleep(cfg.cache_interval)
+			self.reloadConfig()
+			time.sleep(1)
 
 	def refreshTorrents(self):
-
-		try:
-			reload(cfg)
-		except Exception as e:
-			logging.error("cacher.py: Config Error: Couldn't reload settings: " + str(e))
+		self.reloadConfig()
 
 		while self.deletions or self.pending:
 			time.sleep(0.01)
