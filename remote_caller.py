@@ -18,28 +18,28 @@ class SCGIRequest:
 			self.scgi = scgi
 
 	def send(self, methodName, params):
-		xmlReq = xmlrpclib.dumps(params, methodName)
-		scgiReq = self.addHeaders(xmlReq).encode("utf-8")
+		xmlRequest = xmlrpclib.dumps(params, methodName)
+		scgiRequest = self.addHeaders(xmlRequest).encode("utf-8")
 
 		s = socket.socket(*self.sInfo)
 		s.connect(self.scgi)
-		s.send(scgiReq)
+		s.send(scgiRequest)
 
 		sFile = s.makefile()
-		data = resp = sFile.read(1024)
+		data = response = sFile.read(1024)
 
 		while data:
 			data = sFile.read(1024)
-			resp += data
+			response += data
 
 		s.close()
 
-		scgiResp = urllib.unquote(resp)
-		xmlResp = "".join(scgiResp.split("\n")[4:])
-		return xmlrpclib.loads(xmlResp)[0][0]
+		scgiResponse = urllib.unquote(response)
+		xmlResponse = "".join(scgiResponse.split("\n")[4:])
+		return xmlrpclib.loads(xmlResponse)[0][0]
 
 	@staticmethod
 	def addHeaders(body):
 		headers = "CONTENT_LENGTH\x00{}\x00SCGI1\x00".format(len(body))
-		encHeaders = "{}:{},".format(len(headers), headers)
-		return encHeaders + body
+		encodedHeaders = "{}:{},".format(len(headers), headers)
+		return encodedHeaders + body
