@@ -27,8 +27,8 @@ class Checker(SCGIRequest):
 		self.delete = deleter.deletions
 		self.mountPoints = self.cache.mountPoints
 
-		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.pendingDeletions = self.cache.pendingDeletions
+		self.torrentsDownloading = self.cache.torrentsDownloading
 		self.cfgGeneralRules = self.cfgLabelRules = self.cfgTrackerRules = self.lastHash = None
 		self.lastModified = 0
 
