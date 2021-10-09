@@ -9,8 +9,7 @@ class CheckerQueue(Queue):
 		super(CheckerQueue, self).__init__()
 		self.cache = cache
 		self.checker = checker
-		t = Thread(target=self.processor)
-		t.start()
+		Thread(target=self.processor).start()
 
 	def processor(self):
 
