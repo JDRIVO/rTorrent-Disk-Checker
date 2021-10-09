@@ -21,5 +21,4 @@ class CheckerQueue(Queue):
 				time.sleep(0.000001)
 
 			self.cache.lock = True
-			t = Thread(target=self.checker.check, args=(torrent,))
-			t.start()
+			Thread(target=self.checker.check, args=(torrent,)).start()

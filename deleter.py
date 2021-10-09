@@ -15,8 +15,7 @@ class Deleter(SCGIRequest):
 
 		self.updatePending = self.cache.updatePending
 		self.pendingDeletions = self.cache.pendingDeletions
-		t = Thread(target=self.processor)
-		t.start()
+		Thread(target=self.processor).start()
 
 	def processor(self):
 
@@ -77,5 +76,4 @@ class Deleter(SCGIRequest):
 					except Exception as e:
 						logging.error("deleter.py: Folder Deletion Error: Skipping folder: {}: {}".format(root, e))
 
-		t = Thread(target=self.updatePending, args=(torrentData,))
-		t.start()
+		Thread(target=self.updatePending, args=(torrentData,)).start()

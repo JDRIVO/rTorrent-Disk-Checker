@@ -24,10 +24,8 @@ class Cache(SCGIRequest):
 
 		self.getMountPoints()
 		self.refreshTorrents()
-		t = Thread(target=self.getTorrents)
-		t.start()
-		t = Thread(target=self.removeTorrents)
-		t.start()
+		Thread(target=self.getTorrents).start()
+		Thread(target=self.removeTorrents).start()
 
 	def reloadConfig(self):
 		lastModified = os.path.getmtime("config.py")
@@ -55,8 +53,7 @@ class Cache(SCGIRequest):
 				except:
 					pass
 
-				t = Thread(target=self.removeTorrent, args=(torrentHash, mountPoint))
-				t.start()
+				Thread(target=self.removeTorrent, args=(torrentHash, mountPoint)).start()
 
 			time.sleep(0.01)
 
