@@ -77,6 +77,7 @@ while true; do
 		[yY] )
 			low_diskspace=true
 			printf '\nPlease enter a number representing the time in seconds the check will run per cycle: '
+
 			while true; do
 				read interval
 				case $interval in
@@ -110,6 +111,7 @@ while true; do
 
 		* )
 			printf '\nEnter [Y] or [N]: ' ;;
+
 	esac
 done
 
