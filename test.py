@@ -243,8 +243,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 			continue
 
 	else:
-		torrentInfo = fallbackTorrents.popleft()
-		torrent = torrentInfo
+		torrent = fallbackTorrents.popleft()
 		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
 
 	try:
