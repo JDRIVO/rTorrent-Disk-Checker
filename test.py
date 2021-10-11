@@ -54,15 +54,14 @@ mountPoint = mountPoint[0] if mountPoint else "/"
 
 completedTorrents = [
 	(
-		tPath,
 		tName,
 		tHash,
+		tSize,
 		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 		tLabel,
 		tTracker,
 		max([seeds[1] for seeds in tSeeders]),
 		tRatio / 1000.0,
-		tSize,
 		tSize / 1073741824.0,
 	)
 	for tPath, tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize in completedTorrents
@@ -144,7 +143,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	if completedTorrentsCopy:
 		torrent = completedTorrentsCopy.popleft()
-		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
+		tName, tHash, tSizeBytes, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeGigabytes = torrent
 
 		if cfg.exclude_unlabelled and not tLabel:
 			continue
@@ -244,7 +243,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	else:
 		torrent = fallbackTorrents.popleft()
-		tPath, tName, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
+		tName, tHash, tSizeBytes, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeGigabytes = torrent
 
 	try:
 		completedTorrents.remove(torrent)
@@ -273,15 +272,14 @@ with open("testresult.txt", "w+") as textFile:
 
 	for count, torrentData in deletedTorrents:
 		(
-			tPath,
 			tName,
 			tHash,
+			tSizeBytes,
 			tAge,
 			tLabel,
 			tTracker,
 			tSeeders,
 			tRatio,
-			tSizeBytes,
 			tSizeGigabytes,
 		) = torrentData
 		info = "{}. TA: {} Days Old\n{}. TN: {}\n{}. TL: {}\n{}. TR: {}\n{}. TS: {:.2f} GB\n{}. TSS: {}\n{}. TT: {}\n".format(
