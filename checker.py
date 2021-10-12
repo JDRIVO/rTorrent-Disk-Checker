@@ -132,7 +132,7 @@ class Checker(SCGIRequest):
 
 			if completedTorrentsCopy:
 				torrent = completedTorrentsCopy.popleft()
-				tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
+				tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
 
 				if cfg.exclude_unlabelled and not tLabel:
 					continue
@@ -232,7 +232,7 @@ class Checker(SCGIRequest):
 
 			else:
 				torrent = fallbackTorrents.popleft()
-				tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeBytes, tSizeGigabytes = torrent
+				tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
 
 			try:
 				completedTorrents.remove(torrent)

@@ -13,6 +13,7 @@ except:
 	from imp import reload
 
 
+
 class Cache(SCGIRequest):
 
 	def __init__(self):
@@ -106,14 +107,14 @@ class Cache(SCGIRequest):
 				(
 					"",
 					"complete",
+					"d.hash=",
 					"d.name=",
 					"d.directory=",
-					"d.hash=",
-					"d.timestamp.finished=",
 					"d.custom1=",
 					"t.multicall=,t.url=",
-					"t.multicall=,t.url=,t.scrape_complete=",
+					"d.timestamp.finished=",
 					"d.ratio=",
+					"t.multicall=,t.url=,t.scrape_complete=",
 					"d.size_bytes=",
 				),
 			)
@@ -125,27 +126,25 @@ class Cache(SCGIRequest):
 
 		completedTorrents = [
 			(
-				tName,
-				tPath,
+				tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
 				tHash,
-				(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 				tLabel,
 				tTracker,
-				max([seeds[1] for seeds in tSeeders]),
+				(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 				tRatio / 1000.0,
+				max([seeds[1] for seeds in tSeeders]),
 				tSize,
 				tSize / 1073741824.0,
 			)
-			for tName, tPath, tHash, tAge, tLabel, tTracker, tSeeders, tRatio, tSize in completedTorrents
+			for tHash, tName, tPath, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
 		]
 		sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
 		torrents, torrentHashes = {}, {}
 
 		for torrentData in sortedTorrents:
-			tName, tPath, tHash = torrentData[:3]
-			torrentData = torrentData[2:]
-			torrentHashes[tHash] = torrentData
-			parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
+			parentDirectory, torrentHash = torrentData[:2]
+			torrentData = torrentData[1:]
+			torrentHashes[torrentHash] = torrentData
 			mountPoint = self.mountPoints[parentDirectory] if parentDirectory in self.mountPoints else self.getMountPoint(parentDirectory)
 
 			if mountPoint in torrents:

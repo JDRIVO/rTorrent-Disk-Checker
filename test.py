@@ -28,14 +28,14 @@ completedTorrents = rtxmlrpc.send(
 	(
 		"",
 		"complete",
-		"d.directory=",
 		"d.name=",
+		"d.directory=",
 		"d.hash=",
 		"d.custom1=",
 		"t.multicall=,t.url=",
 		"d.timestamp.finished=",
-		"t.multicall=,t.url=,t.scrape_complete=",
 		"d.ratio=",
+		"t.multicall=,t.url=,t.scrape_complete=",
 		"d.size_bytes=",
 	),
 )
@@ -43,7 +43,7 @@ completedTorrents = rtxmlrpc.send(
 mountPoints = {}
 
 for torrentData in completedTorrents:
-	tPath, tName = torrentData[:2]
+	tName, tPath = torrentData[:2]
 	parentDirectory = tPath.rsplit("/", 1)[0] if tName in tPath else tPath
 	mountPoint = [path for path in [parentDirectory.rsplit('/', n)[0] for n in range(parentDirectory.count('/'))] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else "/"
@@ -56,15 +56,15 @@ completedTorrents = [
 	(
 		tName,
 		tHash,
-		tSize,
-		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 		tLabel,
 		tTracker,
-		max([seeds[1] for seeds in tSeeders]),
+		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 		tRatio / 1000.0,
+		max([seeds[1] for seeds in tSeeders]),
+		tSize,
 		tSize / 1073741824.0,
 	)
-	for tPath, tName, tHash, tLabel, tTracker, tAge, tSeeders, tRatio, tSize in completedTorrents
+	for tName, tPath, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
 	if mountPoints[tPath.rsplit("/", 1)[0] if tName in tPath else tPath] == mountPoint
 ]
 completedTorrents = utils.sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
@@ -143,7 +143,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	if completedTorrentsCopy:
 		torrent = completedTorrentsCopy.popleft()
-		tName, tHash, tSizeBytes, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeGigabytes = torrent
+		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
 
 		if cfg.exclude_unlabelled and not tLabel:
 			continue
@@ -243,7 +243,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	else:
 		torrent = fallbackTorrents.popleft()
-		tName, tHash, tSizeBytes, tAge, tLabel, tTracker, tSeeders, tRatio, tSizeGigabytes = torrent
+		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
 
 	try:
 		completedTorrents.remove(torrent)
@@ -274,12 +274,12 @@ with open("testresult.txt", "w+") as textFile:
 		(
 			tName,
 			tHash,
-			tSizeBytes,
-			tAge,
 			tLabel,
 			tTracker,
-			tSeeders,
+			tAge,
 			tRatio,
+			tSeeders,
+			tSizeBytes,
 			tSizeGigabytes,
 		) = torrentData
 		info = "{}. TA: {} Days Old\n{}. TN: {}\n{}. TL: {}\n{}. TR: {}\n{}. TS: {:.2f} GB\n{}. TSS: {}\n{}. TT: {}\n".format(

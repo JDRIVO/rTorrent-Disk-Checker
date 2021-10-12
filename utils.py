@@ -101,7 +101,7 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 			)
 		]
 
-	toIndex = {"age": 3, "labels": 4, "trackers": 5, "seeders": 6, "ratio": 7, "size": 8}
+	toIndex = {"labels": 2, "trackers": 3, "age": 4, "ratio": 5, "seeders": 6,  "size": 7}
 
 	while len(sortOrder) < 4:
 		sortOrder.append(sortOrder[-1])
