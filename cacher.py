@@ -13,7 +13,6 @@ except:
 	from imp import reload
 
 
-
 class Cache(SCGIRequest):
 
 	def __init__(self):
