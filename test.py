@@ -96,6 +96,8 @@ lastModified = os.path.getmtime("config.py")
 
 if lastModified > 0: pass
 
+if not cfg.enable_cache: pass
+
 try:
 	mountPoint = mountPoints[torrentPath]
 except:
