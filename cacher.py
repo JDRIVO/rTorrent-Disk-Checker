@@ -49,7 +49,6 @@ class Cache(SCGIRequest):
 			if self.sortOrder != cfg.sort_order or self.groupOrder != cfg.group_order:
 				self.sortOrder = cfg.sort_order
 				self.groupOrder = cfg.group_order
-
 				if monitor: self.refreshTorrents()
 
 	def removeTorrents(self):
