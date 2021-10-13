@@ -135,7 +135,7 @@ class Cache(SCGIRequest):
 			self.refreshing = False
 			return True
 
-		completedTorrents = (
+		completedTorrents = [
 			(
 				tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
 				tHash,
@@ -148,7 +148,7 @@ class Cache(SCGIRequest):
 				tSize / 1073741824.0,
 			)
 			for tHash, tName, tPath, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
-		)
+		]
 		sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
 		torrents, torrentHashes = {}, {}
 
