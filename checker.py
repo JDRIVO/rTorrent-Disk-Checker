@@ -51,7 +51,7 @@ class Checker(SCGIRequest):
 				reload(cfg)
 			except Exception as e:
 				self.cache.lock = False
-				logging.critical("checker.py: {}: Config Error: Couldn't import config file: {}".format(torrentName, e))
+				logging.critical("checker.py: {}: Config Error: Couldn't update config settings: {}".format(torrentName, e))
 				return
 
 			if self.cfgLabelRules != cfg.label_rules:
