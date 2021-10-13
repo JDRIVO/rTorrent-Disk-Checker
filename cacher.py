@@ -36,7 +36,7 @@ class Cache(SCGIRequest):
 			try:
 				reload(cfg)
 			except Exception as e:
-				logging.error("cacher.py: Config Error: Couldn't reload config settings: " + str(e))
+				logging.error("cacher.py: Config Error: Couldn't update config settings: " + str(e))
 
 	def removeTorrents(self):
 		self.deletedTorrents = []
