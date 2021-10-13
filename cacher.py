@@ -17,17 +17,24 @@ class Cache(SCGIRequest):
 
 	def __init__(self):
 		super(Cache, self).__init__()
-		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.deletions, self.pending = [], []
-		self.lock = self.refreshing = self.repeat = False
+		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
+		self.lock = self.refreshing = self.repeat = self.sortOrder = self.groupOrder = False
 		self.lastModified = 0
 
 		self.getMountPoints()
 		self.refreshTorrents()
-		Thread(target=self.getTorrents).start()
 		Thread(target=self.removeTorrents).start()
+		Thread(target=self.configMonitor).start()
+		Thread(target=self.getTorrents).start()
 
-	def reloadConfig(self):
+	def configMonitor(self):
+
+		while True:
+			self.reloadConfig(True)
+			time.sleep(1)
+
+	def reloadConfig(self, monitor):
 		lastModified = os.path.getmtime("config.py")
 
 		if lastModified > self.lastModified:
@@ -37,6 +44,13 @@ class Cache(SCGIRequest):
 				reload(cfg)
 			except Exception as e:
 				logging.error("cacher.py: Config Error: Couldn't update config settings: " + str(e))
+				return
+
+			if self.sortOrder != cfg.sort_order or self.groupOrder != cfg.group_order:
+				self.sortOrder = cfg.sort_order
+				self.groupOrder = cfg.group_order
+
+				if monitor: self.refreshTorrents()
 
 	def removeTorrents(self):
 		self.deletedTorrents = []
@@ -89,11 +103,10 @@ class Cache(SCGIRequest):
 				self.refreshTorrents()
 				time.sleep(cfg.cache_interval)
 
-			self.reloadConfig()
 			time.sleep(1)
 
 	def refreshTorrents(self):
-		self.reloadConfig()
+		self.reloadConfig(False)
 
 		while self.deletions or self.pending:
 			time.sleep(0.01)
@@ -123,7 +136,7 @@ class Cache(SCGIRequest):
 			self.refreshing = False
 			return True
 
-		completedTorrents = [
+		completedTorrents = (
 			(
 				tPath.rsplit("/", 1)[0] if tName in tPath else tPath,
 				tHash,
@@ -136,7 +149,7 @@ class Cache(SCGIRequest):
 				tSize / 1073741824.0,
 			)
 			for tHash, tName, tPath, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
-		]
+		)
 		sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
 		torrents, torrentHashes = {}, {}
 
