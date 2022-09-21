@@ -83,34 +83,6 @@ class Pushbullet(ServerCommunicator):
 				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
 				self.createRequest(self.PUSH_URL, self.headers, data)
 
-class Pushbullet(ServerCommunicator):
-	DEVICES_URL = "https://api.pushbullet.com/v2/devices"
-	PUSH_URL = "https://api.pushbullet.com/v2/pushes"
-
-	def __init__(self):
-		self.token = cfg.pushbullet_token
-		self.title = cfg.subject
-		self.body = cfg.message
-		self.specificDevices = cfg.specific_devices
-		self.headers = {"Access-Token": self.token, "Content-Type": "application/json"}
-
-	def getDevices(self):
-		response = self.createRequest(self.DEVICES_URL, self.headers)
-		if response: return {x["nickname"]: x["iden"] for x in response["devices"]}
-
-	def pushMessage(self):
-		devices = self.getDevices()
-
-		if devices:
-
-			for name, id in devices.items():
-
-				if self.specificDevices and name not in self.specificDevices:
-					continue
-
-				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
-				self.createRequest(self.PUSH_URL, self.headers, data)
-
 class Pushover(ServerCommunicator):
 	PUSH_URL = "https://api.pushover.net/1/messages.json"
 

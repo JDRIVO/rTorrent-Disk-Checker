@@ -183,7 +183,7 @@ label_rules = {
 # Receive a notification when disk is full? (yes/no)
 enable_email = no
 enable_pushbullet = no
-enable_pushover = yes
+enable_pushover = no
 enable_telegram = no
 enable_slack = no
 
