@@ -183,6 +183,7 @@ label_rules = {
 # Receive a notification when disk is full? (yes/no)
 enable_email = no
 enable_pushbullet = no
+enable_pushover = yes
 enable_telegram = no
 enable_slack = no
 
@@ -211,6 +212,17 @@ pushbullet_token = ''
 
 # Limit message to specific devices? | Empty list = Send to all devices
 specific_devices = []
+
+### PUSHOVER SETTINGS ###
+
+pushover_token = ''
+pushover_user_key = ''
+
+# Add your devices separated by comma
+pushover_device = ''
+
+pushover_priority = ''
+pushover_sound = ''
 
 ### TELEGRAM SETTINGS ###
 

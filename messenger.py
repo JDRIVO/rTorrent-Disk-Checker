@@ -83,6 +83,51 @@ class Pushbullet(ServerCommunicator):
 				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
 				self.createRequest(self.PUSH_URL, self.headers, data)
 
+class Pushbullet(ServerCommunicator):
+	DEVICES_URL = "https://api.pushbullet.com/v2/devices"
+	PUSH_URL = "https://api.pushbullet.com/v2/pushes"
+
+	def __init__(self):
+		self.token = cfg.pushbullet_token
+		self.title = cfg.subject
+		self.body = cfg.message
+		self.specificDevices = cfg.specific_devices
+		self.headers = {"Access-Token": self.token, "Content-Type": "application/json"}
+
+	def getDevices(self):
+		response = self.createRequest(self.DEVICES_URL, self.headers)
+		if response: return {x["nickname"]: x["iden"] for x in response["devices"]}
+
+	def pushMessage(self):
+		devices = self.getDevices()
+
+		if devices:
+
+			for name, id in devices.items():
+
+				if self.specificDevices and name not in self.specificDevices:
+					continue
+
+				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
+				self.createRequest(self.PUSH_URL, self.headers, data)
+
+class Pushover(ServerCommunicator):
+	PUSH_URL = "https://api.pushover.net/1/messages.json"
+
+	def __init__(self):
+		self.token = cfg.pushover_token
+		self.user = cfg.pushover_user_key
+		self.message = cfg.message
+		self.device = cfg.pushover_device
+		self.priority = cfg.pushover_priority
+		self.sound = cfg.pushover_sound
+		self.title = cfg.subject
+		self.url = self.PUSH_URL
+		self.headers = {"Content-Type": "application/json"}
+
+	def sendMessage(self):
+		data = {"token": self.token, "user": self.user, "message": self.message, "device": self.device, "priority": self.priority, "sound": self.sound, "title": self.title}
+		self.createRequest(self.url, self.headers, data)
 
 class Telegram(ServerCommunicator):
 	BOT_URL = "https://api.telegram.org/bot"
@@ -152,6 +197,10 @@ def message():
 		pushbullet = Pushbullet()
 		pushbullet.pushMessage()
 
+	if cfg.enable_pushover:
+		pushover = Pushover()
+		pushover.sendMessage()
+
 	if cfg.enable_telegram:
 		telegram = Telegram()
 		telegram.sendMessage()
@@ -172,6 +221,10 @@ if __name__ == "__main__":
 	if "pushbullet" in args:
 		pushbullet = Pushbullet()
 		pushbullet.pushMessage()
+
+	if "pushover" in args:
+		pushover = Pushover()
+		pushover.sendMessage()
 
 	if "telegram" in args:
 		telegram = Telegram()
