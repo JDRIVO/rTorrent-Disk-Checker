@@ -1,8 +1,9 @@
 import sys
 import json
+import logging
 import smtplib
 import datetime
-import config as cfg
+from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 try:
@@ -10,6 +11,9 @@ try:
 except:
 	from imp import reload
 
+import config as cfg
+
+TESTING = False
 LAST_NOTIFICATION = None
 
 
@@ -21,17 +25,30 @@ def email():
 			server = smtplib.SMTP_SSL(cfg.smtp_server, cfg.port, timeout=10)
 			server.login(cfg.account, cfg.password)
 		except Exception as e:
-			print("Email Error:", e)
+
+			if TESTING:
+				print("Email Error:", e)
+			else:
+				logging.error("messenger.py: Couldn't send email: " + str(e))
+
 			return
 
 	else:
 
 		try:
 			server = smtplib.SMTP(cfg.smtp_server, cfg.port, timeout=10)
-			if cfg.tls: server.starttls()
+
+			if cfg.tls:
+				server.starttls()
+
 			server.login(cfg.account, cfg.password)
 		except Exception as e:
-			print("Email Error:", e)
+
+			if TESTING:
+				print("Email Error:", e)
+			else:
+				logging.error("messenger.py: Couldn't send email: " + str(e))
+
 			return
 
 	message = "Subject: {}\n\n{}".format(cfg.subject, cfg.message)
@@ -39,25 +56,43 @@ def email():
 	server.quit()
 
 
-class ServerCommunicator:
+def sendRequest(service, url, data=None, headers={}, origin_req_host=None, unverifiable=False, method=None):
 
-	def sendRequest(self, request):
+	if data:
+		data = json.dumps(data).encode("utf8")
 
-		try:
-			response = urlopen(request)
-			if response.getcode() == 200: return json.loads(response.read())
-		except Exception as e:
-			print(type(self).__name__ + ":", e)
+	request = Request(
+		url,
+		data=data,
+		headers=headers,
+		origin_req_host=origin_req_host,
+		unverifiable=unverifiable,
+		method=method,
+	)
 
-	def createRequest(self, url, headers={}, data=None, origin_req_host=None, unverifiable=False):
-		if data: data = json.dumps(data).encode("utf8")
-		request = Request(url, headers=headers, data=data, origin_req_host=origin_req_host, unverifiable=unverifiable)
-		return self.sendRequest(request)
+	try:
+		response = urlopen(request)
+	except URLError as e:
+
+		if TESTING:
+			print("{} error: {}".format(service, e.reason))
+		else:
+			logging.error(
+				"messenger.py: Couldn't send notification: {}: {}".format(
+					service,
+					e.reason,
+				)
+			)
+		return
+
+	if response.getcode() == 200:
+		return json.loads(response.read())
 
 
-class Pushbullet(ServerCommunicator):
+class Pushbullet:
 	DEVICES_URL = "https://api.pushbullet.com/v2/devices"
 	PUSH_URL = "https://api.pushbullet.com/v2/pushes"
+	SERVICE = "Pushbullet"
 
 	def __init__(self):
 		self.token = cfg.pushbullet_token
@@ -67,25 +102,29 @@ class Pushbullet(ServerCommunicator):
 		self.headers = {"Access-Token": self.token, "Content-Type": "application/json"}
 
 	def getDevices(self):
-		response = self.createRequest(self.DEVICES_URL, self.headers)
-		if response: return {x["nickname"]: x["iden"] for x in response["devices"]}
+		response = sendRequest(self.SERVICE, self.DEVICES_URL, headers=self.headers)
+
+		if response and "devices" in response:
+			return {x["nickname"]: x["iden"] for x in response["devices"]}
 
 	def pushMessage(self):
 		devices = self.getDevices()
 
-		if devices:
+		if not devices:
+			return
 
-			for name, id in devices.items():
+		for name, id in devices.items():
 
-				if self.specificDevices and name not in self.specificDevices:
-					continue
+			if self.specificDevices and name not in self.specificDevices:
+				continue
 
-				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
-				self.createRequest(self.PUSH_URL, self.headers, data)
+			data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
+			sendRequest(self.SERVICE, self.PUSH_URL, data, self.headers)
 
 
-class Telegram(ServerCommunicator):
+class Telegram:
 	BOT_URL = "https://api.telegram.org/bot"
+	SERVICE = "Telegram"
 
 	def __init__(self):
 		self.token = cfg.telegram_token
@@ -96,12 +135,13 @@ class Telegram(ServerCommunicator):
 
 	def sendMessage(self):
 		data = {"chat_id": self.chatId, "text": self.message}
-		self.createRequest(self.url + "/sendMessage", self.headers, data)
+		sendRequest(self.SERVICE, self.url + "/sendMessage", data, self.headers)
 
 
-class Slack(ServerCommunicator):
+class Slack:
 	CONVERSATIONS_URL = "https://slack.com/api/conversations.list"
 	MESSAGE_URL = "https://slack.com/api/chat.postMessage"
+	SERVICE = "Slack"
 
 	def __init__(self):
 		self.token = cfg.slack_token
@@ -110,12 +150,21 @@ class Slack(ServerCommunicator):
 		self.headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
 
 	def getChannels(self):
-		response = self.createRequest(self.CONVERSATIONS_URL, self.headers)
+		response = sendRequest(self.SERVICE, self.CONVERSATIONS_URL, headers=self.headers)
 
 		if response["ok"]:
 			return {x["name"]: x["id"] for x in response["channels"]}
 		else:
-			print("Slack credentials are incorrect")
+
+			if TESTING:
+				print("{} error: {}".format(self.SERVICE, response["error"]))
+			else:
+				logging.error(
+					"messenger.py: Couldn't send notification: {} error: {}".format(
+						self.SERVICE,
+						response["error"],
+					)
+				)
 
 	def sendMessage(self):
 		channels = self.getChannels()
@@ -128,10 +177,21 @@ class Slack(ServerCommunicator):
 					continue
 
 				data = {"channel": id, "text": self.message}
-				response = self.createRequest(self.MESSAGE_URL, self.headers, data)
+				response = sendRequest(self.SERVICE, self.MESSAGE_URL, data, self.headers)
 
 				if not response["ok"]:
-					print("Slack Error: Insufficient permissions - Please enable:", response["needed"])
+
+					if TESTING:
+						print("{} error: {}: {}".format(self.SERVICE, response["error"], response["needed"]))
+					else:
+						logging.error(
+							"messenger.py: Couldn't send notification: {} error: {}: {}".format(
+								self.SERVICE,
+								response["error"],
+								response["needed"],
+							)
+						)
+
 					return
 
 
@@ -164,6 +224,7 @@ def message():
 
 
 if __name__ == "__main__":
+	TESTING = True
 	args = sys.argv
 
 	if "email" in args:

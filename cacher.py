@@ -1,22 +1,23 @@
 import os
 import time
 import logging
-import config as cfg
 from threading import Thread
 from datetime import datetime
-from utils import sortTorrents
-from remote_caller import SCGIRequest
 
 try:
 	from importlib import reload
 except:
 	from imp import reload
 
+import config as cfg
+from utils import sortTorrents
+from remote_caller import SCGIRequest
+
 
 class Cache(SCGIRequest):
 
 	def __init__(self):
-		super(Cache, self).__init__()
+		super().__init__()
 		self.deletions, self.pending = [], []
 		self.torrents, self.mountPoints, self.torrentsDownloading, self.pendingDeletions = {}, {}, {}, {}
 		self.lock = self.refreshing = self.repeat = self.sortOrder = self.groupOrder = False
@@ -49,7 +50,9 @@ class Cache(SCGIRequest):
 			if self.sortOrder != cfg.sort_order or self.groupOrder != cfg.group_order:
 				self.sortOrder = cfg.sort_order
 				self.groupOrder = cfg.group_order
-				if monitor: self.refreshTorrents()
+
+				if monitor:
+					self.refreshTorrents()
 
 	def removeTorrents(self):
 		self.deletedTorrents = []
@@ -208,10 +211,10 @@ class Cache(SCGIRequest):
 				time.sleep(1)
 
 		incompleteTorrents = [
-			[torrentHash, torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath]
+			(torrentHash, torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath)
 			for torrentHash, torrentName, torrentPath in torrentsDownloading
 		] + [
-			[torrentHash, torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath]
+			(torrentHash, torrentPath.rsplit("/", 1)[0] if torrentName in torrentPath else torrentPath)
 			for complete, torrentHash, torrentName, torrentPath in stoppedTorrents
 			if not complete
 		]

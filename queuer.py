@@ -6,7 +6,7 @@ from threading import Thread
 class CheckerQueue(Queue):
 
 	def __init__(self, cache, checker):
-		super(CheckerQueue, self).__init__()
+		super().__init__()
 		self.cache = cache
 		self.checker = checker
 		Thread(target=self.processor).start()

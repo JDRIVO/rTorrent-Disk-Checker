@@ -1,16 +1,17 @@
 import os
 import logging
-import config as cfg
 from collections import deque
-from remote_caller import SCGIRequest
-from utils import convertRules
-from messenger import message
-from deleter import Deleter
 
 try:
 	from importlib import reload
 except:
 	from imp import reload
+
+import config as cfg
+from deleter import Deleter
+from messenger import message
+from utils import convertRules
+from remote_caller import SCGIRequest
 
 include = "include"
 exclude = "exclude"
@@ -21,7 +22,7 @@ blacklist = "blacklist"
 class Checker(SCGIRequest):
 
 	def __init__(self, cache):
-		super(Checker, self).__init__()
+		super().__init__()
 		self.cache = cache
 		deleter = Deleter(self.cache)
 		self.delete = deleter.deletions
@@ -257,10 +258,11 @@ class Checker(SCGIRequest):
 				self.lastHash = torrentHash
 				self.torrentsDownloading[mountPoint].remove(torrentHash)
 				self.cache.repeat = True
-
 				self.cache.refreshTorrents()
 				self.cache.repeat = False
+
 				self.check(torrentData)
+				return
 
 			self.cache.lock = False
 

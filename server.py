@@ -5,7 +5,7 @@ import socket
 import logging
 import subprocess
 
-logging.basicConfig(filename="checker_server.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
+logging.basicConfig(filename="diskchecker.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
 try:
 	import config as cfg
@@ -37,7 +37,9 @@ checker = Checker(cache)
 checkerQueue = CheckerQueue(cache, checker)
 
 socketFile = cfg.socket_file
-if os.path.exists(socketFile): os.remove(socketFile)
+
+if os.path.exists(socketFile):
+	os.remove(socketFile)
 
 try:
 	s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

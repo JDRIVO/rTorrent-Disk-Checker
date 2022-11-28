@@ -9,5 +9,5 @@ try:
 	s.send(data)
 except Exception as e:
 	import logging
-	logging.basicConfig(filename="checker_client.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
-	logging.critical("Server Error: Couldn't process torrent: {}: {}".format(sys.argv[1], e))
+	logging.basicConfig(filename="diskchecker.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
+	logging.critical("client.py: Couldn't process torrent: {}: {}".format(sys.argv[1], e))
