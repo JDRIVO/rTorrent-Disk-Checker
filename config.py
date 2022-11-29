@@ -183,6 +183,7 @@ label_rules = {
 # Receive a notification when disk is full? (yes/no)
 enable_email = no
 enable_pushbullet = no
+enable_pushover = no
 enable_telegram = no
 enable_slack = no
 
@@ -191,6 +192,7 @@ notification_interval = 60
 
 # Subject/Title if applicable
 subject = 'Warning: Disk Full'
+
 message = 'Free disk space ASAP.'
 
 ### EMAIL SETTINGS ###
@@ -210,7 +212,18 @@ receiver = 'youremail@gmail.com'
 pushbullet_token = ''
 
 # Limit message to specific devices? | Empty list = Send to all devices
-specific_devices = []
+pushbullet_devices = []
+
+### PUSHOVER SETTINGS ###
+
+pushover_token = ''
+pushover_user_key = ''
+
+# Limit message to specific devices? | Empty list = Send to all devices
+pushover_devices = []
+
+pushover_priority = ''
+pushover_sound = ''
 
 ### TELEGRAM SETTINGS ###
 
@@ -222,4 +235,4 @@ chat_id = ''
 slack_token = ''
 
 # Limit message to specific channels? | Empty list = Send to all channels
-specific_channels = []
+slack_channels = []

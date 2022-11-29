@@ -98,7 +98,7 @@ class Pushbullet:
 		self.token = cfg.pushbullet_token
 		self.title = cfg.subject
 		self.body = cfg.message
-		self.specificDevices = cfg.specific_devices
+		self.devices = cfg.pushbullet_devices
 		self.headers = {"Access-Token": self.token, "Content-Type": "application/json"}
 
 	def getDevices(self):
@@ -107,7 +107,7 @@ class Pushbullet:
 		if response and "devices" in response:
 			return {x["nickname"]: x["iden"] for x in response["devices"]}
 
-	def pushMessage(self):
+	def sendMessage(self):
 		devices = self.getDevices()
 
 		if not devices:
@@ -115,11 +115,40 @@ class Pushbullet:
 
 		for name, id in devices.items():
 
-			if self.specificDevices and name not in self.specificDevices:
+			if self.devices and name not in self.devices:
 				continue
 
 			data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
 			sendRequest(self.SERVICE, self.PUSH_URL, data, self.headers)
+
+
+class Pushover:
+	PUSH_URL = "https://api.pushover.net/1/messages.json"
+	SERVICE = "Pushover"
+
+	def __init__(self):
+		self.url = self.PUSH_URL
+		self.token = cfg.pushover_token
+		self.user = cfg.pushover_user_key
+		self.title = cfg.subject
+		self.message = cfg.message
+
+		self.devices = ",".join(device for device in cfg.pushover_devices)
+		self.priority = cfg.pushover_priority
+		self.sound = cfg.pushover_sound
+		self.headers = {"Content-Type": "application/json"}
+
+	def sendMessage(self):
+		data = {
+			"token": self.token,
+			"user": self.user,
+			"title": self.title,
+			"message": self.message,
+			"device": self.devices,
+			"priority": self.priority,
+			"sound": self.sound,
+		}
+		sendRequest(self.SERVICE, self.url, data, self.headers)
 
 
 class Telegram:
@@ -146,7 +175,7 @@ class Slack:
 	def __init__(self):
 		self.token = cfg.slack_token
 		self.message = cfg.message
-		self.specificChannels = cfg.specific_channels
+		self.channels = cfg.slack_channels
 		self.headers = {"Authorization": "Bearer " + self.token, "Content-Type": "application/json"}
 
 	def getChannels(self):
@@ -173,7 +202,7 @@ class Slack:
 
 			for name, id in channels.items():
 
-				if self.specificChannels and name not in self.specificChannels:
+				if self.channels and name not in self.channels:
 					continue
 
 				data = {"channel": id, "text": self.message}
@@ -210,7 +239,11 @@ def message():
 
 	if cfg.enable_pushbullet:
 		pushbullet = Pushbullet()
-		pushbullet.pushMessage()
+		pushbullet.sendMessage()
+
+	if cfg.enable_pushover:
+		pushover = Pushover()
+		pushover.sendMessage()
 
 	if cfg.enable_telegram:
 		telegram = Telegram()
@@ -232,7 +265,11 @@ if __name__ == "__main__":
 
 	if "pushbullet" in args:
 		pushbullet = Pushbullet()
-		pushbullet.pushMessage()
+		pushbullet.sendMessage()
+
+	if "pushover" in args:
+		pushover = Pushover()
+		pushover.sendMessage()
 
 	if "telegram" in args:
 		telegram = Telegram()
