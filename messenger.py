@@ -110,16 +110,15 @@ class Pushbullet:
 	def sendMessage(self):
 		devices = self.getDevices()
 
-		if not devices:
-			return
+		if devices:
 
-		for name, id in devices.items():
+			for name, id in devices.items():
 
-			if self.devices and name not in self.devices:
-				continue
+				if self.devices and name not in self.devices:
+					continue
 
-			data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
-			sendRequest(self.SERVICE, self.PUSH_URL, data, self.headers)
+				data = {"device_iden": id, "type": "note", "title": self.title, "body": self.body}
+				sendRequest(self.SERVICE, self.PUSH_URL, data, self.headers)
 
 
 class Pushover:
