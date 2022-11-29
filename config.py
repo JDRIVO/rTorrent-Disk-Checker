@@ -218,17 +218,16 @@ pushbullet_devices = []
 
 pushover_token = ''
 pushover_user_key = ''
+pushover_priority = ''
+pushover_sound = ''
 
 # Limit message to specific devices? | Empty list = Send to all devices
 pushover_devices = []
 
-pushover_priority = ''
-pushover_sound = ''
-
 ### TELEGRAM SETTINGS ###
 
 telegram_token = ''
-chat_id = ''
+telegram_chat_id = ''
 
 ### SLACK SETTINGS ###
 

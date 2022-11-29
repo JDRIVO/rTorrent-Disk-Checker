@@ -157,7 +157,7 @@ class Telegram:
 
 	def __init__(self):
 		self.token = cfg.telegram_token
-		self.chatId = cfg.chat_id
+		self.chatId = cfg.telegram_chat_id
 		self.message = cfg.message
 		self.url = self.BOT_URL + self.token
 		self.headers = {"Content-Type": "application/json"}
