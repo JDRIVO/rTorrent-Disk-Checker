@@ -132,7 +132,7 @@ class Pushover:
 		self.title = cfg.subject
 		self.message = cfg.message
 
-		self.devices = ",".join(device for device in cfg.pushover_devices)
+		self.devices = cfg.pushover_devices
 		self.priority = cfg.pushover_priority
 		self.sound = cfg.pushover_sound
 		self.headers = {"Content-Type": "application/json"}
