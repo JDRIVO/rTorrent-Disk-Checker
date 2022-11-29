@@ -259,8 +259,8 @@ class Checker(SCGIRequest):
 				self.torrentsDownloading[mountPoint].remove(torrentHash)
 				self.cache.repeat = True
 				self.cache.refreshTorrents()
-				self.cache.repeat = False
 
+				self.cache.repeat = False
 				self.check(torrentData)
 				return
 
