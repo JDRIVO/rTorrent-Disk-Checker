@@ -9,7 +9,7 @@ from remote_caller import SCGIRequest
 class Deleter(SCGIRequest):
 
 	def __init__(self, cache):
-		super(Deleter, self).__init__()
+		super().__init__()
 		self.cache = cache
 		self.pending = self.cache.pending
 		self.deletions = self.cache.deletions
