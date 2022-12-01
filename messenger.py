@@ -233,6 +233,8 @@ def message():
 		if period < datetime.timedelta(minutes=cfg.notification_interval):
 			return
 
+	LAST_NOTIFICATION = datetime.datetime.now()
+
 	if cfg.enable_email:
 		email()
 
@@ -251,8 +253,6 @@ def message():
 	if cfg.enable_slack:
 		slack = Slack()
 		slack.sendMessage()
-
-	LAST_NOTIFICATION = datetime.datetime.now()
 
 
 if __name__ == "__main__":
