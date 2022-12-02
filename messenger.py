@@ -180,6 +180,9 @@ class Slack:
 	def getChannels(self):
 		response = sendRequest(self.SERVICE, self.CONVERSATIONS_URL, headers=self.headers)
 
+		if not response:
+			return
+
 		if response["ok"]:
 			return {x["name"]: x["id"] for x in response["channels"]}
 		else:
@@ -207,7 +210,7 @@ class Slack:
 				data = {"channel": id, "text": self.message}
 				response = sendRequest(self.SERVICE, self.MESSAGE_URL, data, self.headers)
 
-				if not response["ok"]:
+				if response and not response["ok"]:
 
 					if TESTING:
 						print("{} error: {}: {}".format(self.SERVICE, response["error"], response["needed"]))
