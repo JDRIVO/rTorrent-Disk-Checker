@@ -70,12 +70,12 @@ class Checker(SCGIRequest):
 				self.requirements = (
 					cfg.general_rules["age"] if "age" in cfg.general_rules else False,
 					cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
-					cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
+					cfg.general_rules["seeds"] if "seeds" in cfg.general_rules else False,
 					cfg.general_rules["size"] if "size" in cfg.general_rules else False,
 					cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
 					cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
 					cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
-					cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
+					cfg.general_rules["fb_seeds"] if "fb_seeds" in cfg.general_rules else False,
 					cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 				)
 
@@ -133,14 +133,14 @@ class Checker(SCGIRequest):
 
 			if completedTorrentsCopy:
 				torrent = completedTorrentsCopy.popleft()
-				tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
+				tHash, tLabel, tTracker, tAge, tRatio, tSeeds, tSizeBytes, tSizeGigabytes = torrent
 
 				if cfg.exclude_unlabelled and not tLabel:
 					continue
 
 				if override:
 					override = False
-					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = self.requirements
+					minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = self.requirements
 
 				if self.labelRules:
 
@@ -180,7 +180,7 @@ class Checker(SCGIRequest):
 
 							if include not in labelRule:
 								override = True
-								minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = labelRule[:9]
+								minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = labelRule[:9]
 
 						labelMatch = True
 
@@ -207,16 +207,16 @@ class Checker(SCGIRequest):
 
 						if trackerRule is not include:
 							override = True
-							minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = trackerRule[:9]
+							minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = trackerRule[:9]
 
 					elif cfg.trackers_only or (cfg.labels_and_trackers_only and not labelMatch):
 						continue
 
-				if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
+				if tAge < minAge or tRatio < minRatio or tSeeds < minSeeds or tSizeGigabytes < minSize:
 
 					if fbMode == 1:
 
-						if tAge >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
+						if tAge >= fbAge and tRatio >= fbRatio and tSeeds >= fbSeeds and tSizeGigabytes >= fbSize:
 							fallbackTorrents.append(torrent)
 
 					elif fbMode == 2:
@@ -224,7 +224,7 @@ class Checker(SCGIRequest):
 						if (
 							(fbAge is not False and tAge >= fbAge)
 							or (fbRatio is not False and tRatio >= fbRatio)
-							or (fbSeeders is not False and tSeeders >= fbSeeders)
+							or (fbSeeds is not False and tSeeds >= fbSeeds)
 							or (fbSize is not False and tSizeGigabytes >= fbSize)
 						):
 							fallbackTorrents.append(torrent)
@@ -233,7 +233,7 @@ class Checker(SCGIRequest):
 
 			else:
 				torrent = fallbackTorrents.popleft()
-				tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
+				tHash, tLabel, tTracker, tAge, tRatio, tSeeds, tSizeBytes, tSizeGigabytes = torrent
 
 			try:
 				completedTorrents.remove(torrent)

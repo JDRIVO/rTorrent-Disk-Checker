@@ -146,11 +146,11 @@ class Cache(SCGIRequest):
 				tTracker,
 				(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 				tRatio / 1000.0,
-				max([seeds[1] for seeds in tSeeders]),
+				max([seeds[1] for seeds in tSeeds]),
 				tSize,
 				tSize / 1073741824.0,
 			)
-			for tHash, tName, tPath, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
+			for tHash, tName, tPath, tLabel, tTracker, tAge, tRatio, tSeeds, tSize in completedTorrents
 		]
 		sortedTorrents = sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
 		torrents, torrentHashes = {}, {}

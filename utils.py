@@ -30,17 +30,17 @@ def convertRules(mode, dic):
 
 			minAge = rules["age"] if "age" in rules else False
 			minRatio = rules["ratio"] if "ratio" in rules else False
-			minSeeders = rules["seeders"] if "seeders" in rules else False
+			minSeeds = rules["seeds"] if "seeds" in rules else False
 			minSize = rules["size"] if "size" in rules else False
 
 			if "fb_mode" in rules and rules["fb_mode"] != 0:
 				fbMode = rules["fb_mode"]
 				fbAge = rules["fb_age"] if "fb_age" in rules else False
 				fbRatio = rules["fb_ratio"] if "fb_ratio" in rules else False
-				fbSeeders = rules["fb_seeders"] if "fb_seeders" in rules else False
+				fbSeeds = rules["fb_seeds"] if "fb_seeds" in rules else False
 				fbSize = rules["fb_size"] if "fb_size" in rules else False
 			else:
-				fbMode = fbAge = fbRatio = fbSeeders = fbSize = False
+				fbMode = fbAge = fbRatio = fbSeeds = fbSize = False
 
 			if "blacklist" in rules:
 				filter_ = "blacklist"
@@ -57,12 +57,12 @@ def convertRules(mode, dic):
 					dic[item] = (
 						minAge,
 						minRatio,
-						minSeeders,
+						minSeeds,
 						minSize,
 						fbMode,
 						fbAge,
 						fbRatio,
-						fbSeeders,
+						fbSeeds,
 						fbSize,
 						filter_,
 						filterList,
@@ -72,12 +72,12 @@ def convertRules(mode, dic):
 				dic[ruleName] = (
 					minAge,
 					minRatio,
-					minSeeders,
+					minSeeds,
 					minSize,
 					fbMode,
 					fbAge,
 					fbRatio,
-					fbSeeders,
+					fbSeeds,
 					fbSize,
 					filter_,
 					filterList,
@@ -101,7 +101,7 @@ def sortTorrents(sortOrder, groupOrder, torrents):
 			)
 		]
 
-	toIndex = {"labels": 2, "trackers": 3, "age": 4, "ratio": 5, "seeders": 6, "size": 7}
+	toIndex = {"labels": 2, "trackers": 3, "age": 4, "ratio": 5, "seeds": 6, "size": 7}
 
 	while len(sortOrder) < 4:
 		sortOrder.append(sortOrder[-1])

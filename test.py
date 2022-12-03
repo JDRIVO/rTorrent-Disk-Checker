@@ -60,11 +60,11 @@ completedTorrents = [
 		tTracker,
 		(datetime.now() - datetime.utcfromtimestamp(tAge)).days,
 		tRatio / 1000.0,
-		max([seeds[1] for seeds in tSeeders]),
+		max([seeds[1] for seeds in tSeeds]),
 		tSize,
 		tSize / 1073741824.0,
 	)
-	for tName, tPath, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSize in completedTorrents
+	for tName, tPath, tHash, tLabel, tTracker, tAge, tRatio, tSeeds, tSize in completedTorrents
 	if mountPoints[tPath.rsplit("/", 1)[0] if tName in tPath else tPath] == mountPoint
 ]
 completedTorrents = utils.sortTorrents(cfg.sort_order, cfg.group_order, completedTorrents)
@@ -77,12 +77,12 @@ override = True
 requirements = (
 	cfg.general_rules["age"] if "age" in cfg.general_rules else False,
 	cfg.general_rules["ratio"] if "ratio" in cfg.general_rules else False,
-	cfg.general_rules["seeders"] if "seeders" in cfg.general_rules else False,
+	cfg.general_rules["seeds"] if "seeds" in cfg.general_rules else False,
 	cfg.general_rules["size"] if "size" in cfg.general_rules else False,
 	cfg.general_rules["fb_mode"] if "fb_mode" in cfg.general_rules else False,
 	cfg.general_rules["fb_age"] if "fb_age" in cfg.general_rules else False,
 	cfg.general_rules["fb_ratio"] if "fb_ratio" in cfg.general_rules else False,
-	cfg.general_rules["fb_seeders"] if "fb_seeders" in cfg.general_rules else False,
+	cfg.general_rules["fb_seeds"] if "fb_seeds" in cfg.general_rules else False,
 	cfg.general_rules["fb_size"] if "fb_size" in cfg.general_rules else False,
 )
 utils.convertRules(cfg.label_rules, labelRules)
@@ -145,14 +145,14 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	if completedTorrentsCopy:
 		torrent = completedTorrentsCopy.popleft()
-		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
+		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeds, tSizeBytes, tSizeGigabytes = torrent
 
 		if cfg.exclude_unlabelled and not tLabel:
 			continue
 
 		if override:
 			override = False
-			minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = requirements
+			minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = requirements
 
 		if labelRules:
 
@@ -192,7 +192,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 					if include not in labelRule:
 						override = True
-						minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = labelRule[:9]
+						minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = labelRule[:9]
 
 				labelMatch = True
 
@@ -219,16 +219,16 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 				if trackerRule is not include:
 					override = True
-					minAge, minRatio, minSeeders, minSize, fbMode, fbAge, fbRatio, fbSeeders, fbSize = trackerRule[:9]
+					minAge, minRatio, minSeeds, minSize, fbMode, fbAge, fbRatio, fbSeeds, fbSize = trackerRule[:9]
 
 			elif cfg.trackers_only or (cfg.labels_and_trackers_only and not labelMatch):
 				continue
 
-		if tAge < minAge or tRatio < minRatio or tSeeders < minSeeders or tSizeGigabytes < minSize:
+		if tAge < minAge or tRatio < minRatio or tSeeds < minSeeds or tSizeGigabytes < minSize:
 
 			if fbMode == 1:
 
-				if tAge >= fbAge and tRatio >= fbRatio and tSeeders >= fbSeeders and tSizeGigabytes >= fbSize:
+				if tAge >= fbAge and tRatio >= fbRatio and tSeeds >= fbSeeds and tSizeGigabytes >= fbSize:
 					fallbackTorrents.append(torrent)
 
 			elif fbMode == 2:
@@ -236,7 +236,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 				if (
 					(fbAge is not False and tAge >= fbAge)
 					or (fbRatio is not False and tRatio >= fbRatio)
-					or (fbSeeders is not False and tSeeders >= fbSeeders)
+					or (fbSeeds is not False and tSeeds >= fbSeeds)
 					or (fbSize is not False and tSizeGigabytes >= fbSize)
 				):
 					fallbackTorrents.append(torrent)
@@ -245,7 +245,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	else:
 		torrent = fallbackTorrents.popleft()
-		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeders, tSizeBytes, tSizeGigabytes = torrent
+		tName, tHash, tLabel, tTracker, tAge, tRatio, tSeeds, tSizeBytes, tSizeGigabytes = torrent
 
 	try:
 		completedTorrents.remove(torrent)
@@ -261,7 +261,7 @@ finish = datetime.now() - start
 availableSpaceAfter = availableSpace + freedSpace - torrentSize
 availableSpaceAfter = 0 if availableSpaceAfter < 0 else availableSpaceAfter
 
-info1 = "TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TR = Torrent Ratio  TS = Torrent Size  TSS = Torrent Seeders  TT = Torrent Tracker"
+info1 = "TA = Torrent Age  TN = Torrent Name  TL = Torrent Label  TR = Torrent Ratio  TS = Torrent Size  TSS = Torrent Seeds  TT = Torrent Tracker"
 info2 = "Script Executed in {} Seconds\n{} Torrent(s) Deleted Totaling {:.2f} GB".format(finish, count, freedSpace)
 info3 = "{:.2f} GB Free Space Before Torrent Download\n{:.2f} GB Free Space After {:.2f} GB Torrent Download".format(
 	availableSpace, availableSpaceAfter, torrentSize
@@ -280,7 +280,7 @@ with open("testresult.txt", "w+") as textFile:
 			tTracker,
 			tAge,
 			tRatio,
-			tSeeders,
+			tSeeds,
 			tSizeBytes,
 			tSizeGigabytes,
 		) = torrentData
@@ -296,7 +296,7 @@ with open("testresult.txt", "w+") as textFile:
 			count,
 			tSizeGigabytes,
 			count,
-			tSeeders,
+			tSeeds,
 			count,
 			", ".join(tracker[0] for tracker in tTracker),
 		)

@@ -1,6 +1,6 @@
 yes, no = True, False
-age, ratio, seeders, size = 'age', 'ratio', 'seeders', 'size'
-fb_mode, fb_age, fb_ratio, fb_seeders, fb_size = 'fb_mode', 'fb_age', 'fb_ratio', 'fb_seeders', 'fb_size'
+age, ratio, seeds, size = 'age', 'ratio', 'seeds', 'size'
+fb_mode, fb_age, fb_ratio, fb_seeds, fb_size = 'fb_mode', 'fb_age', 'fb_ratio', 'fb_seeds', 'fb_size'
 include, exclude, whitelist, blacklist, trackers, labels, unmatched = 'include', 'exclude', 'whitelist', 'blacklist', 'trackers', 'labels', 'unmatched'
 
 ############ USER DEFINED VARIABLES START ############
@@ -41,7 +41,7 @@ minimum_space_mp = {
 
 # Sort priority - If torrents are sorted first by age for instance and there are multiple torrents aged the same, the torrents of the same age will be
 # sorted by the next element in the list until there are no matching values or until the sort options have been exhausted
-sort_order = [age, ratio, seeders, size]
+sort_order = [age, ratio, seeds, size]
 
 # Group order provides finer control over which torrents are presented first to be deleted - Sort order is preserved within groups
 # If a torrents label and tracker are both included in the label and tracker lists, the torrent will be grouped with labels unless you have
@@ -76,12 +76,12 @@ group_order = [
 general_rules = {
 #                     age: 14,
 #                     ratio: 1.2,
-#                     seeders: 4,
+#                     seeds: 4,
 #                     size: 5,
 #                     fb_mode: 1,
 #                     fb_age: 7,
 #                     fb_ratio: 1.2,
-#                     fb_seeders: 2,
+#                     fb_seeds: 2,
 #                     fb_size: 4,
                 }
 
@@ -112,12 +112,12 @@ tracker_rules = {
 #                     'redacted.ch': {
 #                                       age: 20,
 #                                       ratio: 1,
-#                                       seeders: 5,
+#                                       seeds: 5,
 #                                       size: 10,
 #                                       fb_mode: 2,
 #                                       fb_age: 7,
 #                                       fb_ratio: 1,
-#                                       fb_seeders: 3,
+#                                       fb_seeds: 3,
 #                                       fb_size: 5,
 #                                    },
 #                     'privatehd.to': {
@@ -152,12 +152,12 @@ label_rules = {
 #                     'Movie': {
 #                                 age: 21,
 #                                 ratio: 2,
-#                                 seeders: 3,
+#                                 seeds: 3,
 #                                 size: 5,
 #                                 fb_mode: 1,
 #                                 fb_age: 7,
 #                                 fb_ratio: 3,
-#                                 fb_seeders: 3,
+#                                 fb_seeds: 3,
 #                                 fb_size: 4,
 #                              },
 #                     'TV': {
@@ -171,10 +171,10 @@ label_rules = {
 #                              size: 10,
 #                              fb_mode: 2,
 #                              fb_ratio: 2,
-#                              fb_seeders: 2,
+#                              fb_seeds: 2,
 #                              blacklist: ['blutopia.xyz'],
 #                           },
-#                     ('Sony', 'Nintendo'): {seeders: 2},
+#                     ('Sony', 'Nintendo'): {seeds: 2},
               }
 
 
