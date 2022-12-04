@@ -202,12 +202,13 @@ class Slack:
 		else:
 
 			if TESTING:
-				print("{} error: {}".format(self.SERVICE, response["error"]))
+				print("{} error: {}: {}".format(self.SERVICE, response["error"], response["needed"]))
 			else:
 				logging.error(
-					"messenger.py: Couldn't send notification: {} error: {}".format(
+					"messenger.py: Couldn't send notification: {} error: {}: {}".format(
 						self.SERVICE,
 						response["error"],
+						response["needed"],
 					)
 				)
 
