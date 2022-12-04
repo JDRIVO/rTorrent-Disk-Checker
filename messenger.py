@@ -87,7 +87,11 @@ def sendRequest(service, url, data=None, headers={}, origin_req_host=None, unver
 		return
 
 	if response.getcode() == 200:
-		return json.loads(response.read())
+
+		try:
+			return json.loads(response.read())
+		except ValueError:
+			return
 
 
 class Pushbullet:
