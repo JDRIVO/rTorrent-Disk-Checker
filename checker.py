@@ -266,7 +266,7 @@ class Checker(SCGIRequest):
 
 			self.cache.lock = False
 
-			if cfg.enable_email or cfg.enable_pushbullet or cfg.enable_pushover or cfg.enable_telegram or cfg.enable_slack:
+			if cfg.enable_email or cfg.enable_pushbullet or cfg.enable_pushover or cfg.enable_telegram or cfg.enable_discord or cfg.enable_slack:
 
 				try:
 					message()

@@ -15,6 +15,7 @@ import config as cfg
 
 TESTING = False
 LAST_NOTIFICATION = None
+USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US) AppleWebKit/532.0 (KHTML, like Gecko) Chrome/3.0.195.38 Safari/532.0"
 
 
 def email():
@@ -75,7 +76,7 @@ def sendRequest(service, url, data=None, headers={}, origin_req_host=None, unver
 	except URLError as e:
 
 		if TESTING:
-			print("{} error: {}".format(service, e.reason))
+			print("{} error: {} {}".format(service, e.code, e.reason))
 		else:
 			logging.error(
 				"messenger.py: Couldn't send notification: {}: {}".format(
@@ -166,6 +167,19 @@ class Telegram:
 		sendRequest(self.SERVICE, self.url + "/sendMessage", data, self.headers)
 
 
+class Discord:
+	SERVICE = "Discord"
+
+	def __init__(self):
+		self.url = cfg.discord_webhook_url
+		self.message = cfg.message
+		self.headers = {"User-Agent": USER_AGENT, "Content-Type": "application/json"}
+
+	def sendMessage(self):
+		data = {"content": self.message}
+		sendRequest(self.SERVICE, self.url, data, self.headers)
+
+
 class Slack:
 	CONVERSATIONS_URL = "https://slack.com/api/conversations.list"
 	MESSAGE_URL = "https://slack.com/api/chat.postMessage"
@@ -253,6 +267,10 @@ def message():
 		telegram = Telegram()
 		telegram.sendMessage()
 
+	if cfg.enable_discord:
+		discord = Discord()
+		discord.sendMessage()
+
 	if cfg.enable_slack:
 		slack = Slack()
 		slack.sendMessage()
@@ -276,6 +294,10 @@ if __name__ == "__main__":
 	if "telegram" in args:
 		telegram = Telegram()
 		telegram.sendMessage()
+
+	if "discord" in args:
+		discord = Discord()
+		discord.sendMessage()
 
 	if "slack" in args:
 		slack = Slack()

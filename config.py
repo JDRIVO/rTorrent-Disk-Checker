@@ -185,6 +185,7 @@ enable_email = no
 enable_pushbullet = no
 enable_pushover = no
 enable_telegram = no
+enable_discord = no
 enable_slack = no
 
 # Amount of minutes to wait before sending another notification between torrent downloads
@@ -228,6 +229,10 @@ pushover_devices = []
 
 telegram_token = ''
 telegram_chat_id = ''
+
+### DISCORD SETTINGS ###
+
+discord_webhook_url = ''
 
 ### SLACK SETTINGS ###
 

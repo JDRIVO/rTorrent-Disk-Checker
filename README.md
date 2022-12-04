@@ -4,7 +4,7 @@
                  - a torrent is added by any program (autodl-irssi, RSS Downloader etc)
                  - a torrent is added remotely or directly
 
-This program checks your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the program will delete torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py). If your disk space is still too low, the torrent will be sent to rTorrent in a stopped state.	You can choose to receive an email, Pushbullet, Pushover, Telegram or Slack notification if this occurs.
+This program checks your available disk space. If your free disk space is not large enough to accommodate a pending torrent, the program will delete torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py). If your disk space is still too low, the torrent will be sent to rTorrent in a stopped state.	You can choose to receive an email, Pushbullet, Pushover, Telegram, Discord or Slack notification if this occurs.
 
 ## Requirements
 * rTorrent 0.9.7+
@@ -31,4 +31,4 @@ To send a test message:
 
 `python messenger.py email pushbullet`
 
-Accepted arguments: `email`, `pushbullet`, `pushover`, `telegram`, `slack`
+Accepted arguments: `email`, `pushbullet`, `pushover`, `telegram`, `discord`, `slack`
