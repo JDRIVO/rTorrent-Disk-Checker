@@ -38,7 +38,7 @@ class Cache(SCGIRequest):
 	def reloadConfig(self, monitor):
 		lastModified = os.path.getmtime("config.py")
 
-		if lastModified > self.lastModified:
+		if lastModified != self.lastModified:
 			self.lastModified = lastModified
 
 			try:

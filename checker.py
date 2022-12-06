@@ -46,7 +46,7 @@ class Checker(SCGIRequest):
 			mountPoint = mountPoint[0] if mountPoint else "/"
 			self.mountPoints[parentDirectory] = mountPoint
 
-		if lastModified > self.lastModified:
+		if lastModified != self.lastModified:
 
 			try:
 				reload(cfg)
