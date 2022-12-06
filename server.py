@@ -5,6 +5,11 @@ import socket
 import logging
 import subprocess
 
+script = sys.argv[0]
+
+if "/" in script:
+	os.chdir(os.path.dirname(script))
+
 logging.basicConfig(filename="diskchecker.log", level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%d/%m/%Y %H:%M:%S")
 
 try:
@@ -18,8 +23,8 @@ from queuer import CheckerQueue
 from checker import Checker
 from cacher import Cache
 
-serverPath = os.path.join(os.path.abspath(os.getcwd()), sys.argv[0])
-cmd = "pgrep -a python | grep " + sys.argv[0]
+serverPath = os.path.join(os.path.abspath(os.getcwd()), script)
+cmd = "pgrep -a python | grep " + script
 process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 pids = process.communicate()[0].splitlines()
 
@@ -27,7 +32,7 @@ if len(pids) > 1:
 	myPid = os.getpid()
 	[os.kill(int(pid.split()[0]), signal.SIGKILL) for pid in pids if serverPath in str(pid) and int(pid.split()[0]) != myPid]
 
-if "/" not in sys.argv[0]:
+if "/" not in script:
 	print("Disk checker (server.py) is now running in the background.")
 	subprocess.Popen([sys.executable, serverPath], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	sys.exit(0)
