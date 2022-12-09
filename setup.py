@@ -11,7 +11,7 @@ def main(schedule=False):
 	try:
 
 		if schedule:
-			interval, amount = schedule
+			interval, threshold = schedule
 			rtxmlrpc.send(
 				"schedule2",
 				(
@@ -19,7 +19,7 @@ def main(schedule=False):
 					"low_diskspace",
 					"0",
 					interval,
-					"close_low_diskspace={}G".format(amount),
+					"close_low_diskspace={}G".format(threshold),
 				),
 			)
 
