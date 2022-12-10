@@ -3,7 +3,7 @@ age, ratio, seeds, size = 'age', 'ratio', 'seeds', 'size'
 fb_mode, fb_age, fb_ratio, fb_seeds, fb_size = 'fb_mode', 'fb_age', 'fb_ratio', 'fb_seeds', 'fb_size'
 include, exclude, whitelist, blacklist, trackers, labels, unmatched = 'include', 'exclude', 'whitelist', 'blacklist', 'trackers', 'labels', 'unmatched'
 
-############ USER DEFINED VARIABLES START ############
+############ USER DEFINED VARIABLES ############
 
 # SCGI address or unix socket file path found in your rtorrent.rc file
 scgi = '127.0.0.1:5000'
