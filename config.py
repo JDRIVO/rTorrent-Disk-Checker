@@ -41,6 +41,7 @@ minimum_space_mp = {
 
 # Sort priority - If torrents are sorted first by age for instance and there are multiple torrents aged the same, the torrents of the same age will be
 # sorted by the next element in the list until there are no matching values or until the sort options have been exhausted
+# Elements are arranged in descending order
 sort_order = [age, ratio, seeds, size]
 
 # Group order provides finer control over which torrents are presented first to be deleted - Sort order is preserved within groups
