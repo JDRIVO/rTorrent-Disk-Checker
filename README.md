@@ -23,9 +23,9 @@ Run the setup script by entering the following command in your terminal (Refer t
 
 Results will output to your terminal and a text file named **testresult.txt**
 
-This script accepts two arguments: 1. Torrent Size ( GB ) 2. Mount Point ( 0 will default to mount '/' )
+This script accepts two arguments: 1. Torrent Size ( GB ) 2. Mount Point [Optional] Default mount point is "/"
 
-`python test.py 69 0`
+`python test.py 69`
 
 To send a test message:
 

@@ -14,11 +14,7 @@ from remote_caller import SCGIRequest
 
 try:
 	torrentPath = sys.argv[2]
-except Exception as e:
-	print("Second argument (Mount Point) required.")
-	sys.exit(1)
-
-if torrentPath == "0":
+except:
 	torrentPath = "/"
 
 rtxmlrpc = SCGIRequest()
