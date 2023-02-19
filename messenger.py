@@ -204,15 +204,16 @@ class Slack:
 		if response["ok"]:
 			return {x["name"]: x["id"] for x in response["channels"]}
 		else:
+			needed = response.get("needed")
 
 			if TESTING:
-				print("{} error: {}: {}".format(self.SERVICE, response["error"], response["needed"]))
+				print("{} error: {}: {}".format(self.SERVICE, response["error"], needed if needed else ""))
 			else:
 				logging.error(
 					"messenger.py: Couldn't send notification: {} error: {}: {}".format(
 						self.SERVICE,
 						response["error"],
-						response["needed"],
+						needed if needed else "",
 					)
 				)
 
@@ -230,15 +231,16 @@ class Slack:
 				response = sendRequest(self.SERVICE, self.MESSAGE_URL, data, self.headers)
 
 				if response and not response["ok"]:
+					needed = response.get("needed")
 
 					if TESTING:
-						print("{} error: {}: {}".format(self.SERVICE, response["error"], response["needed"]))
+						print("{} error: {}: {}".format(self.SERVICE, response["error"], needed if needed else ""))
 					else:
 						logging.error(
 							"messenger.py: Couldn't send notification: {} error: {}: {}".format(
 								self.SERVICE,
 								response["error"],
-								response["needed"],
+								needed if needed else "",
 							)
 						)
 
