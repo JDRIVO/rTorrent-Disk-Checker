@@ -7,9 +7,9 @@ from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 try:
-	from importlib import reload
-except:
 	from imp import reload
+except Exception:
+	from importlib import reload
 
 import config as cfg
 

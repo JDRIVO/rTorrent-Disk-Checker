@@ -5,9 +5,9 @@ from threading import Thread
 from datetime import datetime
 
 try:
-	from importlib import reload
-except:
 	from imp import reload
+except Exception:
+	from importlib import reload
 
 import config as cfg
 from utils import sortTorrents
@@ -66,7 +66,7 @@ class Cache(SCGIRequest):
 
 				try:
 					self.torrents[mountPoint].remove(self.torrentHashes[torrentHash])
-				except:
+				except Exception:
 					pass
 
 				Thread(target=self.removeTorrent, args=(torrentHash, mountPoint)).start()
@@ -80,7 +80,7 @@ class Cache(SCGIRequest):
 
 		try:
 			self.torrents[mountPoint].remove(self.torrentHashes[torrentHash])
-		except:
+		except Exception:
 			pass
 
 	def updatePending(self, torrentData):
@@ -90,7 +90,7 @@ class Cache(SCGIRequest):
 
 		try:
 			self.pending.remove(torrentData)
-		except:
+		except Exception:
 			pass
 
 	def getTorrents(self):
@@ -134,7 +134,7 @@ class Cache(SCGIRequest):
 			)
 			torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash="))
 			stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.hash=", "d.complete="))
-		except:
+		except Exception:
 			self.refreshing = False
 			return True
 
@@ -173,7 +173,7 @@ class Cache(SCGIRequest):
 				try:
 					torrentHash, mountPoint, torrentSize = self.deletions[0]
 					torrents[mountPoint].remove(torrentHashes[torrentHash])
-				except:
+				except Exception:
 					pass
 
 			while self.pending:
@@ -181,7 +181,7 @@ class Cache(SCGIRequest):
 				try:
 					torrentHash, mountPoint, torrentSize = self.pending.pop(0)
 					torrents[mountPoint].remove(torrentHashes[torrentHash])
-				except:
+				except Exception:
 					pass
 
 			time.sleep(0.01)
@@ -207,7 +207,7 @@ class Cache(SCGIRequest):
 				torrentsDownloading = self.send("d.multicall2", ("", "leeching", "d.hash=", "d.name=", "d.directory="))
 				stoppedTorrents = self.send("d.multicall2", ("", "stopped", "d.complete=", "d.hash=", "d.name=", "d.directory="))
 				break
-			except:
+			except Exception:
 				time.sleep(1)
 
 		incompleteTorrents = [
@@ -234,5 +234,5 @@ class Cache(SCGIRequest):
 
 			try:
 				self.torrentsDownloading[mountPoint].append(torrentHash)
-			except:
+			except Exception:
 				self.torrentsDownloading[mountPoint] = [torrentHash]

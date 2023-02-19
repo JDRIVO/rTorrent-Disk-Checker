@@ -33,38 +33,45 @@ class Deleter(SCGIRequest):
 
 		try:
 			files = self.send("f.multicall", (torrentHash, "", "f.size_bytes=", "f.frozen_path="))
-			tHash = (torrentHash,)
-			torrentPath = self.send("d.directory", tHash)
-			self.send("d.tracker_announce", tHash)
-			self.send("d.erase", tHash)
+			torrentHash = (torrentHash,)
+			torrentPath = self.send("d.directory", torrentHash)
+			self.send("d.tracker_announce", torrentHash)
+			self.send("d.erase", torrentHash)
 		except Exception as e:
 			self.pendingDeletions[mountPoint] -= torrentSize
 			logging.error("deleter.py: XMLRPC Error: Couldn't delete torrent from rtorrent: " + str(e))
 
 			try:
 				self.pending.remove(torrentData)
-			except:
+			except Exception:
 				pass
 
 			return
 
-		if len(files) <= 1:
-			self.pendingDeletions[mountPoint] -= files[0][0]
+		if len(files) == 1:
+			fileSize, filePath = files[0]
+			self.pendingDeletions[mountPoint] -= fileSize
 
 			try:
-				os.remove(files[0][1])
+				os.remove(filePath)
 			except Exception as e:
-				logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(files[0][1], e))
+				logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(filePath, e))
+
+			try:
+				os.rmdir(os.path.dirname(filePath))
+			except Exception:
+				pass
 
 		else:
 
 			for file in files:
-				self.pendingDeletions[mountPoint] -= file[0]
+				fileSize, filePath = file
+				self.pendingDeletions[mountPoint] -= fileSize
 
 				try:
-					os.remove(file[1])
+					os.remove(filePath)
 				except Exception as e:
-					logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(file[1], e))
+					logging.error("deleter.py: File Deletion Error: Skipping file: {}: {}".format(filePath, e))
 
 			try:
 				os.rmdir(torrentPath)

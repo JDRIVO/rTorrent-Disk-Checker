@@ -3,9 +3,9 @@ import logging
 from collections import deque
 
 try:
-	from importlib import reload
-except:
 	from imp import reload
+except Exception:
+	from importlib import reload
 
 import config as cfg
 from deleter import Deleter
@@ -41,7 +41,7 @@ class Checker(SCGIRequest):
 
 		try:
 			mountPoint = self.mountPoints[parentDirectory]
-		except:
+		except Exception:
 			mountPoint = [path for path in [parentDirectory.rsplit("/", n)[0] for n in range(parentDirectory.count("/"))] if os.path.ismount(path)]
 			mountPoint = mountPoint[0] if mountPoint else "/"
 			self.mountPoints[parentDirectory] = mountPoint
@@ -89,7 +89,7 @@ class Checker(SCGIRequest):
 		try:
 			completedTorrents = self.cache.torrents[mountPoint]
 			completedTorrentsCopy = deque(completedTorrents)
-		except:
+		except Exception:
 			completedTorrentsCopy = None
 
 		try:
@@ -110,13 +110,13 @@ class Checker(SCGIRequest):
 
 			downloading.append(torrentHash)
 
-		except:
+		except Exception:
 			self.torrentsDownloading[mountPoint] = [torrentHash]
 			torrentsDownloading = 0
 
 		try:
 			pendingDeletions = self.pendingDeletions[mountPoint]
-		except:
+		except Exception:
 			pendingDeletions = self.pendingDeletions[mountPoint] = 0
 
 		disk = os.statvfs(mountPoint)
@@ -156,7 +156,7 @@ class Checker(SCGIRequest):
 
 								try:
 									tracker = self.trackers[tLabel + tTracker[0][0]]
-								except:
+								except Exception:
 									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 									for url in tTracker:
@@ -169,7 +169,7 @@ class Checker(SCGIRequest):
 
 								try:
 									tracker = self.trackers[tLabel + tTracker[0][0]]
-								except:
+								except Exception:
 									tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 									for url in tTracker:
@@ -193,7 +193,7 @@ class Checker(SCGIRequest):
 
 					try:
 						tracker = self.trackers[tTracker[0][0]]
-					except:
+					except Exception:
 						tracker = [tracker for tracker in self.trackerRules for url in tTracker if tracker in url[0]]
 
 						for url in tTracker:
@@ -237,7 +237,7 @@ class Checker(SCGIRequest):
 
 			try:
 				completedTorrents.remove(torrent)
-			except:
+			except Exception:
 				continue
 
 			self.delete.append((tHash, mountPoint, tSizeBytes))

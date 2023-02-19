@@ -19,9 +19,9 @@ except Exception as e:
 	logging.critical("server.py: Config Error: Couldn't import config file: " + str(e))
 	sys.exit(1)
 
-from queuer import CheckerQueue
-from checker import Checker
 from cacher import Cache
+from checker import Checker
+from queuer import CheckerQueue
 
 serverPath = os.path.join(os.path.abspath(os.getcwd()), script)
 cmd = "pgrep -a python | grep " + script

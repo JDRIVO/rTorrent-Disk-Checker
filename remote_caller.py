@@ -1,6 +1,6 @@
 import socket
-from xmlrpc import client as xmlrpclib
 from urllib import parse as urllib
+from xmlrpc import client as xmlrpclib
 
 from config import scgi
 
@@ -14,7 +14,7 @@ class SCGIRequest:
 			addrInfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
 			self.sInfo = addrInfo[0][:3]
 			self.scgi = addrInfo[0][4]
-		except:
+		except Exception:
 			self.sInfo = socket.AF_UNIX, socket.SOCK_STREAM
 			self.scgi = scgi
 

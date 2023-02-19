@@ -55,7 +55,7 @@ def main(schedule=False):
 					"execute.throw.bg=python3,{}/client.py,$d.name=,$d.hash=,$d.directory=,$d.size_bytes=".format(path),
 				),
 			)
-		except:
+		except Exception:
 			# Setup has ran before / Method already inserted
 			pass
 

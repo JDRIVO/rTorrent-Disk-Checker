@@ -14,7 +14,7 @@ from remote_caller import SCGIRequest
 
 try:
 	torrentPath = sys.argv[2]
-except:
+except Exception:
 	torrentPath = "/"
 
 rtxmlrpc = SCGIRequest()
@@ -96,7 +96,7 @@ if not cfg.enable_cache: pass
 
 try:
 	mountPoint = mountPoints[torrentPath]
-except:
+except Exception:
 	mountPoint = [path for path in [torrentPath.rsplit('/', n)[0] for n in range(torrentPath.count('/'))] if os.path.ismount(path)]
 	mountPoint = mountPoint[0] if mountPoint else "/"
 	mountPoints[torrentPath] = mountPoint
@@ -117,13 +117,13 @@ try:
 
 	downloads.append(None)
 
-except:
+except Exception:
 	torrentsDownloading[mountPoint] = [None]
 	downloading = 0
 
 try:
 	deletions = pendingDeletions[mountPoint]
-except:
+except Exception:
 	deletions = pendingDeletions[mountPoint] = 0
 
 disk = os.statvfs(mountPoint)
@@ -164,7 +164,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 						try:
 							tracker = trackers[tLabel + tTracker[0][0]]
-						except:
+						except Exception:
 							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 							for url in tTracker:
@@ -177,7 +177,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 						try:
 							tracker = trackers[tLabel + tTracker[0][0]]
-						except:
+						except Exception:
 							tracker = [tracker for tracker in labelRule[-1] for url in tTracker if tracker in url[0]]
 
 							for url in tTracker:
@@ -201,7 +201,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 			try:
 				tracker = trackers[tTracker[0][0]]
-			except:
+			except Exception:
 				tracker = [tracker for tracker in trackerRules for url in tTracker if tracker in url[0]]
 
 				for url in tTracker:
@@ -245,7 +245,7 @@ while freedSpace < requiredSpace and (completedTorrentsCopy or fallbackTorrents)
 
 	try:
 		completedTorrents.remove(torrent)
-	except:
+	except Exception:
 		continue
 
 	count += 1
