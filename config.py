@@ -15,7 +15,7 @@ socket_file = 'unix_socket'
 ###### CACHE SETTINGS ######
 
 # Enable torrent cache? (yes/no)
-# If the cache is disabled, torrent data will be refreshed each time the disk check is run, thereby extending the execution time of the disk check
+# Disabling the cache will refresh torrent data each time a disk check is run, increasing the execution time of the check
 enable_cache = yes
 
 # Amount of seconds to wait before updating the torrent cache
@@ -28,19 +28,20 @@ repeat_check = no
 
 ###### DISK CHECKER SETTINGS ######
 
-# This program will auto-detect mount points and only delete torrents inside the mount point that the torrent will be downloaded to
+# This program auto-detects mount points and will only delete torrents from the mount point to which the torrent will be downloaded
 
 # The minimum amount of free space (in gigabytes) to maintain
 minimum_space = 5
 
 # Optional - Specify minimum space values for specific mount points
 minimum_space_mp = {
-#                        '/': 5,
-#                        '/torrents': 100,
+#                        '/series': 25,
+#                        '/movies': 50,
                    }
 
-# Sort priority - If torrents are sorted first by age for instance and there are multiple torrents aged the same, the torrents of the same age will be
-# sorted by the next element in the list until there are no matching values or until the sort options have been exhausted
+# Sort priority - If torrents are first sorted by age, torrents of the same age will be sorted by the next element in the list
+# until there are no matching values or until the sort options have been exhausted
+
 # Elements are arranged in descending order
 sort_order = [age, ratio, seeds, size]
 
