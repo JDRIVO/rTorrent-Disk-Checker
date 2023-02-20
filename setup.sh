@@ -28,7 +28,7 @@ schedule2 = low_diskspace,0,55,close_low_diskspace=1G
 1G = the threshold in Gigabytes
 
 4. Run setup.py. If you opted to include close_low_diskspace, run setup.py with two arguments; interval and threshold. So for the above example,
-setup.py would be ran as: setup.py 55 1
+setup.py would be ran as: python setup.py 55 1
 
 If setup.py fails, you will need to restart rtorrent for your changes to the rtorrent.rc file to take effect.
 
