@@ -4,7 +4,7 @@
                  - a torrent is added by any program (autodl-irssi, RSS Downloader etc)
                  - a torrent is added remotely or locally
 
-This program checks available disk space and deletes torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py) when there's insufficient space to accommodate a new torrent. If space is still inadequate, the torrent is sent to rTorrent in a stopped state, and notifications can be received from numerous messaging services.
+This program checks available disk space and deletes torrents based on criteria defined in [config.py](https://github.com/JDRIVO/rTorrent-Disk-Checker/blob/master/config.py) when there's insufficient space to accommodate a new torrent. If space is still inadequate, the torrent is sent to rTorrent in a stopped state, and a notification can be sent to you from numerous messaging services.
 
 ## Requirements
 * rTorrent 0.9.7+
